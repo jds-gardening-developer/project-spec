@@ -1,0 +1,18 @@
+{
+  "name": "macplants-erp-spec",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Living specification for the MacPlants ERP build, served via Docsify.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "update-spec": "node scripts/update-spec.mjs",
+    "dev": "npx docsify-cli@4 serve ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
+    "dotenv": "^16.4.5"
+  }
+}
