@@ -21,13 +21,13 @@ The client and the developer can read the latest spec, follow PRD cross-referenc
 - ✓ **Full-text search via Ctrl+K** — Docsify's built-in plugin — existing
 - ✓ **Copy-code buttons on code blocks** — Docsify plugin — existing
 - ✓ **`scripts/update-spec.mjs` (LLM transcript fold-in)** — Anthropic-API-driven workflow that produces `README.proposed.md` for review — existing (preserved as-is for this project)
+- ✓ **Vite + React + react-markdown SPA renders the newest dated spec automatically** — `app/` Vite scaffold, `import.meta.glob` raw loader, `react-markdown` + `remark-gfm` viewer — Validated in Phase 1: Foundation
+- ✓ **Build-time manifest of dated files** — `scripts/build-manifest.mjs` scans `project-spec/*.md`, sorts ISO desc, writes `app/src/manifest.json`; wired via `predev`/`prebuild` npm hooks — Validated in Phase 1: Foundation
 
 ### Active
 
 <!-- The new React viewer's must-haves. -->
 
-- [ ] **Vite + React + react-markdown SPA** that renders the newest dated `project-spec/YYYY-MM-DD.md` automatically
-- [ ] **Build-time manifest** — script that scans `project-spec/*.md`, sorts by ISO date, emits a JSON the React app imports (no runtime FS)
 - [ ] **Sidebar navigation** — H2 entries always visible; H3 entries auto-expanded for the active section (matches existing screenshot behavior)
 - [ ] **Cross-link navigation** — `(see PRD-X.Y)` references rendered as in-page links that scroll to the matching section heading
 - [ ] **Data-model table renderer** — custom React component that styles `Field | Type | Notes` markdown tables as schema cards
@@ -117,5 +117,9 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
+## Current State
+
+**Phase 1: Foundation — complete (2026-04-26).** Vite + React app stood up under `app/` (legacy Docsify viewer at repo-root `index.html` left untouched). `scripts/build-manifest.mjs` regenerates `app/src/manifest.json` from `project-spec/*.md` before every dev/build via `predev`/`prebuild` hooks. `App.jsx` lazy-loads the newest manifest entry through `import.meta.glob` and renders it via `SpecViewer.jsx` (`react-markdown` + `remark-gfm`). 2 items pending live-browser confirmation in `01-HUMAN-UAT.md` (GFM render, HMR). Foundation seam ready for Phase 2 (Rich Rendering: cross-link nav, data-model cards, Mermaid).
+
 ---
-*Last updated: 2026-04-26 after initialization*
+*Last updated: 2026-04-26 after Phase 1: Foundation*
