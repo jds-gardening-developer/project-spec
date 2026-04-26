@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+app/src/manifest.json
+app/dist/
+
+# Vite caches
+.vite/
+app/.vite/
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# OS junk
+.DS_Store
+
+# Transient outputs from scripts/update-spec.mjs
+README.proposed.md
+update-summary.md
+update-raw.md
