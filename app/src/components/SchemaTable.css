@@ -1,0 +1,71 @@
+/* Schema-card layout. Color values reference Plan 01 CSS custom properties; Phase 4 will
+   theme via --schema-card-accent etc. */
+
+.schema-card {
+  border: 1px solid var(--schema-card-border);
+  background: var(--schema-card-background);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.schema-card__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.schema-card__row {
+  display: grid;
+  /* Three columns: field name (auto-sized), type chip (auto-sized), notes (flex). */
+  grid-template-columns: minmax(140px, max-content) minmax(120px, max-content) 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding: 4px 0;
+  border-top: 1px solid var(--schema-card-border);
+}
+
+.schema-card__row:first-child {
+  border-top: none;
+}
+
+.schema-card__field {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.92em;
+  color: var(--schema-card-field-color);
+  word-break: break-word;
+}
+
+.schema-card__type {
+  /* container — leaves room for chip styling */
+}
+
+.schema-card__type-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--schema-card-type-background);
+  color: var(--schema-card-type-color);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.schema-card__type-chip--fk {
+  /* D-11: subtle visual cue that the type is a foreign key. Phase 4 may rebrand. */
+  border: 1px solid var(--schema-card-accent);
+}
+
+.schema-card__notes {
+  color: var(--schema-card-notes-color);
+  font-size: 0.95em;
+}
+
+/* Mobile fallback: stack vertically on narrow screens. */
+@media (max-width: 640px) {
+  .schema-card__row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
