@@ -64,7 +64,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can paste a deep link like `localhost:5173/#/prd-1.1` into a fresh tab and the viewer scrolls to that section on initial render
   4. User can press Cmd+K (macOS) or Ctrl+K (other platforms) and a search panel overlay opens with the spec content already indexed
   5. User can click any search result and the panel dismisses and the page scrolls to that section
-**Plans**: TBD
+**Plans**: 5 plans
+- [ ] 03-01-foundation-PLAN.md — Layout shell wrapping App.jsx, useScrollToAnchor hook extraction, Sidebar/SearchPanel/useScrollSpy/useHashScroll stubs, minisearch dep, CSS custom-property surface, build-search-index script wired (Wave 1)
+- [ ] 03-02-sidebar-PLAN.md — Real Sidebar with DOM-driven heading list, useScrollSpy via IntersectionObserver, click-to-scroll, mobile drawer (NAV-01..03, Wave 2)
+- [ ] 03-03-hash-deeplink-PLAN.md — Real useHashScroll one-shot effect on first content render with prefix-match fallback (NAV-04, Wave 2)
+- [ ] 03-04-search-index-PLAN.md — Real build-search-index.mjs walking newest dated spec into one record per heading; github-slugger devDep (SEA-02, Wave 2)
+- [ ] 03-05-search-panel-PLAN.md — Real SearchPanel modal: Cmd+K trigger, MiniSearch lazy-load, keyboard nav, highlighted snippets, scroll-on-select (SEA-01, SEA-03, Wave 2)
 **UI hint**: yes
 
 ### Phase 4: Branding & Layout
@@ -100,7 +105,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/2 | Planned | - |
 | 2. Rich Rendering | 0/5 | Planned | - |
-| 3. Navigation & Search | 0/TBD | Not started | - |
+| 3. Navigation & Search | 0/5 | Planned | - |
 | 4. Branding & Layout | 0/TBD | Not started | - |
 | 5. Deploy & Cutover | 0/TBD | Not started | - |
 
