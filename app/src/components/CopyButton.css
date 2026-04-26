@@ -1,0 +1,38 @@
+/* CopyButton — positioned by parent .copy-button-wrapper (defined in Pre.jsx scope below).
+   Color values reference Plan 01 CSS custom properties. */
+
+.copy-button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: var(--copy-button-background);
+  color: var(--copy-button-color);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.copy-button:hover,
+.copy-button:focus-visible {
+  opacity: 1;
+  border-color: var(--copy-button-color);
+  outline: none;
+}
+
+.copy-button--copied {
+  color: var(--copy-button-color-success);
+  opacity: 1;
+}
+
+.copy-button--copied:hover,
+.copy-button--copied:focus-visible {
+  border-color: var(--copy-button-color-success);
+}
