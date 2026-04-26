@@ -33,8 +33,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. The 70KB spec content renders without lag, with GFM tables, fenced code blocks, and strikethrough displayed correctly
   5. Adding a hypothetical newer dated file (e.g. `2026-05-10.md`) and re-running the dev server causes the viewer to auto-switch to it
 **Plans**: 2 plans
-- [ ] 01-01-scaffold-PLAN.md — Vite + React scaffold under `app/`, .gitignore, package.json deps + scripts (dev:docsify renamed)
-- [ ] 01-02-manifest-viewer-PLAN.md — build-manifest.mjs script, manifest.json output, SpecViewer (react-markdown + remark-gfm), App wires newest spec
+- [x] 01-01-scaffold-PLAN.md — Vite + React scaffold under `app/`, .gitignore, package.json deps + scripts (dev:docsify renamed)
+- [x] 01-02-manifest-viewer-PLAN.md — build-manifest.mjs script, manifest.json output, SpecViewer (react-markdown + remark-gfm), App wires newest spec
 **UI hint**: yes
 
 ### Phase 2: Rich Rendering
