@@ -29,9 +29,9 @@ The client and the developer can read the latest spec, follow PRD cross-referenc
 <!-- The new React viewer's must-haves. -->
 
 - [ ] **Sidebar navigation** — H2 entries always visible; H3 entries auto-expanded for the active section (matches existing screenshot behavior)
-- [ ] **Cross-link navigation** — `(see PRD-X.Y)` references rendered as in-page links that scroll to the matching section heading
-- [ ] **Data-model table renderer** — custom React component that styles `Field | Type | Notes` markdown tables as schema cards
-- [ ] **Mermaid diagram support** — render \`\`\`mermaid code blocks inline (entity relationships, flow diagrams)
+- [x] **Cross-link navigation** — `(see PRD-X.Y)` references rendered as in-page links that scroll to the matching section heading — Validated in Phase 2: Rich Rendering (pending browser UAT)
+- [x] **Data-model table renderer** — custom React component that styles `Field | Type | Notes` markdown tables as schema cards — Validated in Phase 2: Rich Rendering (pending browser UAT)
+- [x] **Mermaid diagram support** — render \`\`\`mermaid code blocks inline; lazy-loaded — Validated in Phase 2: Rich Rendering (pending browser UAT)
 - [ ] **Client-side full-text search** — Ctrl+K opens a search panel; build-time index via FlexSearch or MiniSearch
 - [ ] **MacPlants green theme** — accent color `#2c8d4f`, layout/feel similar to current Docsify view
 - [ ] **Netlify deploy** — `npm run build` produces `dist/` which Netlify publishes
@@ -119,7 +119,9 @@ This document evolves at phase transitions and milestone boundaries.
 
 ## Current State
 
-**Phase 1: Foundation — complete (2026-04-26).** Vite + React app stood up under `app/` (legacy Docsify viewer at repo-root `index.html` left untouched). `scripts/build-manifest.mjs` regenerates `app/src/manifest.json` from `project-spec/*.md` before every dev/build via `predev`/`prebuild` hooks. `App.jsx` lazy-loads the newest manifest entry through `import.meta.glob` and renders it via `SpecViewer.jsx` (`react-markdown` + `remark-gfm`). 2 items pending live-browser confirmation in `01-HUMAN-UAT.md` (GFM render, HMR). Foundation seam ready for Phase 2 (Rich Rendering: cross-link nav, data-model cards, Mermaid).
+**Phase 2: Rich Rendering — complete (2026-04-26).** All 5 plans landed across 2 waves: Plan 01 added the integration seam (`mermaid@^10`, `rehype-slug@^6`, six renderer/plugin stubs wired into `SpecViewer.jsx`, CSS custom-property surface); Plans 02-05 dropped the real implementations into the seam — a remark plugin that rewrites `(see PRD-X.Y)` text into internal anchor links with click-time resolution and dimmed broken-link UX; a `MermaidPre` renderer that dynamic-imports `mermaid` (lazy chunk ~72 KB gz, kept out of main bundle) and renders fenced ` ```mermaid ` blocks to SVG with a parse-error banner fallback; a schema-card dispatcher that detects 3-column `Field | Type | Notes` tables and renders them as styled cards (FK chip modifier, mobile collapse) while leaving other tables untouched; copy-to-clipboard buttons on non-mermaid fenced code blocks with 1500ms checkmark feedback and silent+console.warn fallback. Tests: 21/21 passing (`node --test`). Build: 100.48 KB gz main bundle (0.48 KB over the 100 KB soft budget; mermaid correctly isolated to lazy chunk). Code review: 0 critical, 4 warnings, 6 info — non-blocking. 11 items pending browser UAT in `02-HUMAN-UAT.md` (smooth-scroll, SVG render, clipboard, prop-passing). Phase 2 deferred items (sidebar/search/brand/hash deep-linking) tracked for Phases 3-5.
+
+**Phase 1: Foundation — complete (2026-04-26).** Vite + React app stood up under `app/` (legacy Docsify viewer at repo-root `index.html` left untouched). `scripts/build-manifest.mjs` regenerates `app/src/manifest.json` from `project-spec/*.md` before every dev/build via `predev`/`prebuild` hooks. `App.jsx` lazy-loads the newest manifest entry through `import.meta.glob` and renders it via `SpecViewer.jsx` (`react-markdown` + `remark-gfm`). 2 items pending live-browser confirmation in `01-HUMAN-UAT.md` (GFM render, HMR).
 
 ---
-*Last updated: 2026-04-26 after Phase 1: Foundation*
+*Last updated: 2026-04-26 after Phase 2: Rich Rendering*
