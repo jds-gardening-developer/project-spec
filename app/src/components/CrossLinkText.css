@@ -1,0 +1,27 @@
+/* Cross-link styles. Plan 02 of Phase 2 (REND-02).
+ *
+ * Color values come from CSS custom properties declared in app/src/styles.css
+ * by Plan 01. Phase 4 overrides those custom properties for brand theming
+ * (e.g. --cross-link-color → MacPlants green #2c8d4f) without touching this file.
+ *
+ * Structural styling (border-bottom, cursor, opacity) lives here. Brand color
+ * lives in styles.css.
+ */
+
+.cross-link {
+  color: var(--cross-link-color);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--cross-link-color);
+  cursor: pointer;
+}
+
+.cross-link:hover {
+  text-decoration: underline;
+}
+
+.cross-link--broken {
+  color: var(--cross-link-broken-color);
+  cursor: not-allowed;
+  border-bottom: 1px dotted var(--cross-link-broken-color);
+  opacity: 0.7;
+}
