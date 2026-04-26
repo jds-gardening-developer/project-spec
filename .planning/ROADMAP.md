@@ -46,7 +46,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Three-column `Field | Type | Notes` markdown tables render as styled schema cards while regular tables continue to render as standard tables
   3. User sees Mermaid diagrams rendered live for ` ```mermaid ` fenced blocks, and Mermaid loads on demand (not in the main bundle)
   4. User can click a copy-to-clipboard button on any code block and the block's contents are copied
-**Plans**: TBD
+**Plans**: 5 plans
+- [ ] 02-01-foundation-PLAN.md — Install mermaid + rehype-slug, create renderer stub files, wire SpecViewer.jsx components/remark/rehype, declare CSS custom property surface (Wave 1)
+- [ ] 02-02-cross-links-PLAN.md — Custom remark plugin + CrossLinkAnchor with click-to-scroll and broken-link fallback (Wave 2)
+- [ ] 02-03-mermaid-PLAN.md — MermaidBlock with dynamic import, securityLevel:'strict', parse-error banner, fixture file (Wave 2)
+- [ ] 02-04-schema-card-PLAN.md — SchemaOrTable dispatcher: Field|Type|Notes detection, card layout, FK chip (Wave 2)
+- [ ] 02-05-copy-code-PLAN.md — CopyButton + Pre.jsx wrapper; mermaid-block exclusion; clipboard fallback warn (Wave 2)
 **UI hint**: yes
 
 ### Phase 3: Navigation & Search
@@ -94,7 +99,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/2 | Planned | - |
-| 2. Rich Rendering | 0/TBD | Not started | - |
+| 2. Rich Rendering | 0/5 | Planned | - |
 | 3. Navigation & Search | 0/TBD | Not started | - |
 | 4. Branding & Layout | 0/TBD | Not started | - |
 | 5. Deploy & Cutover | 0/TBD | Not started | - |
