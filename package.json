@@ -15,14 +15,17 @@
     "preview": "vite preview --config app/vite.config.js",
     "dev:docsify": "npx docsify-cli@4 serve .",
     "build-manifest": "node scripts/build-manifest.mjs",
-    "update-spec": "node scripts/update-spec.mjs"
+    "update-spec": "node scripts/update-spec.mjs",
+    "test": "node --test app/src/components/*.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
     "dotenv": "^16.4.5",
+    "mermaid": "^10.9.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.1",
+    "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
