@@ -32,7 +32,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. On first paint at `localhost:5173`, the viewer auto-loads the file with the most recent ISO date (currently `2026-04-26.md`)
   4. The 70KB spec content renders without lag, with GFM tables, fenced code blocks, and strikethrough displayed correctly
   5. Adding a hypothetical newer dated file (e.g. `2026-05-10.md`) and re-running the dev server causes the viewer to auto-switch to it
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 01-01-scaffold-PLAN.md — Vite + React scaffold under `app/`, .gitignore, package.json deps + scripts (dev:docsify renamed)
+- [ ] 01-02-manifest-viewer-PLAN.md — build-manifest.mjs script, manifest.json output, SpecViewer (react-markdown + remark-gfm), App wires newest spec
 **UI hint**: yes
 
 ### Phase 2: Rich Rendering
@@ -91,7 +93,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/2 | Planned | - |
 | 2. Rich Rendering | 0/TBD | Not started | - |
 | 3. Navigation & Search | 0/TBD | Not started | - |
 | 4. Branding & Layout | 0/TBD | Not started | - |
