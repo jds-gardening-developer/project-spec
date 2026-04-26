@@ -15,3 +15,29 @@ body {
   max-width: 960px;
   margin: 0 auto;
 }
+
+/* --- Phase 2 component theming surface (Phase 4 will override these) --- */
+:root {
+  /* Schema-card (D-12) */
+  --schema-card-border: #e1e4e8;
+  --schema-card-background: #fafbfc;
+  --schema-card-accent: #586069;          /* Phase 4 sets to MacPlants green #2c8d4f */
+  --schema-card-title-color: #24292e;
+  --schema-card-field-color: #24292e;
+  --schema-card-type-background: #eaecef;
+  --schema-card-type-color: #24292e;
+  --schema-card-notes-color: #586069;
+
+  /* Cross-link (REND-02) */
+  --cross-link-color: #0366d6;            /* Phase 4 may override */
+  --cross-link-broken-color: #999999;
+
+  /* Copy-button (REND-05) */
+  --copy-button-color: #6a737d;
+  --copy-button-color-success: #28a745;
+  --copy-button-background: transparent;
+
+  /* Mermaid (D-01) */
+  --mermaid-error-color: #d73a49;
+  --mermaid-error-background: #ffeef0;
+}
