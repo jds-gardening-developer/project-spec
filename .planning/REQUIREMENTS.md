@@ -92,35 +92,42 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIEW-01 | TBD | Pending |
-| VIEW-02 | TBD | Pending |
-| VIEW-03 | TBD | Pending |
-| VIEW-04 | TBD | Pending |
-| REND-01 | TBD | Pending |
-| REND-02 | TBD | Pending |
-| REND-03 | TBD | Pending |
-| REND-04 | TBD | Pending |
-| REND-05 | TBD | Pending |
-| NAV-01 | TBD | Pending |
-| NAV-02 | TBD | Pending |
-| NAV-03 | TBD | Pending |
-| NAV-04 | TBD | Pending |
-| SEA-01 | TBD | Pending |
-| SEA-02 | TBD | Pending |
-| SEA-03 | TBD | Pending |
-| BRD-01 | TBD | Pending |
-| BRD-02 | TBD | Pending |
-| BRD-03 | TBD | Pending |
-| BRD-04 | TBD | Pending |
-| DEP-01 | TBD | Pending |
-| DEP-02 | TBD | Pending |
-| DEP-03 | TBD | Pending |
+| VIEW-01 | Phase 1 | Pending |
+| VIEW-02 | Phase 1 | Pending |
+| VIEW-03 | Phase 1 | Pending |
+| VIEW-04 | Phase 5 | Pending |
+| REND-01 | Phase 1 | Pending |
+| REND-02 | Phase 2 | Pending |
+| REND-03 | Phase 2 | Pending |
+| REND-04 | Phase 2 | Pending |
+| REND-05 | Phase 2 | Pending |
+| NAV-01 | Phase 3 | Pending |
+| NAV-02 | Phase 3 | Pending |
+| NAV-03 | Phase 3 | Pending |
+| NAV-04 | Phase 3 | Pending |
+| SEA-01 | Phase 3 | Pending |
+| SEA-02 | Phase 3 | Pending |
+| SEA-03 | Phase 3 | Pending |
+| BRD-01 | Phase 4 | Pending |
+| BRD-02 | Phase 4 | Pending |
+| BRD-03 | Phase 4 | Pending |
+| BRD-04 | Phase 4 | Pending |
+| DEP-01 | Phase 5 | Pending |
+| DEP-02 | Phase 5 | Pending |
+| DEP-03 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total
-- Mapped to phases: 0 (filled by roadmapper)
-- Unmapped: 23 ⚠️ (will be 0 after roadmap)
+- Mapped to phases: 23
+- Unmapped: 0 ✓
+
+**Phase totals:**
+- Phase 1 (Foundation): 5 requirements (VIEW-01, VIEW-02, VIEW-03, REND-01, DEP-03)
+- Phase 2 (Rich Rendering): 4 requirements (REND-02, REND-03, REND-04, REND-05)
+- Phase 3 (Navigation & Search): 7 requirements (NAV-01..04, SEA-01..03)
+- Phase 4 (Branding & Layout): 4 requirements (BRD-01..04)
+- Phase 5 (Deploy & Cutover): 3 requirements (VIEW-04, DEP-01, DEP-02)
 
 ---
 *Requirements defined: 2026-04-26*
-*Last updated: 2026-04-26 after initial definition*
+*Last updated: 2026-04-26 after roadmap creation (traceability filled)*
