@@ -47,7 +47,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User sees Mermaid diagrams rendered live for ` ```mermaid ` fenced blocks, and Mermaid loads on demand (not in the main bundle)
   4. User can click a copy-to-clipboard button on any code block and the block's contents are copied
 **Plans**: 5 plans
-- [ ] 02-01-foundation-PLAN.md — Install mermaid + rehype-slug, create renderer stub files, wire SpecViewer.jsx components/remark/rehype, declare CSS custom property surface (Wave 1)
+- [x] 02-01-foundation-PLAN.md — Install mermaid + rehype-slug, create renderer stub files, wire SpecViewer.jsx components/remark/rehype, declare CSS custom property surface (Wave 1)
 - [ ] 02-02-cross-links-PLAN.md — Custom remark plugin + CrossLinkAnchor with click-to-scroll and broken-link fallback (Wave 2)
 - [ ] 02-03-mermaid-PLAN.md — MermaidBlock with dynamic import, securityLevel:'strict', parse-error banner, fixture file (Wave 2)
 - [ ] 02-04-schema-card-PLAN.md — SchemaOrTable dispatcher: Field|Type|Notes detection, card layout, FK chip (Wave 2)
