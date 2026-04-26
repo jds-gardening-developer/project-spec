@@ -67,6 +67,19 @@ must_haves:
       pattern: "remarkGfm"
 ---
 
+<convention_deviation>
+**Quote style deviation acknowledged.**
+
+`CONVENTIONS.md` / `CLAUDE.md` mandates double quotes for string literals. This rule was inferred from `scripts/update-spec.mjs` and applies to the **Node tooling layer** (ESM scripts, build tools).
+
+**JSX/React frontend code in `app/`** uses **single quotes** per React community convention and Prettier defaults. This split is intentional:
+
+- Node tooling (`scripts/build-manifest.mjs` in this plan, Task 1): double quotes — matches existing `scripts/update-spec.mjs` convention. Verified in the Task 1 file content (`import fs from "node:fs"` etc.).
+- React/JSX (`app/src/SpecViewer.jsx`, `app/src/App.jsx` in this plan): single quotes — matches React/Vite ecosystem norms.
+
+This split should be reflected in `CONVENTIONS.md` when it is updated for the React layer (deferred to Phase 4 or a project-level cleanup). For Phase 1, the deviation is intentional and not a defect.
+</convention_deviation>
+
 <objective>
 Wire the foundation that every later phase builds on: a build-time manifest of dated markdown files, and a React viewer that renders the newest one with GitHub-flavored markdown support (tables, fenced code, strikethrough).
 
@@ -107,7 +120,7 @@ Output: A `build-manifest.mjs` script wired into `predev`/`prebuild`, an `app/sr
 - ESM, `.mjs` extension, `"type": "module"` (already set in package.json)
 - `import fs from "node:fs"`, `import path from "node:path"` — `node:` prefix mandatory
 - Top-level `await` allowed; do NOT wrap in `async function main()`
-- Double-quoted strings
+- Double-quoted strings (Node tooling layer convention — see `<convention_deviation>` above)
 - File header JSDoc-style block describing purpose/usage
 - `console.log` for progress, `console.error` + `process.exit(1)` for failures
 - Numbered "Next steps" hand-off block at the end
@@ -372,6 +385,7 @@ Notes:
 - DO NOT add custom `components={{...}}` overrides — Phase 2 owns custom renderers, Phase 4 owns theming.
 - The `className="spec-viewer"` is a hook for Phase 4 styling; it has no styles in Phase 1 and that is intentional.
 - The two early-return guards exist because the markdown is loaded asynchronously by `<App>` — during the initial render the prop is `undefined` for one tick.
+- Quote style: single quotes per the `<convention_deviation>` block at the top of this plan.
   </action>
   <verify>
     <automated>test -f app/src/SpecViewer.jsx && grep -q "import ReactMarkdown from 'react-markdown'" app/src/SpecViewer.jsx && grep -q "import remarkGfm from 'remark-gfm'" app/src/SpecViewer.jsx && grep -q "remarkPlugins={\[remarkGfm\]}" app/src/SpecViewer.jsx && grep -q "export default function SpecViewer" app/src/SpecViewer.jsx && ! grep -qE "rehype-raw|rehypeRaw|dangerouslyAllow" app/src/SpecViewer.jsx</automated>
@@ -484,6 +498,7 @@ Notes:
 - The `cancelled` flag is React-correct cleanup for the async effect.
 - DO NOT add suspense, loading skeletons, or animations (theming = Phase 4).
 - DO NOT memoize the loader lookup — it's called once per mount.
+- Quote style: single quotes per the `<convention_deviation>` block at the top of this plan.
   </action>
   <verify>
     <automated>test -f app/src/App.jsx && grep -q "import manifest from './manifest.json'" app/src/App.jsx && grep -q "import.meta.glob" app/src/App.jsx && grep -q "../../project-spec/\*.md" app/src/App.jsx && grep -q "query: '?raw'" app/src/App.jsx && grep -q "<SpecViewer" app/src/App.jsx && grep -q "manifest\[0\]" app/src/App.jsx && grep -q "useEffect" app/src/App.jsx && grep -q "useState" app/src/App.jsx</automated>
@@ -547,12 +562,16 @@ Verify the full Phase 1 outcome end-to-end. Run the following sequence:
    grep -q "2026-04-26" /tmp/manifest.json
    ```
 
-6. **Vite serves the markdown via raw query** (proves the lazy-load path works):
+6. **Vite's `server.fs.allow` is configured to permit reading from `project-spec/`** (verified by HTTP 200 on `@fs` URL):
    ```
    curl -sf "http://localhost:5173/@fs$(pwd)/project-spec/2026-04-26.md?raw" -o /tmp/spec-raw.txt
    test $(wc -c < /tmp/spec-raw.txt) -gt 50000
    ```
    Expected: file is 60-80KB (the spec is ~70KB; Vite wraps it in an ES module export which adds a bit). The `>50000` floor is conservative.
+
+   What this curl test proves: Vite's `server.fs.allow` in `app/vite.config.js` correctly permits reading from `../project-spec/`, so a request to `/@fs<absolute path>/project-spec/...?raw` returns HTTP 200 with file contents. This is a smoke check of the FS allow-list — nothing more.
+
+   What this curl test does NOT prove: that `import.meta.glob('../../project-spec/*.md', { query: '?raw' })` resolves correctly inside the React app at runtime, or that `App.jsx`'s `specLoaders[key]()` returns the expected string. That requires browser-side execution (Vite's glob plugin runs at module-load time in the client), and is captured in the manual checkpoint after the dev server boots — see step 8 below and the SUMMARY's manual-verification note.
 
 7. **No errors in dev log:**
    ```
@@ -567,7 +586,7 @@ Verify the full Phase 1 outcome end-to-end. Run the following sequence:
 
 If any step fails: read /tmp/vite-dev.log, identify the cause, fix the underlying file, re-run. Do NOT mark the task done until every step passes.
 
-Note on rendered-output verification: this Bash-only smoke test cannot fully assert that GFM tables visually render in the browser (that requires a headless browser). The combination of (a) react-markdown loading without errors, (b) remark-gfm being in the bundle, (c) the spec markdown being served correctly, gives high confidence. Visual verification of GFM rendering (and the "70KB renders without lag" success criterion) is appropriate to confirm via a quick manual browser check by the user — but is NOT a checkpoint:human-verify task here; the user can do it after `npm run dev` finishes.
+Note on rendered-output verification: this Bash-only smoke test cannot fully assert that GFM tables visually render in the browser, nor that `import.meta.glob` resolves at runtime — both require a headless browser. The combination of (a) react-markdown loading without errors, (b) remark-gfm being in the bundle, (c) the spec markdown being reachable via Vite's `@fs` route (i.e. `server.fs.allow` is correct), gives high confidence. Visual verification of GFM rendering AND the `import.meta.glob` resolution is appropriate to confirm via a quick manual browser check by the user — but is NOT a checkpoint:human-verify task here; the user can do it after `npm run dev` finishes.
   </action>
   <verify>
     <automated>rm -f app/src/manifest.json; npm run dev > /tmp/vite-dev.log 2>&1 & PID=$!; for i in $(seq 1 30); do if grep -q "Local:" /tmp/vite-dev.log; then break; fi; sleep 0.5; done; sleep 1; test -f app/src/manifest.json && node -e "const m=require('./app/src/manifest.json'); if (m[0].date !== '2026-04-26') process.exit(1)" && curl -sf http://localhost:5173/ -o /tmp/index.html && grep -q '<div id="root">' /tmp/index.html && curl -sf http://localhost:5173/src/manifest.json -o /tmp/manifest.json && grep -q "2026-04-26" /tmp/manifest.json && curl -sf "http://localhost:5173/@fs$(pwd)/project-spec/2026-04-26.md?raw" -o /tmp/spec-raw.txt && [ "$(wc -c < /tmp/spec-raw.txt)" -gt 50000 ] && ! grep -iE "error|failed|cannot find module" /tmp/vite-dev.log; RESULT=$?; kill $PID 2>/dev/null; wait $PID 2>/dev/null; exit $RESULT</automated>
@@ -577,11 +596,11 @@ Note on rendered-output verification: this Bash-only smoke test cannot fully ass
     - app/src/manifest.json[0].date equals `2026-04-26`
     - `curl http://localhost:5173/` returns HTTP 200 with `<div id="root">` in the body
     - `curl http://localhost:5173/src/manifest.json` returns HTTP 200 with `2026-04-26` in the body
-    - `curl http://localhost:5173/@fs<repo>/project-spec/2026-04-26.md?raw` returns HTTP 200 with body >50KB
+    - `curl http://localhost:5173/@fs<repo>/project-spec/2026-04-26.md?raw` returns HTTP 200 with body >50KB — proves Vite's `server.fs.allow` is configured to permit reading from `project-spec/` (NOT a proof that `import.meta.glob` resolves at runtime; that is a browser-side concern verified manually)
     - The dev log contains no lines matching `error`, `failed`, or `cannot find module` (case-insensitive)
     - The dev server is cleanly killed at the end of the test
   </acceptance_criteria>
-  <done>End-to-end smoke test passes: manifest auto-regenerates, dev server boots, all three resource paths (HTML shell, manifest JSON, raw markdown) serve correctly, no errors in the log.</done>
+  <done>End-to-end smoke test passes: manifest auto-regenerates, dev server boots, the HTML shell + manifest JSON serve correctly, and Vite's `server.fs.allow` permits reading the spec markdown via `@fs`. Browser-side `import.meta.glob` resolution is a manual checkpoint after the dev server starts.</done>
 </task>
 
 </tasks>
@@ -617,8 +636,8 @@ Phase 1 success criteria mapped to verification:
 |-----------|--------------|
 | 1. `npm run dev` starts Vite with HMR | Plan 01 Task 7 + Plan 02 Task 5 (smoke tests both confirm `Local:` URL printed; HMR is implicit in Vite) |
 | 2. Manifest scans project-spec/*.md, sorts by date, app imports as JSON | Plan 02 Task 1 (script + JSON output) + Task 4 (App.jsx imports manifest.json) + Task 5 (curl serves manifest at /src/manifest.json) |
-| 3. First paint auto-loads newest ISO date file | Plan 02 Task 4 (`manifest[0]` + glob lazy-load) + Task 5 (curl serves the markdown content) |
-| 4. 70KB content renders without lag, GFM tables/code/strike correct | Plan 02 Task 3 (SpecViewer with remarkGfm) + Task 5 (markdown content >50KB served), with a manual browser check by the user post-execution |
+| 3. First paint auto-loads newest ISO date file | Plan 02 Task 4 (`manifest[0]` + glob lazy-load) + Task 5 (Vite's `server.fs.allow` permits the `@fs` URL; full `import.meta.glob` resolution verified manually in the browser) |
+| 4. 70KB content renders without lag, GFM tables/code/strike correct | Plan 02 Task 3 (SpecViewer with remarkGfm) + Task 5 (markdown content >50KB reachable via `@fs`), with a manual browser check by the user post-execution |
 | 5. Adding a newer file and restarting dev causes auto-switch | Plan 02 Task 2 (`predev` hook regenerates manifest) + Task 1 (script sorts descending) — semantically guaranteed; full demonstration is in the SUMMARY's manual verification step |
 </verification>
 
@@ -628,7 +647,7 @@ Phase 1 success criteria mapped to verification:
 - `package.json` `predev` and `prebuild` hooks run the manifest script before Vite
 - `app/src/SpecViewer.jsx` renders markdown with `remark-gfm`, no `rehype-raw`
 - `app/src/App.jsx` imports manifest, lazy-loads newest file via `import.meta.glob`, renders `<SpecViewer>`
-- `npm run dev` boots, the manifest auto-regenerates, the dev server serves the HTML shell + manifest JSON + raw markdown all at HTTP 200
+- `npm run dev` boots, the manifest auto-regenerates, the dev server serves the HTML shell + manifest JSON, and Vite's `server.fs.allow` permits HTTP 200 on the `@fs` URL for `project-spec/2026-04-26.md`
 - No errors in the Vite dev log
 - Root `index.html` (legacy Docsify entry) UNCHANGED — verify with `git diff index.html` showing no edits in this plan's commits
 </success_criteria>
@@ -638,7 +657,7 @@ After completion, create `.planning/phases/01-foundation/01-02-SUMMARY.md` docum
 - Manifest contents at completion (paste the JSON)
 - Confirmation that `npm run dev` boots cleanly with the predev hook
 - Confirmation that `curl http://localhost:5173/src/manifest.json` returns the expected JSON
-- A quick manual-verification note for the user: "Open http://localhost:5173 in a browser. You should see the spec rendered with PRD section headings, the Data Model tables (3-column), and any fenced code blocks. If anything looks broken, file a gap for Phase 1 closure before moving to Phase 2."
+- A quick manual-verification note for the user: "Open http://localhost:5173 in a browser. You should see the spec rendered with PRD section headings, the Data Model tables (3-column), and any fenced code blocks. This visual check is what proves `import.meta.glob` resolved correctly at runtime — the curl smoke test only proved Vite's `server.fs.allow` was configured. If anything looks broken, file a gap for Phase 1 closure before moving to Phase 2."
 - A note on the new-dated-file flow: "To verify success criterion 5, copy `cp project-spec/2026-04-26.md project-spec/2026-05-10.md`, restart `npm run dev`, refresh the browser — header should show `Viewing: project-spec/2026-05-10.md`. Delete the dummy file when done."
 - Any unexpected discoveries (peer dep warnings, Vite version quirks, react-markdown 9 vs 8 differences) for Phase 2 to consider.
 </output>
