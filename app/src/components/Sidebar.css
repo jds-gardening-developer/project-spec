@@ -1,0 +1,34 @@
+/* Sidebar layout — uses CSS custom properties declared in app/src/styles.css.
+ * Plan 03-02 adds the entry list, active-state bar, mobile drawer. */
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  max-height: 100vh;
+  padding: 16px 0;
+}
+
+/* Mobile drawer pattern (D-02) — hidden by default below 768px.
+ * Plan 03-02 adds the hamburger trigger and aria state. */
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+  .sidebar[data-drawer-open="true"] {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    width: 80%;
+    max-width: 320px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  }
+}
