@@ -471,8 +471,16 @@ From app/src/manifest.json (built by scripts/build-manifest.mjs):
          </div>
        );
        ```
-    4. The error-path return (with `<main>` only) stays unchanged (no need to mount the sidebar when we have nothing to show). Just leave it alone.
-    5. D-04: NO sidebar header text. D-16: plain CSS flex (no layout libraries). The `<aside>` lives inside the Sidebar component itself (already in stub); App.jsx only mounts `<Sidebar />`.
+    4. The error-path return keeps its `<main>` wrapper (no need to mount the sidebar when we have nothing to show), but the leftover `<h1>MacPlants ERP — Specification</h1>` MUST be removed — it is a pre-Phase-3 artefact and violates D-04 ("no site title in Phase 3"). After removal, the error path is just:
+       ```jsx
+       return (
+         <main>
+           <p style={{ color: 'crimson' }}>Error: {error}</p>
+         </main>
+       );
+       ```
+       The error message itself remains visible — only the site-title h1 goes.
+    5. D-04: NO sidebar header text AND no site title anywhere in App.jsx (success or error path). D-16: plain CSS flex (no layout libraries). The `<aside>` lives inside the Sidebar component itself (already in stub); App.jsx only mounts `<Sidebar />`.
 
     **(B) Append to `app/src/styles.css`** — Add a new `:root` block declaring 8 Phase 3 CSS custom properties + add the `.app-shell` and `.app-main` layout rules. Do NOT modify any existing Phase 2 properties or rules.
 
@@ -551,7 +559,7 @@ From app/src/manifest.json (built by scripts/build-manifest.mjs):
       grep -q '\.app-main' app/src/styles.css &&
       ! grep -q '#2c8d4f' app/src/styles.css &&
       ! grep -q '#2c8d4f' app/src/App.jsx &&
-      cd app && npm run build 2>&1 | tail -3
+      npm run build 2>&1 | tail -3
     </automated>
   </verify>
   <acceptance_criteria>

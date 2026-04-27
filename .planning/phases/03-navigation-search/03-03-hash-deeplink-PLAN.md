@@ -122,9 +122,12 @@ Decision for this plan (mirrors CrossLinkText behavior):
     - Test 8: `'#prd-1?query=foo'` (defensive — query in hash) → returns `'prd-1'` (strip from `?` onward)
     - Test 9: `'#prd-1 '` (trailing whitespace) → returns `'prd-1'`
     - Test 10: `'#PRD-1'` (uppercase — rehype-slug always lowercases, so this should miss; do NOT lowercase here, let getElementById return null and silent no-op kick in) → returns `'PRD-1'`
+    - Test 11: `'#/prd-1.1'` → returns `'prd-1-1'` (PRD-numbering dot form — ROADMAP success criterion 3 cites this exact hash literal; rehype-slug emits dashes, so we normalize dots → dashes for the `prd-N.N(.N)*` pattern only)
+    - Test 12: `'#/prd-1.1.2'` (multi-level PRD) → returns `'prd-1-1-2'`
+    - Test 13: `'#some.thing'` (non-PRD id with a dot) → returns `'some.thing'` unchanged (D-14 silent miss handles it; we only transform the PRD pattern so we don't corrupt unrelated anchors)
   </behavior>
   <action>
-    1. **RED commit:** Create `app/src/components/useHashScroll.test.js` with the 10 test cases for `parseHashToId`. Use Phase 2 pattern (`node:test` + `node:assert/strict`). Import `parseHashToId` as a named export from `./useHashScroll.js`. Run `npm test` — the new tests fail (the stub does not export `parseHashToId`). Commit: `test(03-03): add failing tests for parseHashToId helper`.
+    1. **RED commit:** Create `app/src/components/useHashScroll.test.js` with the 13 test cases for `parseHashToId` (Test 1 through Test 13 from `<behavior>`). Use Phase 2 pattern (`node:test` + `node:assert/strict`). Import `parseHashToId` as a named export from `./useHashScroll.js`. Run `npm test` — the new tests fail (the stub does not export `parseHashToId`). Commit: `test(03-03): add failing tests for parseHashToId helper`.
 
     2. **GREEN commit:** Replace `app/src/components/useHashScroll.js` (the Plan 03-01 stub) with the real implementation:
 
@@ -160,6 +163,12 @@ Decision for this plan (mirrors CrossLinkText behavior):
         */
        import { useEffect, useRef } from 'react';
 
+       // Match PRD numbering with dots: 'prd-1.1', 'prd-12.3.4' (case-insensitive)
+       // ROADMAP success criterion 3 cites '/#/prd-1.1' literally; rehype-slug emits
+       // 'prd-1-1' (dashes), so normalize the PRD pattern only. Non-PRD ids with
+       // dots (e.g. 'some.thing') are left alone so D-14 silent miss kicks in.
+       const PRD_DOT_RE = /^prd-\d+(\.\d+)+$/i;
+
        export function parseHashToId(hash) {
          if (typeof hash !== 'string' || hash.length === 0) return null;
          let id = hash.startsWith('#') ? hash.slice(1) : hash;
@@ -168,7 +177,9 @@ Decision for this plan (mirrors CrossLinkText behavior):
          const qIdx = id.indexOf('?');
          if (qIdx >= 0) id = id.slice(0, qIdx);
          id = id.trim();
-         return id.length > 0 ? id : null;
+         if (id.length === 0) return null;
+         if (PRD_DOT_RE.test(id)) id = id.replace(/\./g, '-');
+         return id;
        }
 
        function resolveHeading(id) {
@@ -215,7 +226,7 @@ Decision for this plan (mirrors CrossLinkText behavior):
        }
        ```
 
-       Run `npm test` — all 10 helper tests pass. Hook integration is verified at UAT (real browser, real location.hash, real getElementById against rehype-slug-emitted IDs).
+       Run `npm test` — all 13 helper tests pass. Hook integration is verified at UAT (real browser, real location.hash, real getElementById against rehype-slug-emitted IDs).
 
        Commit: `feat(03-03): implement useHashScroll one-shot hash deep-link consumer`.
 
@@ -233,6 +244,7 @@ Decision for this plan (mirrors CrossLinkText behavior):
       grep -q "requestAnimationFrame" app/src/components/useHashScroll.js &&
       grep -q "useRef" app/src/components/useHashScroll.js &&
       grep -q 'id\^="' app/src/components/useHashScroll.js &&
+      grep -q 'PRD_DOT_RE' app/src/components/useHashScroll.js &&
       ! grep -q "STUB" app/src/components/useHashScroll.js &&
       ! grep -q "console.warn" app/src/components/useHashScroll.js &&
       cd app/.. && npm test 2>&1 | tail -10 &&
@@ -248,7 +260,8 @@ Decision for this plan (mirrors CrossLinkText behavior):
     - `useHashScroll.js` does NOT contain `console.warn` (D-14 silent on miss).
     - `useHashScroll.js` does NOT modify `location.hash` (D-14 conservative; preserve user's deep-link verbatim — verifiable: grep returns no `replaceState` call inside this file).
     - `useHashScroll.js` cleans up via `cancelAnimationFrame` returned from useEffect.
-    - All 10 `parseHashToId` tests pass; total `npm test` count = 21 (Phase 2) + N (Plan 03-02 useScrollSpy) + 10 (this plan).
+    - All 13 `parseHashToId` tests pass (including Test 11/12/13 covering the PRD dot-form normalization that satisfies ROADMAP success criterion 3); total `npm test` count = 21 (Phase 2) + N (Plan 03-02 useScrollSpy) + 13 (this plan).
+    - `useHashScroll.js` defines a `PRD_DOT_RE` constant and applies it before returning, so `grep -q 'PRD_DOT_RE' app/src/components/useHashScroll.js` matches.
     - `npm run build` exits 0.
     - File does NOT modify `App.jsx` (Plan 03-01 already wired the call site).
   </acceptance_criteria>
@@ -276,16 +289,16 @@ Decision for this plan (mirrors CrossLinkText behavior):
 </threat_model>
 
 <verification>
-- `npm test` exits 0 with all 10 parseHashToId cases plus all prior tests passing.
+- `npm test` exits 0 with all 13 parseHashToId cases plus all prior tests passing.
 - `npm run build` exits 0; bundle delta is ~0.3 KB gz (small hook + parser).
-- Hook integration verified at human UAT: paste `localhost:5173/#prd-1-1` into a fresh tab, confirm smooth scroll to PRD-1.1 heading. Confirm `localhost:5173/#nonsense` does nothing (no error, no warning).
+- Hook integration verified at human UAT: paste BOTH `localhost:5173/#prd-1-1` (dash form, matches rehype-slug directly) AND `localhost:5173/#/prd-1.1` (dot form from ROADMAP success criterion 3) into fresh tabs, confirm smooth scroll to PRD-1.1 heading in both cases. Confirm `localhost:5173/#nonsense` does nothing (no error, no warning).
 </verification>
 
 <success_criteria>
-- NAV-04: User can paste a deep link into a fresh tab and viewer scrolls to that section once content loads.
+- NAV-04: User can paste a deep link into a fresh tab and viewer scrolls to that section once content loads. The literal ROADMAP example `localhost:5173/#/prd-1.1` (with dots) MUST work — verified via `parseHashToId` Test 11.
 - D-13: Effect fires after first content render (uses requestAnimationFrame inside an effect gated on content prop).
 - D-14: Unknown hashes silent no-op (no warning, no URL alteration).
-- D-15: rehype-slug format matched directly via getElementById, with prefix-match fallback for PRD-only hashes (CrossLinkText behavior parity).
+- D-15: rehype-slug format matched directly via getElementById, with prefix-match fallback for PRD-only hashes (CrossLinkText behavior parity), AND dot-to-dash normalization for ROADMAP-style `prd-N.N` hashes (so the user-pasted dot form resolves to the dash form rehype-slug emits).
 - File-disjointness: this plan touches only useHashScroll.js + useHashScroll.test.js (App.jsx call site was wired by Plan 03-01).
 </success_criteria>
 
