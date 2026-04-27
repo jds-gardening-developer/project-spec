@@ -138,7 +138,6 @@ function DiagramViewport({ children }) {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [fullscreen, setFullscreen] = useState(false);
   const dragRef = useRef(null);
-  const hasAutoFittedRef = useRef(false);
 
   // Capture (and cache) the SVG's natural size from getBBox the first time it's
   // available. Returns the cached size on subsequent calls so getBBox isn't
@@ -269,28 +268,20 @@ function DiagramViewport({ children }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [fullscreen]);
 
-  // Auto-fit on first SVG appearance. Mermaid renders async via dynamic import,
-  // so we observe the canvas for child mutations and fit once an SVG shows up
-  // with non-zero dimensions.
+  // Capture natural size once the SVG appears (so the Fit button works), but
+  // do NOT auto-fit — the diagram opens at 100% native size by default.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const tryFit = () => {
-      if (hasAutoFittedRef.current) return;
-      if (fit()) hasAutoFittedRef.current = true;
+    const tryCapture = () => {
+      if (naturalSizeRef.current) return;
+      getNaturalSize();
     };
-    tryFit();
-    const observer = new MutationObserver(tryFit);
+    tryCapture();
+    const observer = new MutationObserver(tryCapture);
     observer.observe(canvas, { childList: true, subtree: true });
     return () => observer.disconnect();
-  }, [fit]);
-
-  // Re-fit when entering fullscreen (the viewport size jumps from 600px to full vh).
-  useEffect(() => {
-    // Defer one frame so the layout settles before measuring.
-    const id = requestAnimationFrame(() => fit());
-    return () => cancelAnimationFrame(id);
-  }, [fullscreen, fit]);
+  }, [getNaturalSize]);
 
   // Apply zoom to the SVG via width/height ATTRIBUTES (not CSS transform).
   // This forces the browser to re-rasterize the SVG vector at the new size, so
