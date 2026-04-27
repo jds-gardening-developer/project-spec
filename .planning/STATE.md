@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 Phase: 999.1 of 5 (schema index page)
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-27
+Last activity: 2026-04-27 - Completed quick task 260427-gjf: Schema index page
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -76,6 +76,12 @@ None yet.
 - Branch `web-app-refactor` has uncommitted prior changes (modified `index.html`, `README.md`; untracked `project-spec/`). These represent a partial dated-snapshot refactor and should be folded into Phase 1's foundation work, not committed separately.
 - No `.gitignore`, no tests, no CI in the existing repo (per `.planning/codebase/CONCERNS.md`). Phase 1 should add `.gitignore` (at least `node_modules/`, `dist/`) as part of scaffold; testing strategy decided during planning.
 - Live `index.html` must NOT be replaced until Phase 5 — earlier phases iterate via `npm run dev` only, so the current Docsify site keeps working in production while the rebuild is in progress.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260427-gjf | Schema index page — visual ER diagram + aggregated field reference | 2026-04-27 | 3cf6d50 | [260427-gjf-schema-index-page-visual-er-diagram-of-a](./quick/260427-gjf-schema-index-page-visual-er-diagram-of-a/) |
 
 ## Session Continuity
 
