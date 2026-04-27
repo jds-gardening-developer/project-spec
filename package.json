@@ -8,16 +8,17 @@
     "node": ">=20"
   },
   "scripts": {
-    "predev": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs",
+    "predev": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs && node scripts/build-schema-index.mjs",
     "dev": "vite --config app/vite.config.js",
-    "prebuild": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs",
+    "prebuild": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs && node scripts/build-schema-index.mjs",
     "build": "vite build --config app/vite.config.js",
     "preview": "vite preview --config app/vite.config.js",
     "dev:docsify": "npx docsify-cli@4 serve .",
     "build-manifest": "node scripts/build-manifest.mjs",
     "build-search-index": "node scripts/build-search-index.mjs",
+    "build-schema-index": "node scripts/build-schema-index.mjs",
     "update-spec": "node scripts/update-spec.mjs",
-    "test": "node --test app/src/components/*.test.js"
+    "test": "node --test app/src/components/*.test.js scripts/*.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
