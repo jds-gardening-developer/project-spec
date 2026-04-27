@@ -13,7 +13,6 @@ import {
   safeMermaidIdent,
   buildErDiagramSource,
   sortedEntities,
-  DIAGRAM_FIELD_CAP,
 } from './SchemaPage.helpers.js';
 
 // ---------- slugify ----------
@@ -102,18 +101,18 @@ describe('buildErDiagramSource', () => {
     ],
   };
 
-  it('contains the literal "erDiagram" line after the init directive', () => {
+  it('starts with the literal "erDiagram" line', () => {
     const out = buildErDiagramSource(FAKE);
-    assert.match(out, /^%%\{init:.*?\}%%\nerDiagram\n/);
+    assert.match(out, /^erDiagram\n/);
   });
 
-  it('declares every entity with quoted name and an attribute block', () => {
+  it('declares every entity as a bare quoted name (entity-only diagram)', () => {
     const out = buildErDiagramSource(FAKE);
-    assert.match(out, /"Plant" \{/);
-    assert.match(out, /"Plant Variant" \{/);
-    // Closing braces — one per entity (2 here).
-    const closes = out.match(/^ {4}\}$/gm) || [];
-    assert.equal(closes.length, 2);
+    assert.match(out, /^ {4}"Plant"$/m);
+    assert.match(out, /^ {4}"Plant Variant"$/m);
+    // No attribute blocks — fields are rendered in the reference cards instead.
+    assert.doesNotMatch(out, /\{$/m);
+    assert.doesNotMatch(out, /^\s*\}$/m);
   });
 
   it('emits one }o--|| edge per relationship with quoted endpoints + label', () => {
@@ -121,7 +120,7 @@ describe('buildErDiagramSource', () => {
     assert.match(out, /"Plant Variant" \}o--\|\| "Plant" : "plant"/);
   });
 
-  it('caps fields per entity at DIAGRAM_FIELD_CAP', () => {
+  it('does not render fields inside the diagram (kept in reference cards instead)', () => {
     const big = {
       entities: [
         {
@@ -137,15 +136,16 @@ describe('buildErDiagramSource', () => {
       relationships: [],
     };
     const out = buildErDiagramSource(big);
-    const indented = out.split('\n').filter((l) => /^ {8}\S/.test(l));
-    assert.equal(indented.length, DIAGRAM_FIELD_CAP);
+    // Only the bare entity name should be indented — no field lines.
+    const indented = out.split('\n').filter((l) => /^ {4}\S/.test(l));
+    assert.equal(indented.length, 1);
+    assert.match(indented[0], /^ {4}"Wide"$/);
   });
 
-  it('returns init directive + "erDiagram" for malformed input', () => {
-    for (const bad of [null, {}, { entities: 'not-an-array' }]) {
-      const out = buildErDiagramSource(bad);
-      assert.match(out, /^%%\{init:.*?\}%%\nerDiagram\n$/);
-    }
+  it('returns "erDiagram\\n" for malformed input', () => {
+    assert.equal(buildErDiagramSource(null), 'erDiagram\n');
+    assert.equal(buildErDiagramSource({}), 'erDiagram\n');
+    assert.equal(buildErDiagramSource({ entities: 'not-an-array' }), 'erDiagram\n');
   });
 
   it('escapes embedded double-quotes in relationship labels', () => {
@@ -163,7 +163,7 @@ describe('buildErDiagramSource', () => {
       relationships: [],
     };
     const out = buildErDiagramSource(data);
-    assert.match(out, /"Empty" \{\n {4}\}/);
+    assert.match(out, /^ {4}"Empty"$/m);
   });
 });
 

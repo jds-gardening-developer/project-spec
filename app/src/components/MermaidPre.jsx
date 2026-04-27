@@ -30,6 +30,16 @@ function loadMermaid() {
       startOnLoad: false,
       securityLevel: 'strict',
       theme: 'default',
+      // ER diagram defaults are tiny — the SchemaPage uses ER for the schema map.
+      // Per-diagram %%{init}%% directives are ignored under strict securityLevel,
+      // so we bump these globally. The spec uses flowchart/sequence diagrams (not
+      // ER) so this only takes effect on the SchemaPage.
+      er: {
+        fontSize: 18,
+        entityPadding: 15,
+        minEntityWidth: 160,
+        minEntityHeight: 80,
+      },
     });
     return mermaid;
   });

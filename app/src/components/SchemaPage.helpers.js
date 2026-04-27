@@ -41,26 +41,17 @@ export const DIAGRAM_FIELD_CAP = 6;
  * for empty / malformed input so the renderer still produces an empty diagram
  * frame instead of crashing.
  */
-// Per-render Mermaid config string — bumps ER font + entity sizing so labels
-// stay readable when SchemaPage's viewport scales the SVG. Applies only to this
-// diagram (not the inline mermaid blocks elsewhere in the spec).
-export const ER_INIT_DIRECTIVE =
-  "%%{init: {'theme':'default','themeVariables':{'fontSize':'18px'},'er':{'fontSize':18,'entityPadding':15,'minEntityWidth':140,'minEntityHeight':75}}}%%";
-
 export function buildErDiagramSource(data) {
-  if (!data || !Array.isArray(data.entities)) return ER_INIT_DIRECTIVE + '\nerDiagram\n';
-  const lines = [ER_INIT_DIRECTIVE, 'erDiagram'];
+  if (!data || !Array.isArray(data.entities)) return 'erDiagram\n';
+  // Entity-name-only ER diagram. The full field list is rendered in the
+  // <article> cards below the diagram, so duplicating fields inside the
+  // diagram boxes just makes the whole thing illegible. Mermaid accepts a
+  // bare entity name on its own line as an "orphan" declaration — needed
+  // because some entities have no FK relationships.
+  const lines = ['erDiagram'];
 
   for (const entity of data.entities) {
-    lines.push(`    "${entity.name}" {`);
-    const fields = entity.fields || [];
-    const shown = fields.slice(0, DIAGRAM_FIELD_CAP);
-    for (const field of shown) {
-      const safeType = safeMermaidIdent(field.type || 'string') || 'string';
-      const safeName = safeMermaidIdent(field.name || 'field');
-      lines.push(`        ${safeType} ${safeName}`);
-    }
-    lines.push('    }');
+    lines.push(`    "${entity.name}"`);
   }
 
   const rels = Array.isArray(data.relationships) ? data.relationships : [];
