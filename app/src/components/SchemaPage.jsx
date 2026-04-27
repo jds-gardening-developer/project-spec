@@ -4,8 +4,9 @@ import { buildErDiagramSource, slugify, sortedEntities } from './SchemaPage.help
 import './SchemaPage.css';
 
 const ZOOM_MIN = 0.25;
-const ZOOM_MAX = 4;
+const ZOOM_MAX = 8;
 const ZOOM_STEP = 1.2;
+const FIT_PADDING = 24;
 
 /**
  * SchemaPage — interactive ER overview of every entity in the spec.
@@ -131,10 +132,46 @@ export default function SchemaPage({ initialData }) {
 
 function DiagramViewport({ children }) {
   const viewportRef = useRef(null);
+  const canvasRef = useRef(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [fullscreen, setFullscreen] = useState(false);
   const dragRef = useRef(null);
+  const hasAutoFittedRef = useRef(false);
+
+  const fit = useCallback(() => {
+    const viewport = viewportRef.current;
+    const canvas = canvasRef.current;
+    if (!viewport || !canvas) return false;
+    const svg = canvas.querySelector('svg');
+    if (!svg) return false;
+    // SVG natural dimensions — read from getBBox for the rendered geometry,
+    // or fall back to clientWidth/Height. Mermaid sets viewBox + width/height
+    // attributes, so getBoundingClientRect at zoom=1 gives natural size if we
+    // temporarily reset the transform — but easier: read the bbox directly.
+    let svgWidth, svgHeight;
+    try {
+      const bbox = svg.getBBox();
+      svgWidth = bbox.width;
+      svgHeight = bbox.height;
+    } catch {
+      svgWidth = svg.clientWidth;
+      svgHeight = svg.clientHeight;
+    }
+    if (svgWidth === 0 || svgHeight === 0) return false;
+    const vRect = viewport.getBoundingClientRect();
+    const fitScale = Math.min(
+      ZOOM_MAX,
+      (vRect.width - FIT_PADDING * 2) / svgWidth,
+      (vRect.height - FIT_PADDING * 2) / svgHeight
+    );
+    setZoom(fitScale);
+    setPan({
+      x: (vRect.width - svgWidth * fitScale) / 2,
+      y: (vRect.height - svgHeight * fitScale) / 2,
+    });
+    return true;
+  }, []);
 
   const reset = useCallback(() => {
     setZoom(1);
@@ -212,6 +249,29 @@ function DiagramViewport({ children }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [fullscreen]);
 
+  // Auto-fit on first SVG appearance. Mermaid renders async via dynamic import,
+  // so we observe the canvas for child mutations and fit once an SVG shows up
+  // with non-zero dimensions.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const tryFit = () => {
+      if (hasAutoFittedRef.current) return;
+      if (fit()) hasAutoFittedRef.current = true;
+    };
+    tryFit();
+    const observer = new MutationObserver(tryFit);
+    observer.observe(canvas, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [fit]);
+
+  // Re-fit when entering fullscreen (the viewport size jumps from 600px to full vh).
+  useEffect(() => {
+    // Defer one frame so the layout settles before measuring.
+    const id = requestAnimationFrame(() => fit());
+    return () => cancelAnimationFrame(id);
+  }, [fullscreen, fit]);
+
   return (
     <div
       ref={viewportRef}
@@ -225,12 +285,14 @@ function DiagramViewport({ children }) {
         <button type="button" onClick={() => zoomBy(ZOOM_STEP)} aria-label="Zoom in">+</button>
         <span className="schema-diagram-zoom-display">{Math.round(zoom * 100)}%</span>
         <button type="button" onClick={() => zoomBy(1 / ZOOM_STEP)} aria-label="Zoom out">−</button>
-        <button type="button" onClick={reset}>Reset</button>
+        <button type="button" onClick={fit}>Fit</button>
+        <button type="button" onClick={reset}>1:1</button>
         <button type="button" onClick={() => setFullscreen((v) => !v)}>
           {fullscreen ? 'Close' : 'Fullscreen'}
         </button>
       </div>
       <div
+        ref={canvasRef}
         className="schema-diagram-canvas"
         style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
       >
