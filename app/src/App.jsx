@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import SpecViewer from './SpecViewer.jsx';
 import manifest from './manifest.json';
+import { Sidebar } from './components/Sidebar.jsx';
+import { SearchPanel } from './components/SearchPanel.jsx';
+import { useHashScroll } from './components/useHashScroll.js';
 
 // Vite glob — resolved at build time. Keys are import paths relative to this file;
 // values are functions returning Promise<string of file contents>.
@@ -20,6 +23,8 @@ export default function App() {
 
   // Manifest is sorted newest-first by build-manifest.mjs.
   const newest = manifest[0];
+
+  useHashScroll(content);
 
   useEffect(() => {
     if (!newest) {
@@ -52,20 +57,23 @@ export default function App() {
   if (error) {
     return (
       <main>
-        <h1>MacPlants ERP — Specification</h1>
         <p style={{ color: 'crimson' }}>Error: {error}</p>
       </main>
     );
   }
 
   return (
-    <main>
-      <header>
-        <small>
-          Viewing: <code>project-spec/{newest?.filename}</code>
-        </small>
-      </header>
-      <SpecViewer markdown={content} />
-    </main>
+    <div className="app-shell">
+      <Sidebar />
+      <main className="app-main">
+        <header>
+          <small>
+            Viewing: <code>project-spec/{newest?.filename}</code>
+          </small>
+        </header>
+        <SpecViewer markdown={content} />
+      </main>
+      <SearchPanel />
+    </div>
   );
 }
