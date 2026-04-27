@@ -7,6 +7,10 @@
 
 .schema-page {
   padding: 24px 8px;
+}
+
+.schema-page__header,
+.schema-page__entities {
   max-width: 80ch;
 }
 
@@ -23,22 +27,111 @@
   line-height: 1.45;
 }
 
-/* --- ER diagram card --- */
+/* --- ER diagram card with pan/zoom viewport ---
+ * The diagram has 20 entities + 34 FK edges, so its natural SVG width far
+ * exceeds the page column. The viewport gives it a fixed-height surface and
+ * applies a CSS transform so the user can scroll-wheel-zoom and drag-to-pan.
+ * MermaidPre.css sets `svg { max-width: 100% }` for the markdown use case;
+ * we override that here so the SVG renders at its natural size. */
 .schema-page__diagram {
   border: 1px solid var(--schema-card-border);
   background: var(--schema-card-background);
   border-radius: 6px;
-  padding: 12px;
   margin: 0 0 32px 0;
-  /* Diagrams can be wider than the column on small screens — let them scroll
-   * horizontally inside the card rather than overflow the page layout. */
-  overflow-x: auto;
+  position: relative;
 }
 
-.schema-page__diagram .mermaid-block {
-  /* MermaidBlock owns its inner styling; we just ensure the SVG sits flush
-   * inside our card without an extra outer margin. */
+.schema-diagram-viewport {
+  position: relative;
+  height: 600px;
+  overflow: hidden;
+  cursor: grab;
+  border-radius: 6px;
+}
+
+.schema-diagram-viewport:active {
+  cursor: grabbing;
+}
+
+.schema-diagram-viewport.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  height: 100vh;
+  background: var(--schema-card-background);
+  border-radius: 0;
+}
+
+.schema-diagram-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  /* Disable pointer events on the SVG so drag events bubble to the viewport.
+   * The "View in spec →" links live OUTSIDE the diagram, so this is fine. */
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.schema-diagram-canvas .mermaid-block {
   margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.schema-diagram-canvas .mermaid-block svg {
+  /* Override MermaidPre.css `max-width: 100%` so the SVG renders at natural size. */
+  max-width: none;
+  height: auto;
+}
+
+.schema-diagram-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  background: var(--schema-card-background);
+  border: 1px solid var(--schema-card-border);
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.schema-diagram-controls button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--sidebar-text);
+  font-family: inherit;
+  min-width: 28px;
+}
+
+.schema-diagram-controls button:hover {
+  background: var(--sidebar-hover-bg);
+  border-color: var(--schema-card-border);
+}
+
+.schema-diagram-controls button:focus-visible {
+  outline: 2px solid var(--cross-link-color);
+  outline-offset: 1px;
+}
+
+.schema-diagram-zoom-display {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 0.85rem;
+  color: var(--sidebar-text);
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  justify-content: center;
 }
 
 /* --- Entity reference list --- */
