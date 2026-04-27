@@ -1,534 +1,807 @@
 [
   {
-    "id": "macplants-erp--full-requirements-overview",
-    "title": "Macplants ERP — Full Requirements Overview",
-    "prd_id": null,
-    "level": 1,
-    "body": "**Purpose:** Complete list of every feature we're building for Stage 1 of MacPlants ERP build, written for team discussion.\n\n\"Jake spends 75% of his time doing copy, paste, we must fix that\""
-  },
-  {
     "id": "to-add-in",
     "title": "To Add In",
     "prd_id": null,
     "level": 2,
-    "body": "Keep a record of all updates made by all users for 1 month (rolling). After 1 month, logs can be archived.\n\nSuper Admin will have a screen to view the user action log — ordered by time, filterable by user. Shows all stock updates, order changes, and other admin actions from both ERP and PWA.\n\n---"
+    "body": "Super Admin will have a screen to view the user action log — ordered by time, filterable by user. Shows all stock updates, order changes, and other admin actions from both ERP and PWA."
   },
   {
     "id": "prd-0-erp-account-types",
     "title": "PRD-0: ERP Account Types",
-    "prd_id": "prd-0",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model",
     "title": "Data Model",
-    "prd_id": "prd-0",
+    "prd_id": null,
+    "level": 2,
+    "body": "**Convention:** every Data Model block in this document lists the core persisted fields for each object — i.e. the columns that would actually live in the database. Derived values (lifetime value, current balance, quote/order/invoice totals, line totals, reserved-quantity rollups, etc.) are computed on demand from the underlying records and are NOT stored as fields. They show up in the UI sections of each PRD instead."
+  },
+  {
+    "id": "user",
+    "title": "User",
+    "prd_id": null,
     "level": 3,
-    "body": "*Convention: every **Data Model** block in this document lists the **core persisted fields** for each object — i.e. the columns that would actually live in the database. Derived values (lifetime value, current balance, quote/order/invoice totals, line totals, reserved-quantity rollups, etc.) are computed on demand from the underlying records and are NOT stored as fields. They show up in the UI sections of each PRD instead.*\n\n**User**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| role | enum | Super Admin / Admin / Staff |\n| name | string | |\n| email | string | |\n| active | boolean | |\n| created\\_by | FK → User | |\n| created\\_at | datetime | |\n| last\\_login\\_at | datetime (nullable) | |\n\n* **Super Admin** — Can Add / Remove Staff / See all updates made via user action log / Revert actions…"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| role | enum | Super Admin / Admin / Staff |\n| name | string |  |\n| email | string |  |\n| active | boolean |  |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| last\\_login\\_at | datetime | nullable |\n\n# \n\n#"
+  },
+  {
+    "id": "prd-01",
+    "title": "PRD-0.1",
+    "prd_id": null,
+    "level": 1,
+    "body": "Super Admin\n\n* **Super Admin** — Can Add / Remove Staff / See all updates made via user action log.\n\n* **Admin** — Full ERP Access (cannot add/remove staff)\n\n* **Staff Member** — PWA Access only (Not ERP login). Can CRUD stock/batches on PWA.\n\n**Note:** Super Admin \\= Josh only. Admin \\= Jake and office staff. Staff \\= nursery team on PWA."
+  },
+  {
+    "id": "what-it-must-do",
+    "title": "What It Must Do",
+    "prd_id": null,
+    "level": 2,
+    "body": "- On the left hand side of the screen there will be a menu item called “Update”, only the Super Admin will be able to view this  \n- This will detail all the updates that have happened in the past 1 / 3 Months by each staff member.  Every stock update made by staff members on their PWA  \n- Every stock update made by admins on the ERP"
+  },
+  {
+    "id": "how-do-we-know-it-is-done-",
+    "title": "How do we know it is done ?",
+    "prd_id": null,
+    "level": 2,
+    "body": "- Super admin can login to ERP and see a full list of actions completed by staff over last 1 month / 3 months"
   },
   {
     "id": "prd-1-plant-database--inventory",
     "title": "PRD-1: Plant Database & Inventory",
-    "prd_id": "prd-1",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-1",
     "title": "Data Model",
-    "prd_id": "prd-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "plant",
+    "title": "Plant",
+    "prd_id": null,
     "level": 3,
-    "body": "**Plant**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| name | string | |\n| latin\\_name | string | |\n| category | string | e.g. herbaceous / shrub / climber |\n| description | string | |\n| care\\_instructions | string | |\n| available\\_online | boolean | master webshop toggle; false = hidden everywhere |\n| vat\\_applicable | boolean | applies to all pot sizes of this plant |\n| special\\_plant | boolean | applies to all pot sizes; flagged for hand-managed handling |\n\n**Plant Variant** *(one per pot size; a Plant has many)*\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| plant | FK → Plant | |\n| pot\\_size | enum | 7cm / 9cm / 1L / 2L / 3L / etc. |\n| sku | string | auto-generated; single source of truth across ERP, EPOS & labels |\n| cost\\_price | decimal | |\n| trade\\_price | decimal | |\n| retail…"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| name | string |  |\n| latin\\_name | string |  |\n| category | string | e.g. herbaceous / shrub / climber |\n| description | string |  |\n| care\\_instructions | string |  |\n| available\\_online | boolean | master webshop toggle; false \\= hidden everywhere |\n| vat\\_applicable | boolean | applies to all pot sizes of this plant |\n| special\\_plant | boolean | applies to all pot sizes; flagged for hand-managed handling |\n|  |  |  |"
+  },
+  {
+    "id": "plant-variant",
+    "title": "Plant Variant",
+    "prd_id": null,
+    "level": 3,
+    "body": "*(one per pot size; a Plant has many)*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| plant | FK → Plant |  |\n| pot\\_size | enum | 7cm / 9cm / 1L / 2L / 3L / etc. |\n| sku | string | auto-generated; single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW |\n| Plant\\_ID |  | So it can communicate with the Label printer ? |\n| cost\\_price | decimal |  |\n| trade\\_price | decimal |  |\n| retail\\_price | decimal |  |\n| dimensions | string (nullable) | Text Field |\n| available\\_on\\_webshop | boolean | per pot size |\n|  |  |  |"
+  },
+  {
+    "id": "plant-batch",
+    "title": "Plant Batch",
+    "prd_id": null,
+    "level": 3,
+    "body": "*(physical group of stock of one variant moving through one lifecycle)*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| plant\\_variant | FK → Plant Variant |  |\n| status | enum | Growing / Trade Ready / Retail Ready / Reserved |\n| quantity | integer |  |\n| location | string | bed reference, e.g. \"1.3\", \"GK\", \"Shop\" |\n| ready\\_date | date (nullable) | when reached, auto-creates a TO DO task; status does NOT auto-change |\n| reserved\\_against | FK → Order (nullable) |  |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| last\\_updated\\_by | FK → User |  |\n| last\\_updated\\_at | datetime |  |"
+  },
+  {
+    "id": "shrinkage-record",
+    "title": "Shrinkage Record",
+    "prd_id": null,
+    "level": 3,
+    "body": "*(captured whenever a batch quantity is adjusted downward)*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| plant\\_batch | FK → Plant Batch |  |\n| quantity\\_lost | integer | snapshot at moment of shrinkage |\n| reason | enum | Disease / Dead / Weeds / Stock Take / Other |\n| reason\\_comment | string (nullable) | required when reason \\= Other |\n| recorded\\_by | FK → User |  |\n| recorded\\_at | datetime |  |"
   },
   {
     "id": "what-is-it",
     "title": "What Is It",
-    "prd_id": "prd-1",
-    "level": 3,
+    "prd_id": null,
+    "level": 2,
     "body": "The foundation of the entire system. A single database that holds every plant variety Macplants grows or sells, every pot size, every price, and every batch of stock — whether it's available, growing, on order from a supplier, or reserved for a customer. This replaces GrowMaster as the source of truth for stock."
   },
   {
-    "id": "what-it-must-do",
+    "id": "what-it-must-do-1",
     "title": "What It Must Do",
-    "prd_id": "prd-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "plants",
+    "title": "Plants",
+    "prd_id": null,
     "level": 3,
-    "body": "#### **Plants**\n\n* In Settings \\> Plants. List all of the plants in the database. This will detail Plant Name, Plant Sizes, Available on WebShop Boolean, VAT Applicable boolean, Special Plant Boolean.  \n* User can click on plant, view all different pot sizes, cost price, trade price and retail price. This works the same as on the plant table.  \n* User will be able to toggle each pot size as ON or OFF for the Retail Webshop available. User will see the plant category as a pill.  \n* Edit icon on the right hand side. User clicks on this and then they can see the plant name, description, care instructions, can edit prices & dimensions (text field) for each pot size for cost, trade or retail.  \n* In Settings \\> Plant Settings. The user can see all plants that have the boolean 'Special Plant: Tr…"
+    "body": "* In Settings \\> Plants. List all of the plants in the database. This will detail Plant Name, Plant Sizes, Available on WebShop Boolean, VAT Applicable boolean, Special Plant Boolean.\n\n* User can click on plant, view all different pot sizes, cost price, trade price and retail price. This works the same as on the plant table.\n\n* User will be able to toggle each pot size as ON or OFF for the Retail Webshop available. User will see the plant category as a pill.\n\n* Edit icon on the right hand side. User clicks on this and then they can see the plant name, description, care instructions, can edit prices & dimensions (text field) for each pot size for cost, trade or retail.\n\n* In Settings \\> Plant Settings. The user can see all plants that have the boolean 'Special Plant: True'. The User can add…"
+  },
+  {
+    "id": "plant-batches",
+    "title": "Plant Batches",
+    "prd_id": null,
+    "level": 3,
+    "body": "* Status — Growing, Reserved, Trade Ready, Retail Ready.\n\n* Track inventory through batches — each batch is a group of plants of the same variety and size moving through the same lifecycle.\n\n* Allow admin to create batches at any time without needing a purchase order from ERP. This is a core daily action on the ERP.\n\n* Track batch status: growing, trade ready, reserved (committed to an order), retail-ready.\n\n* Allow admin/staff user to add / remove / update quantity of batches.\n\n* Provide a search that lets staff find any plant by latin name and instantly see the full stock picture.\n\n* Every stock change — status updates, quantity adjustments, wastage, new batches — must be recorded with who did it and when. This can be viewed from the batch line and also from a central admin panel which O…"
   },
   {
     "id": "how-we-know-its-done",
     "title": "How We Know It's Done",
-    "prd_id": "prd-1",
-    "level": 3,
-    "body": "* Staff can create a plant with all required fields. Note: we will be uploading all the data so staff being able to create plants is not very important. Data upload will be manual to start by developers.  \n* Each plant will have multiple sizes, each with its own SKU, trade price, retail price, cost price, and dimensions. SKU will be generated automatically — are we using PLANT ID from GrowMaster?  \n* Staff can create batches manually without a purchase order.  \n* Batch status changes work correctly and are recorded on plant batch — visible by admin. Also status updates are visible by Super Admin.  \n* The stock summary for any plant variant correctly shows reserved, growing, trade ready and retail-ready quantities.  \n* Every stock change has a full audit trail (who, when, what changed).  \n*…"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Staff can create a plant with all required fields. Note: we will be uploading all the data so staff being able to create plants is not very important. Data upload will be manual to start by developers.\n\n* Each plant will have multiple sizes, each with its own SKU (Link to EPOS Now), trade price, retail price, cost price, and dimensions. SKU will be generated automatically — we will also use PLANT ID so we can link to the Label Printer ?\n\n* Staff can create batches manually without a purchase order.\n\n* Batch status changes work correctly and are recorded on plant batch — visible by admin. Also status updates are visible by Super Admin.\n\n* The stock summary for any plant variant correctly shows reserved, growing, trade ready and retail-ready quantities.\n\n* Every stock change has a full aud…"
   },
   {
     "id": "prd-11-purchase-orders--lifecycle",
     "title": "PRD-1.1: Purchase Orders — Lifecycle",
-    "prd_id": "prd-1-1",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-2",
     "title": "Data Model",
-    "prd_id": "prd-1-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "purchase-order",
+    "title": "Purchase Order",
+    "prd_id": null,
     "level": 3,
-    "body": "**Purchase Order**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| po\\_number | string | auto-generated |\n| status | enum | Draft / Requested / Accepted / Arrived / Reconciled / Cancelled |\n| paid | boolean | settable at any stage |\n| supplier | FK → Supplier | exactly one; cannot be split across suppliers |\n| expected\\_delivery | date | |\n| notes | string | addable at any stage |\n| created\\_by | FK → User | |\n| created\\_at | datetime | |\n| reconciled\\_by | FK → User (nullable) | |\n| reconciled\\_at | datetime (nullable) | |\n\n**Purchase Order Line Item**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| purchase\\_order | FK → Purchase Order | |\n| plant\\_variant | FK → Plant Variant | |\n| quantity\\_ordered | integer | |\n| quantity\\_received | integer (nullable) | set on reconciliation |\n| unit…"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| po\\_number | string | auto-generated |\n| status | enum | Draft / Requested / Accepted / Arrived / Reconciled / Archived |\n| paid | boolean | settable at any stage |\n| supplier | FK → Supplier | exactly one; cannot be split across suppliers |\n| expected\\_delivery | date |  |\n| notes | string | addable at any stage |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| reconciled\\_by | FK → User (nullable) |  |\n| reconciled\\_at | datetime (nullable) |  |"
+  },
+  {
+    "id": "purchase-order-line-item",
+    "title": "Purchase Order Line Item",
+    "prd_id": null,
+    "level": 3,
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| purchase\\_order | FK → Purchase Order |  |\n| plant\\_variant | FK → Plant Variant |  |\n| quantity\\_ordered | integer |  |\n| quantity\\_received | integer (nullable) | set on reconciliation |\n| unit\\_cost | decimal | defaults from variant.cost\\_price; per-PO override; doesn't propagate |\n| reconciled\\_location | string (nullable) | bed reference, set on reconciliation |\n| reconciled\\_batch\\_status | enum (nullable) | Growing / Retail Ready / Trade Ready |\n| reconciled\\_ready\\_date | date (nullable) |  |"
+  },
+  {
+    "id": "supplier",
+    "title": "Supplier",
+    "prd_id": null,
+    "level": 3,
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| name | string |  |\n| contact\\_name | string |  |\n| email | string |  |\n| phone | string |  |\n| address | string |  |\n\n**Note:** a supplier may also be a customer, but the two records are NOT linked — separate accounts."
   },
   {
     "id": "what-is-it-1",
     "title": "What Is It",
-    "prd_id": "prd-1-1",
-    "level": 3,
+    "prd_id": null,
+    "level": 2,
     "body": "A structured way to order stock from external suppliers, track what's been ordered vs what's actually arrived, and update inventory when shipments come in. Replaces the current process of receiving invoices and manually uploading them.\n\nAdmin User will RECONCILE the stock when it arrives. MacPlants staff will note actual quantities which arrived on a piece of paper and this data will be INPUT into the system using the Purchase Order which was created."
   },
   {
-    "id": "what-it-must-do-1",
+    "id": "what-it-must-do-2",
     "title": "What It Must Do",
-    "prd_id": "prd-1-1",
-    "level": 3,
-    "body": "* In Settings \\> Suppliers. Maintain a supplier database with name, contact, email, phone, and address. (A Supplier can be a customer as well — however these are not linked, separate accounts.)  \n* One PO equals one supplier — you cannot split a PO across multiple suppliers.  \n* User is able to easily duplicate a PO — they can then assign the duplicate to a different supplier.  \n* Staff / Admin User can add Notes to PO at ANY stage on ERP.  \n* Auto-generate a unique PO reference number for each order.  \n* Send the PO directly to the supplier by email from within the ERP, with a formatted PDF Doc attached.  \n* User can create Tasks from PO. User can see all tasks related to PO on the single PO Screen.  \n* When stock arrives, staff RECONCILE actual quantities received per line. The received…"
+    "prd_id": null,
+    "level": 2,
+    "body": "* In Settings \\> Suppliers. Maintain a supplier database with name, contact, email, phone, and address. (A Supplier can be a customer as well — however these are not linked, separate accounts.)\n\n* One PO equals one supplier — you cannot split a PO across multiple suppliers.\n\n* User is able to easily duplicate a PO — they can then assign the duplicate to a different supplier.\n\n* Staff / Admin User can add Notes to PO at ANY stage on ERP.\n\n* Auto-generate a unique PO reference number for each order.\n\n* Send the PO directly to the supplier by email from within the ERP, with a formatted PDF Doc attached.\n\n* User can create Tasks from PO. User can see all tasks related to PO on the single PO Screen.\n\n* When stock arrives, staff RECONCILE actual quantities received per line. The received quantit…"
   },
   {
     "id": "how-we-know-its-done-1",
     "title": "How We Know It's Done",
-    "prd_id": "prd-1-1",
-    "level": 3,
-    "body": "* Staff can CRUD a PO, add line items, add notes, and save as draft.  \n* Staff can view 'progress' of individual PO — progress stepper at top of screen.  \n* Once a PO is approved it cannot be updated or deleted. Only cancelled.  \n* Staff can send a PO to a supplier via email from within the ERP — this will have Supplier Order PDF attached. Staff can download Supplier Order PDF.  \n* Staff can reconcile stock against individual PO lines with actual quantities, plant size, batch location, batch status and ready date (optional).  \n* The PO tracking screen shows all open POs with status. User can filter by status. Pills with all the statuses display at top of screen with quantity of POs with that status.  \n* All PO status changes can be fully audited by system admin through Audit Trail — this i…"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Staff can CRUD a PO, add line items, add notes, and save as draft.\n\n* Staff can view 'progress' of individual PO — progress stepper at top of screen.\n\n* Once a PO is approved it cannot be updated or deleted. Only cancelled.\n\n* Staff can send a PO to a supplier via email from within the ERP — this will have Supplier Order PDF attached. Staff can download Supplier Order PDF.\n\n* Staff can reconcile stock against individual PO lines with actual quantities, plant size, batch location, batch status and ready date (optional).\n\n* The PO tracking screen shows all open POs with status. User can filter by status. Pills with all the statuses display at top of screen with quantity of POs with that status.\n\n* All PO status changes can be fully audited by system admin through Audit Trail — this is very…"
   },
   {
     "id": "prd-20-customers",
     "title": "PRD-2.0: Customers",
-    "prd_id": "prd-2-0",
-    "level": 2,
-    "body": "The system holds 2 types of customer: **trade customers** and **retail customers**.\n\n* Trade customers purchase items through the trade customer portal.  \n* Retail customers purchase items through the WP website or in the SHOP.  \n  ---"
+    "prd_id": null,
+    "level": 1,
+    "body": "The system holds 2 types of customer: trade customers and retail customers.\n\n* Trade customers purchase items through the trade customer portal.\n\n* Retail customers purchase items through the WP website or in the SHOP."
   },
   {
     "id": "prd-211-trade-customer-accounts",
     "title": "PRD-2.1.1: Trade Customer Accounts",
-    "prd_id": "prd-2-1",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-3",
     "title": "Data Model",
-    "prd_id": "prd-2-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "trade-customer",
+    "title": "Trade Customer",
+    "prd_id": null,
     "level": 3,
-    "body": "**Trade Customer**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| business\\_name | string | |\n| customer\\_type | enum | Landscaper / Garden Designer / Contractor / Garden Centre / etc. |\n| contact\\_name | string | |\n| email | string | |\n| phone | string | |\n| billing\\_address | string | |\n| delivery\\_address | string | |\n| credit\\_limit | decimal | adjustable per customer |\n| payment\\_terms\\_days | integer | default 30 for all trade |\n| account\\_status | enum | Active / On Hold |\n| portal\\_login | FK → User | linked User account for trade portal access |\n| created\\_by | FK → User | |\n| created\\_at | datetime | |\n\n*Derived (not stored): `current_balance` is the sum of unpaid invoices linked to this customer; `lifetime_value` is the sum of all invoices ever raised against this customer. Bot…"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| business\\_name | string |  |\n| customer\\_type | enum | Landscaper / Garden Designer / Contractor / Garden Centre / etc. |\n| contact\\_name | string |  |\n| email | string |  |\n| phone | string |  |\n| billing\\_address | string |  |\n| delivery\\_address | string |  |\n| credit\\_limit | decimal | adjustable per customer |\n| payment\\_terms\\_days | integer | default 30 for all trade |\n| account\\_status | enum | Active / On Hold |\n| portal\\_login | FK → User | linked User account for trade portal access |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n\n**Note:** Derived (not stored): current\\_balance is the sum of unpaid invoices linked to this customer; This is are query-time aggregates over the Invoice table."
   },
   {
     "id": "what-is-it-2",
     "title": "What Is It",
-    "prd_id": "prd-2-1",
-    "level": 3,
+    "prd_id": null,
+    "level": 2,
     "body": "MacPlants has many different trade customers — landscapers, garden designers, contractors, and garden centres.\n\nThe ERP will store an account for each trade customer. Their contact details, addresses, credit terms, payment methods. Trade accounts are created by Macplants staff, not by the customers themselves."
   },
   {
-    "id": "what-it-must-do-2",
+    "id": "what-it-must-do-3",
     "title": "What It Must Do",
-    "prd_id": "prd-2-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "trade-customers--view-all",
+    "title": "Trade Customers — View All",
+    "prd_id": null,
     "level": 3,
-    "body": "#### **Trade Customers — All**\n\n* ERP stores trade customer records: business name, customer type, contact name, email, phone, billing address, delivery address.  \n* User can search by customer name, business name.\n\n  #### **Trade Customer Single Page**\n\n* **Customer detail screen (single page):** When an admin clicks on a customer, they see:  \n  * Current balance — outstanding unpaid invoice total  \n  * Lifetime value — total value of all invoices ever raised against this customer  \n  * Order / quote / invoice history  \n  *   \n* Allow admin to set customer credit limit.  This is different for every trade customer so this must be adjustable on trade customer single page.  \n* Every trade customer has 30 day payment terms  \n* **Over-credit-limit flow:** When a customer attempts to place an o…"
+    "body": "* ERP stores trade customer records: business name, customer type, contact name, email, phone, billing address, delivery address.\n\n* User can search by customer name, business name."
+  },
+  {
+    "id": "trade-customer-single-page",
+    "title": "Trade Customer Single Page",
+    "prd_id": null,
+    "level": 3,
+    "body": "* Customer detail screen (single page): When an admin clicks on a customer, they see:\n\n  * Current balance — outstanding unpaid invoice total\n\n  * Order / quote / invoice history\n\n* Allow admin to set customer credit limit. This is different for every trade customer so this must be adjustable on trade customer single page.\n\n* Every trade customer has 30 day payment terms\n\n* **Over-credit-limit flow:** When a customer attempts to place an order OVER their credit limit, the system should present a payment screen that lets the customer pay for the order immediately by card (Stripe). This removes friction — the customer can keep ordering, they just need to pay upfront in FULL. The user will see a message 'You cannot place an order that exceeds your credit limit, please order within your credit…"
   },
   {
     "id": "how-we-know-its-done-2",
     "title": "How We Know It's Done",
-    "prd_id": "prd-2-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "new-trade-customer-flow",
+    "title": "New Trade Customer Flow",
+    "prd_id": null,
     "level": 3,
-    "body": "#### **New Trade Customer Flow**\n\n* Admin can CRUD a trade customer with full contact details, set credit limit. Admin triggers email which allows user to login to their trade portal account.  \n* Admin can set per-customer credit terms. Customer CANNOT order over their credit terms. The ERP will have visibility of any active orders which they have in the system at any one time. Orders will be marked as paid MANUALLY by Arien (stage 1).  \n* **ARIAN** — When an order is made by a trade customer it will be live in the ERP. Once the order is complete the customer will be issued an invoice via Xero which they can pay by Stripe or Bank Transfer.  The order will then be marked as PAID by finance manually.   \n* If Customer has reached their Credit Limit they are able to pay for the order instantly…"
+    "body": "* Admin can CRUD a trade customer with full contact details, set credit limit. Admin triggers email which allows user to login to their trade portal account.\n\n* Admin can set per-customer credit terms. Customer CANNOT order over their credit terms. The ERP will have visibility of any active orders which they have in the system at any one time. Orders will be marked as paid MANUALLY by Arien (stage 1).\n\n* When an order is made by a trade customer it will be live in the ERP. Once the order is complete the customer will be issued an invoice via Xero which they can pay by Stripe or Bank Transfer. The order will then be marked as PAID by finance manually by Finance.\n\n* If Customer has reached their Credit Limit they are able to pay for the order instantly using Stripe on the ERP Trade Portal.…"
   },
   {
     "id": "prd-212-retail-customer-accounts",
     "title": "PRD-2.1.2: Retail Customer Accounts",
-    "prd_id": "prd-2-1",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-4",
     "title": "Data Model",
-    "prd_id": "prd-2-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "retail-customer",
+    "title": "Retail Customer",
+    "prd_id": null,
     "level": 3,
-    "body": "**Retail Customer**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| name | string | |\n| email | string | |\n| phone | string | |\n| billing\\_address | string | |\n| delivery\\_address | string | |\n| source | enum | WordPress / Shop / Manual |\n| account\\_created | datetime | auto-created on first WordPress checkout |\n\n* MacPlants has many plant enthusiasts who buy plants from them.  \n* Customers can buy online through the WordPress site. When they make a purchase an account will be created automatically on the ERP.  \n* The customer will checkout on the ERP.  \n* On their customer account page they will be able to view all previous orders.  \n  ---"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| name | string |  |\n| email | string |  |\n| phone | string |  |\n| billing\\_address | string |  |\n| delivery\\_address | string |  |\n| source | enum | WordPress / Shop / Manual |\n| account\\_created | datetime | auto-created on first WordPress checkout |\n\n* MacPlants has many plant enthusiasts who buy plants from them.\n\n* Customers can buy online through the WordPress site. When they make a purchase an account will be created automatically on the ERP when they complete the purcase.  Look at Echo3 checkout process to see an example of what this is like to move to a subdomain on checkout.\n\n* The customer will checkout on the ERP.\n\n* On their customer account page they will be able to view all previous orders."
   },
   {
     "id": "prd-03-order-lifecycle",
     "title": "PRD-03: Order Lifecycle",
-    "prd_id": "prd-03",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-5",
     "title": "Data Model",
-    "prd_id": "prd-03",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "quote",
+    "title": "Quote",
+    "prd_id": null,
     "level": 3,
-    "body": "**Quote**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| quote\\_number | string | QU-XXXX, auto; preserved as ORD-XXXX on conversion |\n| title | string | default = \"QU-XXXX — Customer Name\"; overridable |\n| status | enum | Draft / Sent / Awaiting Response / Pending / Approved / Rejected / Expired / Archived |\n| customer | FK → Customer | |\n| created\\_by | FK → User | |\n| created\\_at | datetime | |\n| expires\\_at | datetime (nullable) | 2 weeks from sent — REQUIRED? |\n| notes | string | customer-visible, quote-level |\n| internal\\_notes | string | not customer-visible |\n\n**Quote Line Item**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| quote | FK → Quote | |\n| plant\\_variant | FK → Plant Variant | |\n| quantity | integer | |\n| unit\\_price | decimal | defaults from variant trade/retail price…"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| quote\\_number | string | QU-XXXX, auto; preserved as ORD-XXXX on conversion |\n| title | string | default \\= \"QU-XXXX — Customer Name\"; overridable |\n| status | enum | Draft / Sent / Awaiting Response / Pending / Approved / Rejected / Expired / Archived |\n| customer | FK → Customer |  |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| expires\\_at | datetime (nullable) | 2 weeks from sent — REQUIRED? |\n| notes | string | customer-visible, quote-level |\n| internal\\_notes | string | not customer-visible |"
+  },
+  {
+    "id": "quote-line-item",
+    "title": "Quote Line Item",
+    "prd_id": null,
+    "level": 3,
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| quote | FK → Quote |  |\n| plant\\_variant | FK → Plant Variant |  |\n| quantity | integer |  |\n| unit\\_price | decimal | defaults from variant trade/retail price; admin override allowed |\n| line\\_note | string (nullable) | per-line, customer-visible; used for substitutions |\n| line\\_status | enum | Active / Struck Through (substituted) |"
+  },
+  {
+    "id": "order",
+    "title": "Order",
+    "prd_id": null,
+    "level": 3,
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| order\\_number | string | ORD-XXXX, matches the QU it converted from; retail orders get a fresh ORD |\n| title | string | default \\= \"ORD-XXXX — Customer Name\"; overridable for trade shows etc. |\n| status | enum | Pending / Confirmed / Ready to Pick / Staged / Packed / Dispatched-Collected / Completed / Archived |\n| customer | FK → Customer |  |\n| source\\_quote | FK → Quote (nullable) | null for retail and trade instant-buy orders |\n| delivery\\_method | enum | Collection / DPD / Pallet / Dutch Trolley / MacPlants Van |\n| delivery\\_date | date | for trade, customer-specified preferred date |\n| assigned\\_picker | FK → User (nullable) | manually assigned by Admin from Ready-to-Pick stage |\n| notes | string |  |\n| created\\_at | datetime |  |\n|…"
+  },
+  {
+    "id": "order-line-item",
+    "title": "Order Line Item",
+    "prd_id": null,
+    "level": 3,
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| order | FK → Order |  |\n| plant\\_variant | FK → Plant Variant |  |\n| quantity | integer |  |\n| unit\\_price | decimal |  |\n| line\\_note | string (nullable) | per-line, customer-visible ‘Sub for x” |"
+  },
+  {
+    "id": "invoice",
+    "title": "Invoice",
+    "prd_id": null,
+    "level": 3,
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| invoice\\_number | string | INV-XXXX, auto-generated |\n| order | FK → Order | multiple invoices per order possible (each material change pre-Xero supersedes the previous) |\n| status | enum | Unpaid / Paid |\n| issued\\_at | datetime |  |\n| due\\_at | datetime | for trade, issued \\+ 30 days |\n| posted\\_to\\_xero | boolean |  |\n| posted\\_to\\_xero\\_at | datetime (nullable) | set 24h after dispatch/collection |\n| marked\\_paid\\_by | FK → User (nullable) | manually marked by Ariane / finance |\n| marked\\_paid\\_at | datetime (nullable) |  |\n\n**Note:** Derived (not stored): an invoice's subtotal, VAT, and grand total are computed from the line items of the order it points to. Once an invoice is posted to Xero, the order is locked, so the computation b…"
+  },
+  {
+    "id": "quote--order",
+    "title": "Quote → Order",
+    "prd_id": null,
+    "level": 2,
+    "body": "When a QUOTE is raised it is given a number — QUO-1234. This number stays the same throughout the entire ORDER LIFECYCLE. Prefixes change per stage for easy searching: QU-1234 (quote) → ORD-1234 (order). Same numeric ID, different prefixes."
   },
   {
     "id": "quote-phase",
     "title": "Quote Phase",
-    "prd_id": "prd-03",
+    "prd_id": null,
     "level": 3,
-    "body": "* **Draft** — created but not sent to the customer  \n* **Sent** — customer been sent quote, we're waiting on their decision  \n* **Awaiting Response** — Quote sent to customer, awaiting response.   \n* **Pending** — customer accepted but not all stock is available yet  \n* **Approved** — all stock available, awaiting payment from customer to proceed.   \n* **Rejected** — customer declined (terminal, end of the road)  \n* **Expired** — Quotes expires after 2 weeks automatically \\- REQUIRED ?  \n* **Archived** \\-"
+    "body": "* **Draft** — created but not sent to the customer\n\n* **Sent** — customer been sent quote, we're waiting on their decision\n\n* **Pending** — customer accepted but not all stock is available yet\n\n* **Approved** — all stock available, awaiting payment from customer to proceed.\n\n* **Rejected** — customer declined (terminal, end of the road)\n\n* **Expired** — Quotes expires after 2 weeks automatically \\- REQUIRED \n\n* **Archived** \\-"
   },
   {
-    "id": "order-phase---to-discuss-with-jake",
-    "title": "Order Phase \\- TO DISCUSS WITH JAKE",
-    "prd_id": "prd-03",
+    "id": "order-phase",
+    "title": "Order Phase",
+    "prd_id": null,
     "level": 3,
-    "body": "Multiple Invoices can be attached to an Order.  As the order may change. \n\n* **Pending:**\\+ Plants have gone out of stock since the quote was made.   \n* **Confirmed \\- Good name ?** — Customer has PAID or Credit Terms agreed. Order is live,  CUSTOMER IS SENT ORDER CONFIRMATION  \\- Delivery Date??   \n* Stock reserved. *Online orders go straight here.*  \n* **Ready to Pick** — Order will go here THE DAY BEFORE ?  \n* queued for the warehouse team.  Admin will MANUALLY assign staff to pick certain orders. JAKE.   \n* **Trade vs retail pickers:** Macplants operates with separate trade and retail pickers (e.g. Vicky picks trade, Lindsey picks retail). When assigning a pick, admin should be able to filter the staff dropdown by picker type so trade orders go to trade pickers and retail orders go to…"
+    "body": "Multiple Invoices can be attached to an Order. As the order may change.\n\n* **Pending:**\\+ Plants have gone out of stock since the quote was made.\n\n* **Confirmed** \\- Customer has PAID or Credit Terms agreed. Order is live, customer is sent order confirmation\n\n* Stock reserved. Online orders go straight here.\n\n* **Ready to Pick** — Order can be easily move to ready to pick from the Confirmed Orders screen.  Then when on the Ready to Pick screen, admin can easily assign entire Order to be picked by certain staff member. \n\n* **Trade vs retail pickers:** Macplants operates with separate trade and retail pickers (e.g. Vicky picks trade, Lindsey picks retail). Admin should be easily able to add a picker to an order from Ready to Pick filter screen. \n\n* **Order dashboard / bird's-eye view:** Admi…"
   },
   {
     "id": "invoice-phase",
     "title": "Invoice Phase",
-    "prd_id": "prd-03",
+    "prd_id": null,
     "level": 3,
-    "body": "* If the client has ordered the plants on CREDIT then an invoice is sent to them once the plants have been dispatched.  The Order is marked as UNPAID.  It is the Job of Finance to mark the invoice as paid on the ERP when the payment arrives. \n\n**Credit Notes**\n\n* **Refunded / Credit Noted** — see PRD-3.3 below. Any order can be refunded (retail) or credit noted (trade) at any stage, including after completion."
+    "body": "If the client has ordered the plants on CREDIT then an invoice is sent to them once the plants have been dispatched ( The Order is still marked as UNPAID. It is the Job of Finance to mark the invoice as paid on the ERP when the payment arrives.  An Order is marked as paid if there is an Invoice within that Order which is marked as Paid ?"
+  },
+  {
+    "id": "credit-notes",
+    "title": "Credit Notes",
+    "prd_id": null,
+    "level": 3,
+    "body": "Refunded / Credit Noted — see PRD-3.3 below. Any order can be refunded (retail) or credit noted (trade) at any stage, including after completion."
   },
   {
     "id": "notes--audit-trail",
     "title": "Notes & Audit Trail",
-    "prd_id": "prd-03",
+    "prd_id": null,
     "level": 3,
-    "body": "* Notes can be added at any point in the Order Lifecycle and will persist between Quote and Order.  \n* Tasks can be added to a Quote or Order."
+    "body": "* Notes can be added at any point in the Order Lifecycle and will persist between Quote and Order.\n\n* Tasks can be added to a Quote or Order."
   },
   {
     "id": "order-lifecycle---what-is-it",
     "title": "Order Lifecycle \\- What Is It",
-    "prd_id": "prd-03",
-    "level": 3,
-    "body": "The engine that runs the entire order lifecycle — from initial quote through to final delivery and invoicing.\n\nTrade customers can request a quote & then buy plants\n\nTrade customers can see LIVE AVAILABILITY of all the plants which are in stock and 'Trade Ready' from the portal, they can BUY INSTANTLY.  Very important to move the friction of them wanting to purchase, should be as easy as possible, too easy even. \n\nRetail orders go straight to the Order Phase.  The customer adds the their desired items in the cart on the WP site.  The checkout page takes them to the ERP.  They see their basket and are prompted to pay.  FINISH FLOW OF ACCOUNT CREATION ON ORDER LIFECYCLE. \n\n###"
+    "prd_id": null,
+    "level": 2,
+    "body": "The engine that runs the entire order lifecycle — from initial quote through to final delivery and invoicing.\n\nTrade customers can request a quote & then buy plants\n\nTrade customers can see LIVE AVAILABILITY of all the plants which are in stock and 'Trade Ready' from the portal, they can BUY INSTANTLY. Very important to move the friction of them wanting to purchase, should be as easy as possible, too easy even.\n\nRetail orders go straight to the Order Phase. The customer adds the their desired items in the cart on the WP site. The checkout page takes them to the ERP. They see their basket and are prompted to pay."
   },
   {
-    "id": "what-it-must-do-3",
+    "id": "what-it-must-do-4",
     "title": "What It Must Do",
-    "prd_id": "prd-03",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "quotes---single-quote-screen",
+    "title": "Quotes \\- Single Quote Screen",
+    "prd_id": null,
     "level": 3,
-    "body": "#### **Quotes \\- Single Quote Screen**\n\n* Admin must be able to CRUD for quotes \\+ Download PDF on single quote screen  \n* CRUD for line items on Quotes.  \n* When adding line items to a quote: Admin user types in plant name — it searches through all plant names and allows admin to select a plant name from the database. User can select pot size & quantity.  \n* When user selects pot size the cost price of this plant at this pot size, will automatically autofill the price input field; user can override the price field \\- there will be a small piece of text to say that this is the COST PRICE.  \n* **Per-line notes on quotes & orders:** Every line item on a quote or order has its own optional note field. Notes appear directly below the relevant line on the generated PDF (used most often for subs…"
+    "body": "* Admin must be able to CRUD for quotes \\+ Download PDF on single quote screen\n\n* CRUD for line items on Quotes.\n\n* When adding line items to a quote: Admin user types in plant name — it searches through all plant names and allows admin to select a plant name from the database. User can select pot size & quantity.  Admin can see in stock quantity of that pot size. \n\n* When user selects pot size the cost price of this plant at this pot size, will automatically autofill the price input field with the COST price; user can override the price field \\- there will be a small piece of text to say that this is the COST PRICE.\n\n* **Per-line notes on quotes & orders:** Every line item on a quote or order has its own optional note field. Notes appear directly below the relevant line on the generated P…"
+  },
+  {
+    "id": "orders",
+    "title": "Orders",
+    "prd_id": null,
+    "level": 3,
+    "body": "#### ***Single Order Screen***\n\n* A quote can be converted to an Order once it has been paid (order will be marked as PAID then) OR the customer has made an order within their Credit Terms (marked as unpaid)\n\n* Orders CAN be edited (line items, quantities) while the invoice is still on the ERP and has NOT been posted to Xero. This is important because plants die, customers change their minds and we need to handle that without messy Xero corrections. The admin user can generate a new invoice at any moment with the updated line items. A record of all invoices for that order are kept.\n\n* On single Order page in ERP — admin can see Order Progress Stepper along the top with different stages complete (Ready to Pick, Staged, Packed, Dispatched & Complete).\n\n* **Order title (custom, applies to eve…"
+  },
+  {
+    "id": "general-order-logic",
+    "title": "General Order Logic",
+    "prd_id": null,
+    "level": 3,
+    "body": "An Order is posted to ONLY Xero when it has been dispatched, at this point the order becomes READ-ONLY on the ERP. Any correction after that point must go through the credit note flow (PRD-3.3).\n\nEvery order starts as a Quote. Quotes go through: Draft → Sent → (Pending (stock gap)) → Approved / Expired.\n\nAn approved quote converts to an Order. An order can either be paid upfront or be within the customer's credit terms./\n\nAll Quotes & Orders display cost price of each Unit, the subtotal, VAT Total & Total at the very bottom.\n\nIf the customer exceeds their credit limit, the system presents a Stripe payment screen so they can pay immediately rather than being blocked.\n\nStock is only reserved when the Order is made (payment received or credit terms confirmed). Not before.\n\nIf stock dies/sells…"
+  },
+  {
+    "id": "xero-posting-flow-important--changed-this-meeting",
+    "title": "Xero Posting Flow (IMPORTANT — changed this meeting)",
+    "prd_id": null,
+    "level": 3,
+    "body": "**Previous assumption:** An invoice gets sent to Xero as soon as an order is created.\n\n**New flow** (to avoid messy edits/deletions in Xero when orders change):\n\n* Quote accepted → Order create on ERP & Invoice will be generated automatically on ERP. NOT sent to Xero.\n\n* Customer is sent an email with the PDF attachment of the Invoice.\n\n* Order can be freely edited on the ERP during its lifecycle (adjust quantities, swap lines, add notes). The invoice updates automatically.\n\n* Once the order is Dispatched / Collected, the final invoice is posted to Xero (suggested: 24 hours after dispatch/collection — to be confirmed with Ariane).\n\n* Once posted to Xero, the invoice becomes read-only on the ERP. Any correction must go through the credit note flow.\n\n* Payment reconciliation in Xero is by ba…"
   },
   {
     "id": "how-we-know-its-done-3",
     "title": "How We Know It's Done",
-    "prd_id": "prd-03",
-    "level": 3,
-    "body": "* Full Quote → Invoice → Order lifecycle works with correct status transitions.  \n* Stock is reserved at invoice approval and released on cancellation.  \n* Customer-facing emails are sent with a live link to the invoice (not a PDF).  \n* Order status history provides a full audit trail.  \n* Pending → Approved workflow notifies the manager when stock becomes available.  \n* Orders can be edited while invoice is on ERP; invoice posts to Xero 24h after dispatch/collection; post-Xero edits go through credit note flow.  \n* Billing history (invoices \\+ payment status \\+ balance) is visible on every order.  \n  ---\n\n  ##"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Full Quote → Invoice → Order lifecycle works with correct status transitions.\n\n* Stock is reserved at invoice approval and released on cancellation.\n\n* Customer-facing emails are sent with a live link to the invoice (not a PDF).\n\n* Order status history provides a full audit trail.\n\n* Pending → Approved workflow notifies the manager when stock becomes available.\n\n* Orders can be edited while invoice is on ERP; invoice posts to Xero 24h after dispatch/collection; post-Xero edits go through credit note flow.\n\n* Billing history (invoices \\+ payment status \\+ balance) is visible on every order."
   },
   {
     "id": "prd-31-customer-notifications-during-order-lifecycle",
     "title": "PRD-3.1: Customer Notifications (During Order Lifecycle)",
-    "prd_id": "prd-3-1",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-6",
     "title": "Data Model",
-    "prd_id": "prd-3-1",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "email-notification",
+    "title": "Email Notification",
+    "prd_id": null,
     "level": 3,
-    "body": "**Email Notification** *(outgoing email snapshot)*\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| trigger | enum | quote\\_sent / quote\\_approved / invoice\\_raised / order\\_confirmed / order\\_packed |\n| recipient | string | email address |\n| subject | string | |\n| body | string | full HTML body stored as a snapshot for audit |\n| linked\\_record | FK (polymorphic) | Order / Quote / Invoice |\n| sent\\_at | datetime | |\n| sent\\_by | FK → User (nullable) | null when system-triggered |\n\n**Internal Notification** *(dashboard / in-app, not emailed)*\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| type | enum | pending\\_order\\_stock\\_arrived / po\\_overdue / batch\\_ready\\_date\\_due / account\\_on\\_hold / new\\_trade\\_order / credit\\_limit\\_breach |\n| linked\\_record | FK (polymorphic) | the relevant obj…"
+    "body": "*(outgoing email snapshot)*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| trigger | enum | quote\\_sent / quote\\_approved / invoice\\_raised / order\\_confirmed / order\\_packed |\n| recipient | string | email address |\n| subject | string |  |\n| body | string | full HTML body stored as a snapshot for audit |\n| linked\\_record | FK (polymorphic) | Order / Quote / Invoice |\n| sent\\_at | datetime |  |\n| sent\\_by | FK → User (nullable) | null when system-triggered |"
+  },
+  {
+    "id": "internal-notification",
+    "title": "Internal Notification",
+    "prd_id": null,
+    "level": 3,
+    "body": "*(dashboard / in-app, not emailed)*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| type | enum | pending\\_order\\_stock\\_arrived / po\\_overdue / batch\\_ready\\_date\\_due / account\\_on\\_hold / new\\_trade\\_order / credit\\_limit\\_breach |\n| linked\\_record | FK (polymorphic) | the relevant object |\n| audience\\_role | enum | Admin / Sales / Warehouse |\n| created\\_at | datetime |  |\n| dismissed\\_by | FK → User (nullable) |  |\n| dismissed\\_at | datetime (nullable) |  |\n\nCustomer email notifications fire automatically on:\n\n* Order confirmed\n\n* Dispatch notifications come from DPD directly, not the ERP.\n\nEvery email sent stores a snapshot of the message (subject, body, recipient, timestamp) against the order record for a full communication audit trail.\n\n* \n\nNotifications are role-aware — wareh…"
   },
   {
     "id": "how-we-know-its-done-4",
     "title": "How We Know It's Done",
-    "prd_id": "prd-3-1",
-    "level": 3,
-    "body": "* Tasks can be created manually with assignee, due date, priority, and linked source record.  \n* Tasks auto-create from all listed operational triggers and persist until manually completed.  \n* Staff schedule records who is working each day and auto-assignment respects it.  \n* Staff can view, start, and complete tasks from the PWA; admin sees updates live in the ERP.  \n* Tasks are fully audited (creation, reassignment, status changes).  \n* Customer email notifications fire on all listed order events, with snapshots stored against the order record.  \n* Internal notifications appear on the dashboard and link through to the relevant detail screen.  \n* Account-on-hold warnings show clearly when staff open a flagged customer record.  \n  ---"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Tasks can be created manually with assignee, due date, priority, and linked source record.\n\n* Tasks auto-create from all listed operational triggers and persist until manually completed.\n\n* Staff schedule records who is working each day and auto-assignment respects it.\n\n* Staff can view, start, and complete tasks from the PWA; admin sees updates live in the ERP.\n\n* Tasks are fully audited (creation, reassignment, status changes).\n\n* Customer email notifications fire on all listed order events, with snapshots stored against the order record.\n\n* Internal notifications appear on the dashboard and link through to the relevant detail screen.\n\n* Account-on-hold warnings show clearly when staff open a flagged customer record."
   },
   {
     "id": "prd-32-delivery-methods--routing",
     "title": "PRD-3.2: Delivery Methods & Routing",
-    "prd_id": "prd-3-2",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-7",
     "title": "Data Model",
-    "prd_id": "prd-3-2",
+    "prd_id": null,
+    "level": 2,
+    "body": "*Delivery method fields live on the Order itself — there is no separate persisted entity. Listed here to make the delivery-related columns of the Order schema explicit.*"
+  },
+  {
+    "id": "order--delivery-related-fields",
+    "title": "Order — delivery-related fields",
+    "prd_id": null,
     "level": 3,
-    "body": "*Delivery method fields live on the **Order** itself — there is no separate persisted entity. Listed here to make the delivery-related columns of the Order schema explicit.*\n\n**Order — delivery-related fields**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| delivery\\_method | enum | Collection / DPD / Pallet / Dutch Trolley / MacPlants Van |\n| delivery\\_price | decimal | auto for retail DPD; manual for Pallet / Dutch Trolley / Van; £0 for Collection |\n| delivery\\_date | date | collection / carrier pickup date for non-DPD methods |\n| carrier\\_reference | string (nullable) | DPD label number etc. |\n| number\\_of\\_boxes | integer (nullable) | captured at pack stage for multi-box orders |"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| delivery\\_method | enum | Collection / DPD / Pallet / Dutch Trolley / MacPlants Van |\n| delivery\\_price | decimal | auto for retail DPD; manual for Pallet / Dutch Trolley / Van; £0 for Collection |\n| delivery\\_date | date | collection / carrier pickup date for non-DPD methods |\n| carrier\\_reference | string (nullable) | DPD label number etc. |\n| number\\_of\\_boxes | integer (nullable) | captured at pack stage for multi-box orders |"
   },
   {
     "id": "what-is-it-3",
     "title": "What Is It",
-    "prd_id": "prd-3-2",
-    "level": 3,
+    "prd_id": null,
+    "level": 2,
     "body": "The system that defines how orders get to the customer. Macplants supports 5 delivery methods, each with different rules, capacity limits, and scheduling. When an order is confirmed, the system suggests the best option."
   },
   {
-    "id": "what-it-must-do-4",
+    "id": "what-it-must-do-5",
     "title": "What It Must Do",
-    "prd_id": "prd-3-2",
-    "level": 3,
-    "body": "Support five fulfilment methods:\n\n* **Collection** — Free. Available for both retail (via website) and trade. Retail customers CAN order online for collection and should be able to pay online at checkout.  \n* **DPD** — Retail only for stage 1 (automatic pricing — use current website logic). Not allowed for trade via the trade portal right now. Note: future consideration for trade DPD with a percentage markup (10–20%) on DPD costs, as some London-based trade customers want this.  \n* **Pallet** — Add manually to invoice (price \\+ set date for collection by carrier).  \n* **Dutch Trolley** — Add manually to invoice (price \\+ set date for collection by Groveport).  \n* **MacPlants Van** — Add manually to invoice (price based on mileage \\+ set date).\n\n**Additional rules:**\n\n* Collection: availabl…"
+    "prd_id": null,
+    "level": 2,
+    "body": "Support five fulfilment methods:\n\n* **Collection** — Free. Available for both retail (via website) and trade. Retail customers CAN order online for collection and should be able to pay online at checkout.\n\n* **DPD** — Retail only for stage 1 (automatic pricing — use current website logic). Not allowed for trade via the trade portal right now. Note: future consideration for trade DPD with a percentage markup (10–20%) on DPD costs, as some London-based trade customers want this.\n\n* **Pallet** — Add manually to invoice (price \\+ set date for collection by carrier).\n\n* **Dutch Trolley** — Add manually to invoice (price \\+ set date for collection by Groveport).\n\n* **MacPlants Van** — Add manually to invoice (price based on mileage \\+ set date).\n\nAdditional rules:\n\n* **Collection:** available an…"
   },
   {
     "id": "how-we-know-its-done-5",
     "title": "How We Know It's Done",
-    "prd_id": "prd-3-2",
-    "level": 3,
-    "body": "* Staff Members can select delivery method for an order & update it at any stage.  \n* Orders for delivery on a certain day are visible for ERP Admin.  \n  ---\n\n  ## \n\n  ##"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Staff Members can select delivery method for an order & update it at any stage.\n\n* Orders for delivery on a certain day are visible for ERP Admin."
   },
   {
-    "id": "prd-33-refunds--credit-notes-",
-    "title": "PRD-3.3: Refunds & Credit Notes \\\\\\\\\\\\\\\\",
-    "prd_id": "prd-3-3",
-    "level": 2,
+    "id": "prd-33-refunds--credit-notes",
+    "title": "PRD-3.3: Refunds & Credit Notes",
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-8",
     "title": "Data Model",
-    "prd_id": "prd-3-3",
-    "level": 3,
-    "body": "**Refund / Credit Note**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| type | enum | Refund (retail) / Credit Note (trade) |\n| order | FK → Order | |\n| invoice | FK → Invoice | the original invoice being reversed |\n| amount | decimal | |\n| reason | string | |\n| plants\\_returned | boolean | if true, restock task is generated |\n| created\\_by | FK → User | |\n| created\\_at | datetime | |\n| pushed\\_to\\_xero | boolean | |\n| pushed\\_to\\_xero\\_at | datetime (nullable) | |"
-  },
-  {
-    "id": "what-is-it-4",
-    "title": "What Is It",
-    "prd_id": "prd-3-3",
-    "level": 3,
-    "body": "When a customer returns plants, changes their mind after completion, or receives something they don't want, the ERP must be able to issue either a refund (retail) or a credit note (trade). This was not originally in scope but was raised as a clear Stage 1 requirement — returns happen regularly enough that a manual workaround would create pain."
-  },
-  {
-    "id": "what-it-must-do-5",
-    "title": "What It Must Do",
-    "prd_id": "prd-3-3",
-    "level": 3,
-    "body": "* Any order, at any stage — including after completion and after the invoice has been posted to Xero — can be Refunded or Credit Noted. A button on the order screen provides this action.  \n* **Retail customers → Refund.** Money is returned to the customer's bank account. The refund is pushed to Xero so the accounts reflect the reversal. The sale is no longer counted in ERP reporting.  \n* **Trade customers → Credit Note.** A credit balance is applied to the customer's account for future use. The credit note is pushed to Xero. Physical cash transfers back to a trade customer are rare — the default is a credit note.  \n* **Returned plants:** If plants are physically returned and still viable, a TO DO task is created for staff to add them back into stock (choose location, batch, status). If the…"
-  },
-  {
-    "id": "how-we-know-its-done-6",
-    "title": "How We Know It's Done",
-    "prd_id": "prd-3-3",
-    "level": 3,
-    "body": "* A Refund button appears on every retail order; a Credit Note button on every trade order. Both are available regardless of order status.  \n* Refunds push to Xero correctly; credit notes push to Xero and apply to the trade customer's account balance.  \n* Returned viable plants generate a restock task; dead returns are captured as shrinkage.  \n* Order billing history reflects refunds and credit notes.  \n* Full audit trail on all refund / credit note actions.  \n  ---"
-  },
-  {
-    "id": "prd-34-trade-shows-stock-reservation--sales-reconciliation",
-    "title": "PRD-3.4: Trade Shows (Stock Reservation & Sales Reconciliation)",
-    "prd_id": "prd-3-4",
+    "prd_id": null,
     "level": 2,
     "body": ""
   },
   {
-    "id": "data-model-9",
-    "title": "Data Model",
-    "prd_id": "prd-3-4",
+    "id": "refund--credit-note",
+    "title": "Refund / Credit Note",
+    "prd_id": null,
     "level": 3,
-    "body": "*No new objects.* Trade shows reuse the existing Order (with custom Title) and Purchase Order (for unsold-stock returns) primitives. The only show-specific behaviour is suppressing customer-facing notifications when the linked customer is the dummy show customer."
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| type | enum | Refund (retail) / Credit Note (trade) |\n| order | FK → Order |  |\n| invoice | FK → Invoice | the original invoice being reversed |\n| amount | decimal |  |\n| reason | string |  |\n| plants\\_returned | boolean | if true, restock task is generated |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| pushed\\_to\\_xero | boolean |  |\n| pushed\\_to\\_xero\\_at | datetime (nullable) |  |"
   },
   {
-    "id": "what-is-it-5",
+    "id": "what-is-it-4",
     "title": "What Is It",
-    "prd_id": "prd-3-4",
-    "level": 3,
-    "body": "Trade shows (Scone Palace, Powis, RHS shows, Chelsea, farmers' markets, etc.) are a meaningful part of the Macplants business — Scone alone takes \\~4 weeks of one person's time to prepare. The ERP must support reserving stock for a show, generating a pick list, taking the show stock out of online/trade availability, and reconciling sales after the show closes.\n\nThere is **no bespoke \"show\" module**. Trade shows are handled entirely with two existing primitives — a normal Order (with a custom title) and a normal Purchase Order — used in sequence. This keeps the codebase clean and means show data flows through the same reporting, invoicing, and audit machinery as everything else."
+    "prd_id": null,
+    "level": 2,
+    "body": "When a customer returns plants, changes their mind after completion, or receives something they don't want, the ERP must be able to issue either a refund (retail) or a credit note (trade). This was not originally in scope but was raised as a clear Stage 1 requirement — returns happen regularly enough that a manual workaround would create pain."
   },
   {
     "id": "what-it-must-do-6",
     "title": "What It Must Do",
-    "prd_id": "prd-3-4",
-    "level": 3,
-    "body": "* **Step 1 — Create a titled order to reserve show stock.** Admin creates a normal order, sets the **Order Title** (PRD-03) to something descriptive (e.g. \"Scone 2026\"), and adds the plants and quantities being taken to the show as line items. The order can sit against a dummy show customer (or any customer admin chooses to use for shows). Creating this order reserves the stock in the standard way, so it immediately disappears from the trade portal and the WordPress retail site. The pick list for the show is generated from this order exactly like any other order — no separate show pick-list flow.  \n* **Step 2 — After the show, edit the order to reflect what actually sold.** When the team returns from the show, admin edits the line item quantities on the original order down to the quantitie…"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Any order, at any stage — including after completion and after the invoice has been posted to Xero — can be Refunded or Credit Noted. A button on the order screen provides this action.\n\n* **Retail customers → Refund.** Money is returned to the customer's bank account. The refund is pushed to Xero so the accounts reflect the reversal. The sale is no longer counted in ERP reporting.\n\n* **Trade customers → Credit Note.** A credit balance is applied to the customer's account for future use. The credit note is pushed to Xero. Physical cash transfers back to a trade customer are rare — the default is a credit note.\n\n* **Returned plants:** If plants are physically returned and still viable, a TO DO task is created for staff to add them back into stock (choose location, batch, status). If the pl…"
+  },
+  {
+    "id": "how-we-know-its-done-6",
+    "title": "How We Know It's Done",
+    "prd_id": null,
+    "level": 2,
+    "body": "* A Refund button appears on every retail order; a Credit Note button on every trade order. Both are available regardless of order status.\n\n* Refunds push to Xero correctly; credit notes push to Xero and apply to the trade customer's account balance.\n\n* Returned viable plants generate a restock task; dead returns are captured as shrinkage.\n\n* Order billing history reflects refunds and credit notes.\n\n* Full audit trail on all refund / credit note actions."
+  },
+  {
+    "id": "prd-34-trade-shows-stock-reservation--sales-reconciliation",
+    "title": "PRD-3.4: Trade Shows (Stock Reservation & Sales Reconciliation)",
+    "prd_id": null,
+    "level": 1,
+    "body": "NB \\- Tech Team to Ignore this \\- no new functionality here \\- this is just to document how this will be handled"
+  },
+  {
+    "id": "data-model-9",
+    "title": "Data Model",
+    "prd_id": null,
+    "level": 2,
+    "body": "*No new objects. Trade shows reuse the existing Order (with custom Title) and Purchase Order (for unsold-stock returns) primitives. The only show-specific behaviour is suppressing customer-facing notifications when the linked customer is the dummy show customer.*"
+  },
+  {
+    "id": "what-is-it-5",
+    "title": "What Is It",
+    "prd_id": null,
+    "level": 2,
+    "body": "Trade shows (Scone Palace, Powis, RHS shows, Chelsea, farmers' markets, etc.) are a meaningful part of the Macplants business — Scone alone takes \\~4 weeks of one person's time to prepare. The ERP must support reserving stock for a show, generating a pick list, taking the show stock out of online/trade availability, and reconciling sales after the show closes.\n\nThere is no bespoke \"show\" module. Trade shows are handled entirely with two existing primitives — a normal Order (with a custom title) and a normal Purchase Order — used in sequence. This keeps the codebase clean and means show data flows through the same reporting, invoicing, and audit machinery as everything else."
+  },
+  {
+    "id": "what-it-must-do-7",
+    "title": "What It Must Do",
+    "prd_id": null,
+    "level": 2,
+    "body": "* **Step 1 — Create a titled order to reserve show stock.** Admin creates a normal order, sets the Order Title (PRD-03) to something descriptive (e.g. \"Scone 2026\"), and adds the plants and quantities being taken to the show as line items. The order can sit against a dummy show customer (or any customer admin chooses to use for shows). Creating this order reserves the stock in the standard way, so it immediately disappears from the trade portal and the WordPress retail site. The pick list for the show is generated from this order exactly like any other order — no separate show pick-list flow.\n\n* **Step 2 — After the show, edit the order to reflect what actually sold.** When the team returns from the show, admin edits the line item quantities on the original order down to the quantities tha…"
   },
   {
     "id": "how-we-know-its-done-7",
     "title": "How We Know It's Done",
-    "prd_id": "prd-3-4",
-    "level": 3,
-    "body": "* Admin can create an order with a custom title (e.g. \"Scone 2026\") that reserves the stock and removes it from the trade portal and website.  \n* A show pick list downloads as a PDF in the same format as any normal order pick list.  \n* After the show, admin can edit the order quantities down to actual sold quantities and push the order through the standard invoice flow. Payment is recorded manually with a mixed-tender note (terminal / PayPal / cash).  \n* Admin can then create a separate PO for the returning unsold stock; reconciling that PO puts the plants back into the correct nursery location.  \n* Show orders never trigger customer-facing emails.  \n* For any past show, Macplants can pull the original order, the final invoice, and the return PO and see the full taken / sold / returned pic…"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Admin can create an order with a custom title (e.g. \"Scone 2026\") that reserves the stock and removes it from the trade portal and website.\n\n* A show pick list downloads as a PDF in the same format as any normal order pick list.\n\n* After the show, admin can edit the order quantities down to actual sold quantities and push the order through the standard invoice flow. Payment is recorded manually with a mixed-tender note (terminal / PayPal / cash).\n\n* Admin can then create a separate PO for the returning unsold stock; reconciling that PO puts the plants back into the correct nursery location.\n\n* Show orders never trigger customer-facing emails.\n\n* For any past show, Macplants can pull the original order, the final invoice, and the return PO and see the full taken / sold / returned picture.…"
   },
   {
     "id": "prd-04-staff-member-tasks",
     "title": "PRD-04: Staff Member Tasks",
-    "prd_id": "prd-04",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "data-model-10",
     "title": "Data Model",
-    "prd_id": "prd-04",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "task",
+    "title": "Task",
+    "prd_id": null,
     "level": 3,
-    "body": "**Task**\n\n| Field | Type | Notes |\n| --- | --- | --- |\n| title | string | |\n| description | string | |\n| status | enum | Open / In Progress / Completed / Cancelled |\n| type | enum | Finance / Admin / Staff / Other |\n| priority | enum | High / Medium / Low |\n| assignee | FK → User | |\n| due\\_date | date | |\n| attached\\_to | FK (polymorphic, nullable) | Quote / Order / Invoice / PO / Plant Batch — null for standalone tasks |\n| source | enum | Manual / Auto-generated (system trigger e.g. batch ready, PO overdue) |\n| notes | string | |\n| created\\_by | FK → User | |\n| created\\_at | datetime | |\n| completed\\_by | FK → User (nullable) | |\n| completed\\_at | datetime (nullable) | |"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| title | string |  |\n| description | string |  |\n| status | enum | Open / In Progress / Completed / Cancelled |\n| type | enum | Finance / Admin / Staff / Other |\n| priority | enum | High / Medium / Low |\n| assignee | FK → User |  |\n| due\\_date | date |  |\n| attached\\_to | FK (polymorphic, nullable) | Quote / Order / Invoice / PO / Plant Batch — null for standalone tasks |\n| source | enum | Manual / Auto-generated (system trigger e.g. batch ready, PO overdue) |\n| notes | string |  |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| completed\\_by | FK → User (nullable) |  |\n| completed\\_at | datetime (nullable) |  |"
   },
   {
     "id": "what-is-it-6",
     "title": "What Is It",
-    "prd_id": "prd-04",
-    "level": 3,
-    "body": "The operational glue that keeps nothing falling through the cracks. Tasks capture every action that needs a human to do something — from verifying a batch is ready, to reconciling a PO, to responding to a new trade order. Notifications keep both staff and customers informed as orders move through their lifecycle. This replaces the current situation where reminders live on Post-its, or in scattered emails."
-  },
-  {
-    "id": "what-it-must-do-7",
-    "title": "What It Must Do",
-    "prd_id": "prd-04",
-    "level": 3,
-    "body": "* Tasks appear in the main ERP navigation as a dedicated area. Admin can create tasks manually and assign them to a specific staff member with a due date and priority.  \n* The system auto-creates tasks from operational triggers:  \n  * Batch reaches its ready date → task for staff to physically verify and manually update status (readiness is weather-dependent, so status does NOT change automatically).  \n  * Stock arrives for a pending order → task for manager to review and confirm.  \n  * Supplier PO is overdue (past expected delivery date) → task to chase supplier.  \n  * New trade order awaiting response → task for sales staff to review.  \n  * PO received on site → task to reconcile quantities and create/adjust batches.  \n  * Order cancelled → task to return reserved stock to correct locati…"
-  },
-  {
-    "id": "prd-05-erp-portals---discuss-with-team",
-    "title": "PRD-05: ERP Portals \\- DISCUSS WITH TEAM",
-    "prd_id": "prd-05",
+    "prd_id": null,
     "level": 2,
-    "body": "**MacPlants Users:** Admin, Staff **Customers:** Retail, Trade"
-  },
-  {
-    "id": "51-admin-portal--super-admin-portal",
-    "title": "5.1 Admin Portal — Super Admin portal",
-    "prd_id": "prd-05",
-    "level": 3,
-    "body": "`.staff.macplants.co.uk/login`"
-  },
-  {
-    "id": "52-staff-portal",
-    "title": "5.2 Staff Portal",
-    "prd_id": "prd-05",
-    "level": 3,
-    "body": "`.staff.macplants.co.uk/login`"
-  },
-  {
-    "id": "53-retail-customer-portal",
-    "title": "5.3 Retail Customer Portal",
-    "prd_id": "prd-05",
-    "level": 3,
-    "body": "`.retail.macplants.co.uk/login`"
-  },
-  {
-    "id": "54-trade-customer-portal",
-    "title": "5.4 Trade Customer Portal",
-    "prd_id": "prd-05",
-    "level": 3,
-    "body": "Login URL: `/.trade.macplants.co.uk/login` **Integration:** Stripe"
-  },
-  {
-    "id": "what-is-it-7",
-    "title": "What Is It",
-    "prd_id": "prd-05",
-    "level": 3,
-    "body": "A self-service web portal where trade customers log in, search for plants and pricing, build orders, select delivery methods, advise timelines, and track their order status. This replaces the current process where customers email a wish list, staff manually search GrowMaster, and a spreadsheet is sent back."
+    "body": "The operational glue that keeps nothing falling through the cracks. Tasks capture every action that needs a human to do something — from verifying a batch is ready, to reconciling a PO, to responding to a new trade order. Notifications keep both staff and customers informed as orders move through their lifecycle. This replaces the current situation where reminders live on Post-its, or in scattered emails.\n\nInterna Tasks surface on the ERP dashboard and in-app:\n\n* Pending orders that can now be approved (stock has arrived).\n\n* Overdue supplier POs.\n\n* Batch ready-date tasks awaiting verification.\n\n* New trade orders awaiting response."
   },
   {
     "id": "what-it-must-do-8",
     "title": "What It Must Do",
-    "prd_id": "prd-05",
+    "prd_id": null,
+    "level": 2,
+    "body": "* Tasks appear in the main ERP navigation as a dedicated area. Admin can create tasks manually and assign them to a specific staff member with a due date and priority.\n\n* The system auto-creates tasks from operational triggers:\n\n  * Batch reaches its ready date → task for staff to physically verify and manually update status (readiness is weather-dependent, so status does NOT change automatically).\n\n  * Stock arrives for a pending order → task for manager to review and confirm.\n\n  * Supplier PO is overdue (past expected delivery date) → task to chase supplier.\n\n  * New trade order awaiting response → task for sales staff to review.\n\n  * PO received on site → task to reconcile quantities and create/adjust batches.\n\n  * Order cancelled → task to return reserved stock to correct location.\n\n*…"
+  },
+  {
+    "id": "prd-05-erp-portals---discuss-with-team",
+    "title": "PRD-05: ERP Portals \\- DISCUSS WITH TEAM",
+    "prd_id": null,
+    "level": 1,
+    "body": "MacPlants Users: Admin, Staff Customers: Retail, Trade"
+  },
+  {
+    "id": "51-admin-portal--super-admin-portal",
+    "title": "5.1 Admin Portal — Super Admin portal",
+    "prd_id": null,
+    "level": 2,
+    "body": ".staff.macplants.co.uk/login"
+  },
+  {
+    "id": "52-staff-portal",
+    "title": "5.2 Staff Portal",
+    "prd_id": null,
+    "level": 2,
+    "body": ".staff.macplants.co.uk/login"
+  },
+  {
+    "id": "53-retail-customer-portal",
+    "title": "5.3 Retail Customer Portal",
+    "prd_id": null,
+    "level": 2,
+    "body": ".retail.macplants.co.uk/login"
+  },
+  {
+    "id": "54-trade-customer-portal",
+    "title": "5.4 Trade Customer Portal",
+    "prd_id": null,
+    "level": 2,
+    "body": "Login URL: /.trade.macplants.co.uk/login Integration: Stripe"
+  },
+  {
+    "id": "what-is-it-7",
+    "title": "What Is It",
+    "prd_id": null,
+    "level": 2,
+    "body": "A self-service web portal where trade customers log in, search for plants and pricing, build orders, select delivery methods, advise timelines, and track their order status. This replaces the current process where customers email a wish list, staff manually search GrowMaster, and a spreadsheet is sent back."
+  },
+  {
+    "id": "what-it-must-do-9",
+    "title": "What It Must Do",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "trade-customer-portal",
+    "title": "Trade Customer Portal",
+    "prd_id": null,
     "level": 3,
-    "body": "#### **Trade Customer Portal**\n\n* Trade customers log in with credentials created by Macplants staff. No self-registration.  \n* Customers can search plants by name.  \n* All plants are shown on the portal unless marked as \"unavailable.\" Even plants that are currently out of stock are visible — Macplants can always reject the order. Plants marked as unavailable are hidden entirely.  \n* Retail-ready stock is excluded from the trade portal. Trade customers can ONLY buy retail-ready plants via the shop or mail order.  \n* Stock quantities ARE shown on the trade portal (earlier concern about hiding quantities for \"special\" plants was dropped — of \\~1,200 plants, only \\~20 are truly special. These will be flagged via internal notes rather than hiding quantities across the board).  \n* Customers can…"
+    "body": "* Trade customers log in with credentials created by Macplants staff. No self-registration.\n\n* Customers can search plants by name.\n\n* All plants are shown on the portal unless marked as \"unavailable.\" Even plants that are currently out of stock are visible — Macplants can always reject the order. Plants marked as unavailable are hidden entirely.\n\n* Retail-ready stock is excluded from the trade portal. Trade customers can ONLY buy retail-ready plants via the shop or mail order.\n\n* Stock quantities ARE shown on the trade portal (earlier concern about hiding quantities for \"special\" plants was dropped — of \\~1,200 plants, only \\~20 are truly special. These will be flagged via internal notes rather than hiding quantities across the board).\n\n* Customers can build a quote/order with plant lines…"
+  },
+  {
+    "id": "internal-quote-builder-admin-side",
+    "title": "Internal Quote Builder (Admin Side)",
+    "prd_id": null,
+    "level": 3,
+    "body": "* Everything the portal offers, plus full stock visibility on what is Available.\n\n* See cost price of each plant size for MacPlants staff. ESSENTIAL. Automatically calculate the profit margin percentage.\n\n* Override pricing on any line manually.\n\n* Add internal notes (not visible to customer) and customer-visible notes per QUOTE — ESSENTIAL. MacPlants may want to discuss any swaps that happened.\n\n* Send quotes to customers with one click.\n\n* **Substitution workflow (IMPORTANT):** When reviewing a customer's quote request, staff can strike through (DELETE) unavailable lines and add substitution lines at the bottom with a note and unit price. The amended quote is sent back to the customer. The customer can then accept or reject each line individually (including substitutions) and submit. Thi…"
   },
   {
     "id": "how-we-know-its-done-8",
     "title": "How We Know It's Done",
-    "prd_id": "prd-05",
-    "level": 3,
-    "body": "* Trade customers can log in with ERP-created credentials.  \n* Portal shows searchable plants with availability and prices.  \n* Customers can build quotes with line items, quantities, delivery date, and fulfilment method.  \n* Running totals (subtotal, VAT, total) calculate correctly. No deposit logic.  \n* Customer-submitted orders always go to Awaiting Response.  \n* Admin can review, modify, and send quotes back to customers.  \n* Customers can approve quotes in the portal — OR individual line items of quote.  \n* Admin has a dedicated Pending Orders screen showing orders awaiting stock.  \n* Admin Side — Internal quote builder shows full stock visibility.  \n  ---\n\n  ## \n\n  ##"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Trade customers can log in with ERP-created credentials.\n\n* Portal shows searchable plants with availability and prices.\n\n* Customers can build quotes with line items, quantities, delivery date, and fulfilment method.\n\n* Running totals (subtotal, VAT, total) calculate correctly. No deposit logic.\n\n* Customer-submitted orders always go to Awaiting Response.\n\n* Admin can review, modify, and send quotes back to customers.\n\n* Customers can approve quotes in the portal — OR individual line items of quote.\n\n* Admin has a dedicated Pending Orders screen showing orders awaiting stock.\n\n* Admin Side — Internal quote builder shows full stock visibility."
   },
   {
     "id": "prd-6-dashboard--analytics",
     "title": "PRD-6: Dashboard & Analytics",
-    "prd_id": "prd-6",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "what-is-it-8",
     "title": "What Is It",
-    "prd_id": "prd-6",
-    "level": 3,
+    "prd_id": null,
+    "level": 2,
     "body": "The first screen admins see when they log in. A control-tower view for managers and the business owner, showing at a glance how the business is performing today, what operational work is in flight, and what needs attention right now. Designed so the owner can walk in on any given morning and understand the state of Macplants in under 30 seconds."
   },
   {
-    "id": "what-it-must-do-9",
+    "id": "what-it-must-do-10",
     "title": "What It Must Do",
-    "prd_id": "prd-6",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
+  },
+  {
+    "id": "business-performance-owner-view--core-figures",
+    "title": "Business Performance (Owner View — Core Figures)",
+    "prd_id": null,
     "level": 3,
-    "body": "#### **Business Performance (Owner View — Core Figures)**\n\n* **Sales revenue** — today, this week, this month, this year. Shown ex VAT. Split by retail vs trade.  \n* **Orders placed** — count of new orders today, this week, this month. Split by retail vs trade.  \n* **Average order value** — rolling 30-day figure for retail and trade separately.  \n* **Plants picked** — count of individual plants picked today and this week (pulled from PWA pick completion data).  \n* **Orders dispatched** — count and total value of orders dispatched today and this week.  \n* **Outstanding invoices** — total value of invoices in \"Awaiting Payment\" status, plus ageing buckets (0–30 days, 31–60, 60+).  \n* **Approved orders in the pipeline** — total value of orders sitting in Approved/Ready to Pick/Staged status (…"
+    "body": "* **Sales revenue** — today, this week, this month, this year. Shown ex VAT. Split by retail vs trade.\n\n* **Orders placed** — count of new orders today, this week, this month. Split by retail vs trade.\n\n* **Average order value** — rolling 30-day figure for retail and trade separately.\n\n* **Plants picked** — count of individual plants picked today and this week (pulled from PWA pick completion data).\n\n* **Orders dispatched** — count and total value of orders dispatched today and this week.\n\n* **Outstanding invoices** — total value of invoices in \"Awaiting Payment\" status, plus ageing buckets (0–30 days, 31–60, 60+).\n\n* **Approved orders in the pipeline** — total value of orders sitting in Approved/Ready to Pick/Staged status (i.e. revenue committed but not yet dispatched).\n\n* Each figure co…"
+  },
+  {
+    "id": "todays-operations-manager-view",
+    "title": "Today's Operations (Manager View)",
+    "prd_id": null,
+    "level": 3,
+    "body": "* **Pending quotes** — quotes awaiting a customer response, with count and oldest-first list.\n\n* **Orders awaiting payment** — invoices raised but not yet paid, with age.\n\n* **Orders waiting for stock (Pending)** — highlighted when stock becomes available so the manager can click Confirm to approve.\n\n* **Orders due ready today** — list of orders that need to be picked/packed today.\n\n* **Orders due for dispatch today** — collections, DPD, pallet, Dutch trolley, van — all due out today.\n\n* **New trade orders awaiting response** — count and list of orders in \"Awaiting Response\" status.\n\n* **Open tasks** — count of open tasks, split by assignee. Owner can see who is busy and who has capacity."
+  },
+  {
+    "id": "exceptions--alerts---what-is-most-important-",
+    "title": "Exceptions & Alerts \\- WHAT IS MOST IMPORTANT ??",
+    "prd_id": null,
+    "level": 3,
+    "body": "* **Overdue supplier POs** — POs past their expected delivery date.\n\n* **Account-on-hold activity** — any on-hold customer with recent activity (quote, login, payment attempt).\n\n* **Credit limit breaches** — customers who have attempted to order above their credit limit.\n\n* **Low stock alerts** — NOT required for Stage 1 (deferred), but the widget slot should be reserved in the layout.\n\n* **Overstock alerts** — NOT required for Stage 1 (deferred).\n\n* **Long-lead-time orders approaching delivery** — orders invoiced months ago with delivery dates within the next 30 days, so the team can start preparing."
+  },
+  {
+    "id": "general-behaviour",
+    "title": "General Behaviour",
+    "prd_id": null,
+    "level": 3,
+    "body": "* Every widget links through to the relevant detail screen (clicking \"Orders due ready today\" opens a filtered order list).\n\n* Custom Calender\n\n* The dashboard is the landing page after login for admin users. It is not shown to warehouse/nursery staff (they land in the PWA).\n\n* All revenue figures are ex VAT by default, with a toggle to view inc VAT.\n\n* The dashboard works on desktop and tablet. Mobile layout stacks widgets vertically."
   },
   {
     "id": "how-we-know-its-done-9",
     "title": "How We Know It's Done",
-    "prd_id": "prd-6",
-    "level": 3,
-    "body": "* Admin lands on the dashboard after login.  \n* Sales revenue, order count, average order value, plants picked, orders dispatched, outstanding invoices, and pipeline value all show live data with period comparisons.  \n* Retail vs trade split is visible on revenue and order-count widgets.  \n* All operational widgets (pending quotes, awaiting payment, pending stock, due ready today, due dispatch today, new trade orders, open tasks) show live counts and link through to filtered lists.  \n* Exception widgets (overdue POs, on-hold activity, credit breaches, long-lead orders) surface the right records.  \n* Pending orders with newly available stock are visibly flagged and can be confirmed directly.  \n* Every widget is clickable and takes the user to the underlying detail screen.  \n* Figures refres…"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Admin lands on the dashboard after login.\n\n* Sales revenue, order count, average order value, plants picked, orders dispatched, outstanding invoices, and pipeline value all show live data with period comparisons.\n\n* Retail vs trade split is visible on revenue and order-count widgets.\n\n* All operational widgets (pending quotes, awaiting payment, pending stock, due ready today, due dispatch today, new trade orders, open tasks) show live counts and link through to filtered lists.\n\n* Exception widgets (overdue POs, on-hold activity, credit breaches, long-lead orders) surface the right records.\n\n* Pending orders with newly available stock are visibly flagged and can be confirmed directly.\n\n* Every widget is clickable and takes the user to the underlying detail screen.\n\n* Figures refresh witho…"
   },
   {
     "id": "prd-6-wordpress--erp-api-contract",
     "title": "PRD-6: WordPress & ERP API Contract",
-    "prd_id": "prd-6",
-    "level": 2,
+    "prd_id": null,
+    "level": 1,
     "body": ""
   },
   {
     "id": "what-is-it-9",
     "title": "What Is It",
-    "prd_id": "prd-6",
-    "level": 3,
-    "body": "The API and integration rules that connect the new WordPress retail website to the ERP. WordPress displays products and handles browsing. The ERP owns all data, pricing, stock, and order processing. Checkout happens on the ERP (subdomain), not on WordPress.\n\n**Note:** The WordPress site is built by Paul/Craig. The ERP API is built by Sigurd. This document defines the contract between the two so both teams build in parallel."
+    "prd_id": null,
+    "level": 2,
+    "body": "The API and integration rules that connect the new WordPress retail website to the ERP. WordPress displays products and handles browsing. The ERP owns all data, pricing, stock, and order processing. Checkout happens on the ERP (subdomain), not on WordPress.\n\n**Note:** The WordPress site is built by Paul/Craig. The ERP API is built by the ERP Team. This document defines the contract between the two so both teams build in parallel."
   },
   {
-    "id": "what-it-must-do-10",
+    "id": "what-it-must-do-11",
     "title": "What It Must Do",
-    "prd_id": "prd-6",
-    "level": 3,
-    "body": "* The ERP provides API endpoints for WordPress to pull: all products with variants, images, and pricing; stock levels per SKU; new products since a given timestamp.  \n* WordPress syncs products into Custom Post Types with ACF fields. SKU is the linking key between systems.  \n* Stock sync runs frequently (every 5–15 minutes) and only updates stock quantity and status. It does not overwrite descriptions, meta titles, meta descriptions, images, or any editorially-changed content.  \n* On ERP there is an Available / Unavailable on WebShop Override.  \n* If the ERP API is down, WordPress does not zero out stock. It retries and logs the failure.  \n* Checkout is handled on the ERP, hosted on a subdomain (e.g. `checkout.macplants.co.uk`). When a customer clicks checkout on WordPress, they are redire…"
+    "prd_id": null,
+    "level": 2,
+    "body": "* The ERP provides API endpoints for WordPress to pull: all products with variants, images, and pricing; stock levels per SKU; new products since a given timestamp.\n\n* WordPress syncs products into Custom Post Types with ACF fields. SKU is the linking key between systems.\n\n* Stock sync is manual. When a new plant is added to the ERP is needs to be MANUALLY added to the WP site.  As this wont’ happen often it is the best solution.\n\n* On ERP there is an Available / Unavailable on WebShop Override.\n\n* If the ERP API is down, WordPress does not zero out stock. It retries and logs the failure.\n\n* Checkout is handled on the ERP, hosted on a subdomain (e.g. checkout.macplants.co.uk). When a customer clicks checkout on WordPress, they are redirected to the ERP which validates stock, takes payment…"
   },
   {
     "id": "how-we-know-its-done-10",
     "title": "How We Know It's Done",
-    "prd_id": "prd-6",
-    "level": 3,
-    "body": "* WordPress can pull all products from the ERP API and create CPT posts with ACF fields.  \n* Stock sync updates only stock fields without overwriting editorial content.  \n* New products can be synced on demand.  \n* Basket validates stock availability against the ERP before checkout.  \n* Checkout redirects to the ERP-hosted page with basket data.  \n* Customer registration on WordPress pushes data to the ERP.  \n* Customer account page shows order history from the ERP.  \n* SKU serves as the unique linking key.  \n* Sync is re-runnable without duplicates.  \n  ---"
+    "prd_id": null,
+    "level": 2,
+    "body": "* Stock sync updates only stock fields without overwriting editorial content.\n\n* New products can be synced on demand.\n\n* Basket validates stock availability against the ERP before checkout.\n\n* Checkout redirects to the ERP-hosted page with basket data.\n\n* Customer registration on WordPress pushes data to the ERP.\n\n* Customer account page shows order history from the ERP.\n\n* SKU serves as the unique linking key.\n\n* Sync is re-runnable without duplicates."
   },
   {
     "id": "prd-xx-dpd-shipping-integration",
     "title": "PRD-XX: DPD Shipping Integration",
     "prd_id": null,
-    "level": 2,
+    "level": 1,
     "body": ""
   },
   {
     "id": "stage-1-not-required---confirm",
     "title": "Stage 1: NOT Required \\- CONFIRM",
     "prd_id": null,
-    "level": 3,
-    "body": "For Stage 1, DPD is NOT directly integrated. The workflow will be:\n\n* Order comes through the ERP with the customer's address captured.  \n* Shipping cost is calculated using the same logic as the current Mac Plants website (tried and tested — just copy that logic). This runs at checkout.  \n* Once the order is ready to dispatch, the address/customer details are copied from the ERP into the DPD portal manually. DPD already has all returning customers stored, so it auto-populates.  \n* DPD sends dispatch notifications directly to the customer (not via the ERP)."
+    "level": 2,
+    "body": "For Stage 1, DPD is NOT directly integrated. The workflow will be:\n\n* Order comes through the ERP with the customer's address captured.\n\n* Shipping cost is calculated using the same logic as the current Mac Plants website (tried and tested — just copy that logic). This runs at checkout.\n\n* Once the order is ready to dispatch, the address/customer details are copied from the ERP into the DPD portal manually. DPD already has all returning customers stored, so it auto-populates.\n\n* DPD sends dispatch notifications directly to the customer (not via the ERP)."
   },
   {
     "id": "stage-2-direct-api-integration",
     "title": "Stage 2: Direct API integration",
     "prd_id": null,
-    "level": 3,
-    "body": "If the manual copy-paste to DPD becomes the biggest time-sink, prioritise a direct integration via DPD's API at Stage 2\\.\n\n**Note:** DPD max of \\~20 boxes per order (approximate — to be confirmed). Beyond that we use pallet / Dutch trolley / MacPlants van.\n\n---"
+    "level": 2,
+    "body": "If the manual copy-paste to DPD becomes the biggest time-sink, prioritise a direct integration via DPD's API at Stage 2\\.\n\n**Note:** DPD max of \\~20 boxes per order (approximate — to be confirmed). Beyond that we use pallet / Dutch trolley / MacPlants van."
   },
   {
     "id": "meeting-action-items-april-2026",
     "title": "Meeting Action Items (April 2026\\)",
     "prd_id": null,
-    "level": 2,
-    "body": "* **Josh to confirm HLS/GrowMaster separation** — Can HLS operate independently with ERP data? Josh spoke to Dura-ID previously. Confirm on Friday. This is a BLOCKER for retiring GrowMaster.  \n* **Jake to write down unusual use cases** — Document edge-case clients and unusual order scenarios (e.g. Marian Boswell year-long hold, customers ordering 700 plants with no intention of buying all). These need system coverage before build.  \n* **Team to agree maximum stock hold period** — How long will Macplants hold reserved stock before revisiting pricing or charging storage? Relevant for long-lead-time orders (6+ months).  \n* **Speak to packing team about dimensions/volumetrics** — Get ballpark formulas for box quantities by plant size. Needed for future auto-calculation of parcels.  \n* **GrowMa…"
+    "level": 1,
+    "body": "* **Josh to confirm HLS/GrowMaster separation** — Can HLS operate independently with ERP data? Josh spoke to Dura-ID previously. Confirm on Friday. This is a BLOCKER for retiring GrowMaster.\n\n* **Jake to write down unusual use cases** — Document edge-case clients and unusual order scenarios (e.g. Marian Boswell year-long hold, customers ordering 700 plants with no intention of buying all). These need system coverage before build.\n\n* **Team to agree maximum stock hold period** — How long will Macplants hold reserved stock before revisiting pricing or charging storage? Relevant for long-lead-time orders (6+ months).\n\n* **Speak to packing team about dimensions/volumetrics** — Get ballpark formulas for box quantities by plant size. Needed for future auto-calculation of parcels.\n\n* **GrowMaster…"
   },
   {
     "id": "scope-decisions-summary-confirmed-in-meeting",
     "title": "Scope Decisions Summary (Confirmed in Meeting)",
     "prd_id": null,
-    "level": 2,
+    "level": 1,
     "body": ""
   },
   {
     "id": "in-for-stage-1",
     "title": "IN for Stage 1",
     "prd_id": null,
-    "level": 3,
-    "body": "Stock management (plant database, batches, statuses), purchase orders, trade customer accounts (basic), trade portal & quote builder with substitution workflow, trade instant-buy with Stripe top-up when over credit limit, order lifecycle (quote → invoice → order), order editing pre-Xero-posting, custom order titles (default: order number + customer name; overridable), delivery methods (manual pricing except retail DPD), to-do list system, PWA (pick \\+ pack tabs), WordPress API integration, email on order creation with live invoice link (not PDF), Xero invoice posting 24h after dispatch/collection, refunds & credit notes, customer single-page view (lifetime value, balance, sales graph), user action log (1 month rolling), trade shows handled via custom-titled order \\+ return PO (PRD-3.4), pe…"
+    "level": 2,
+    "body": "Stock management (plant database, batches, statuses), purchase orders, trade customer accounts (basic), trade portal & quote builder with substitution workflow, trade instant-buy with Stripe top-up when over credit limit, order lifecycle (quote → invoice → order), order editing pre-Xero-posting, custom order titles (default: order number \\+ customer name; overridable), delivery methods (manual pricing except retail DPD), to-do list system, PWA (pick \\+ pack tabs), WordPress API integration, email on order creation with live invoice link (not PDF), Xero invoice posting 24h after dispatch/collection, refunds & credit notes, customer single-page view (lifetime value, balance, sales graph), user action log (1 month rolling), trade shows handled via custom-titled order \\+ return PO (PRD-3.4), p…"
   },
   {
     "id": "out-for-stage-1-deferred",
     "title": "OUT for Stage 1 (Deferred)",
     "prd_id": null,
-    "level": 3,
+    "level": 2,
     "body": "DPD API integration (manual copy to DPD portal instead — copy current site's shipping-cost logic), label printer / Nice Labels API integration (pending HLS confirmation — interim approach is to keep using the HLS standalone software for label printing on a shared shop computer), EPOS → ERP barcode/API integration (Stage 2 — Stage 1 keeps EPOS separate; shop sales not pushed to ERP), trade pricing tiers / quantity break rebates, wastage reporting (but shrinkage data IS captured from day one), low stock alerts (design now agreed: per-plant manually-set trigger total across all pot sizes — see PRD-1, but feature itself deferred), overstock alerts, \"Looking Good\" list (a dated, sendable list of plants that look good right now — name, pot size, price; not linked to stock), low-stock report / au…"
   }
 ]
