@@ -1,0 +1,1123 @@
+{
+  "source": "project-spec/2026-04-26.md",
+  "generated_at": "2026-04-27T11:07:59.230Z",
+  "entities": [
+    {
+      "name": "User",
+      "prd_id": "prd-0",
+      "fields": [
+        {
+          "name": "role",
+          "type": "enum",
+          "notes": "Super Admin / Admin / Staff"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notes": ""
+        },
+        {
+          "name": "created_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "last_login_at",
+          "type": "datetime (nullable)",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Plant",
+      "prd_id": "prd-1",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "latin_name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "notes": "e.g. herbaceous / shrub / climber"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "care_instructions",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "available_online",
+          "type": "boolean",
+          "notes": "master webshop toggle; false = hidden everywhere"
+        },
+        {
+          "name": "vat_applicable",
+          "type": "boolean",
+          "notes": "applies to all pot sizes of this plant"
+        },
+        {
+          "name": "special_plant",
+          "type": "boolean",
+          "notes": "applies to all pot sizes; flagged for hand-managed handling"
+        }
+      ]
+    },
+    {
+      "name": "Plant Variant",
+      "prd_id": "prd-1",
+      "fields": [
+        {
+          "name": "plant",
+          "type": "FK → Plant",
+          "notes": ""
+        },
+        {
+          "name": "pot_size",
+          "type": "enum",
+          "notes": "7cm / 9cm / 1L / 2L / 3L / etc."
+        },
+        {
+          "name": "sku",
+          "type": "string",
+          "notes": "auto-generated; single source of truth across ERP, EPOS & labels"
+        },
+        {
+          "name": "cost_price",
+          "type": "decimal",
+          "notes": ""
+        },
+        {
+          "name": "trade_price",
+          "type": "decimal",
+          "notes": ""
+        },
+        {
+          "name": "retail_price",
+          "type": "decimal",
+          "notes": ""
+        },
+        {
+          "name": "dimensions",
+          "type": "string (nullable)",
+          "notes": "DISCUSS — Stage 2 candidate"
+        },
+        {
+          "name": "available_on_webshop",
+          "type": "boolean",
+          "notes": "per pot size"
+        },
+        {
+          "name": "unavailable_on_webshop",
+          "type": "boolean",
+          "notes": "shippability override (e.g. too tall in winter)"
+        }
+      ]
+    },
+    {
+      "name": "Plant Batch",
+      "prd_id": "prd-1",
+      "fields": [
+        {
+          "name": "plant_variant",
+          "type": "FK → Plant Variant",
+          "notes": ""
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "notes": "Growing / Trade Ready / Retail Ready / Reserved"
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "notes": ""
+        },
+        {
+          "name": "location",
+          "type": "string",
+          "notes": "bed reference, e.g. \"1.3\", \"GK\", \"Shop\""
+        },
+        {
+          "name": "ready_date",
+          "type": "date (nullable)",
+          "notes": "when reached, auto-creates a TO DO task; status does NOT auto-change"
+        },
+        {
+          "name": "reserved_against",
+          "type": "FK → Order (nullable)",
+          "notes": ""
+        },
+        {
+          "name": "created_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "last_updated_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "last_updated_at",
+          "type": "datetime",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Shrinkage Record",
+      "prd_id": "prd-1",
+      "fields": [
+        {
+          "name": "plant_batch",
+          "type": "FK → Plant Batch",
+          "notes": ""
+        },
+        {
+          "name": "quantity_lost",
+          "type": "integer",
+          "notes": "snapshot at moment of shrinkage"
+        },
+        {
+          "name": "reason",
+          "type": "enum",
+          "notes": "Disease / Dead / Weeds / Stock Take / Other"
+        },
+        {
+          "name": "reason_comment",
+          "type": "string (nullable)",
+          "notes": "required when reason = Other"
+        },
+        {
+          "name": "recorded_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "recorded_at",
+          "type": "datetime",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Purchase Order",
+      "prd_id": "prd-1-1",
+      "fields": [
+        {
+          "name": "po_number",
+          "type": "string",
+          "notes": "auto-generated"
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "notes": "Draft / Requested / Accepted / Arrived / Reconciled / Cancelled"
+        },
+        {
+          "name": "paid",
+          "type": "boolean",
+          "notes": "settable at any stage"
+        },
+        {
+          "name": "supplier",
+          "type": "FK → Supplier",
+          "notes": "exactly one; cannot be split across suppliers"
+        },
+        {
+          "name": "expected_delivery",
+          "type": "date",
+          "notes": ""
+        },
+        {
+          "name": "notes",
+          "type": "string",
+          "notes": "addable at any stage"
+        },
+        {
+          "name": "created_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "reconciled_by",
+          "type": "FK → User (nullable)",
+          "notes": ""
+        },
+        {
+          "name": "reconciled_at",
+          "type": "datetime (nullable)",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Purchase Order Line Item",
+      "prd_id": "prd-1-1",
+      "fields": [
+        {
+          "name": "purchase_order",
+          "type": "FK → Purchase Order",
+          "notes": ""
+        },
+        {
+          "name": "plant_variant",
+          "type": "FK → Plant Variant",
+          "notes": ""
+        },
+        {
+          "name": "quantity_ordered",
+          "type": "integer",
+          "notes": ""
+        },
+        {
+          "name": "quantity_received",
+          "type": "integer (nullable)",
+          "notes": "set on reconciliation"
+        },
+        {
+          "name": "unit_cost",
+          "type": "decimal",
+          "notes": "defaults from variant.cost_price; per-PO override; doesn't propagate"
+        },
+        {
+          "name": "reconciled_location",
+          "type": "string (nullable)",
+          "notes": "bed reference, set on reconciliation"
+        },
+        {
+          "name": "reconciled_batch_status",
+          "type": "enum (nullable)",
+          "notes": "Growing / Retail Ready / Trade Ready"
+        },
+        {
+          "name": "reconciled_ready_date",
+          "type": "date (nullable)",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Supplier",
+      "prd_id": "prd-1-1",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "contact_name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "address",
+          "type": "string",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Trade Customer",
+      "prd_id": "prd-2-1",
+      "fields": [
+        {
+          "name": "business_name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "customer_type",
+          "type": "enum",
+          "notes": "Landscaper / Garden Designer / Contractor / Garden Centre / etc."
+        },
+        {
+          "name": "contact_name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "billing_address",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "delivery_address",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "credit_limit",
+          "type": "decimal",
+          "notes": "adjustable per customer"
+        },
+        {
+          "name": "payment_terms_days",
+          "type": "integer",
+          "notes": "default 30 for all trade"
+        },
+        {
+          "name": "account_status",
+          "type": "enum",
+          "notes": "Active / On Hold"
+        },
+        {
+          "name": "portal_login",
+          "type": "FK → User",
+          "notes": "linked User account for trade portal access"
+        },
+        {
+          "name": "created_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Retail Customer",
+      "prd_id": "prd-2-1",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "billing_address",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "delivery_address",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "source",
+          "type": "enum",
+          "notes": "WordPress / Shop / Manual"
+        },
+        {
+          "name": "account_created",
+          "type": "datetime",
+          "notes": "auto-created on first WordPress checkout"
+        }
+      ]
+    },
+    {
+      "name": "Quote",
+      "prd_id": "prd-03",
+      "fields": [
+        {
+          "name": "quote_number",
+          "type": "string",
+          "notes": "QU-XXXX, auto; preserved as ORD-XXXX on conversion"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "notes": "default = \"QU-XXXX — Customer Name\"; overridable"
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "notes": "Draft / Sent / Awaiting Response / Pending / Approved / Rejected / Expired / Archived"
+        },
+        {
+          "name": "customer",
+          "type": "FK → Customer",
+          "notes": ""
+        },
+        {
+          "name": "created_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime (nullable)",
+          "notes": "2 weeks from sent — REQUIRED?"
+        },
+        {
+          "name": "notes",
+          "type": "string",
+          "notes": "customer-visible, quote-level"
+        },
+        {
+          "name": "internal_notes",
+          "type": "string",
+          "notes": "not customer-visible"
+        }
+      ]
+    },
+    {
+      "name": "Quote Line Item",
+      "prd_id": "prd-03",
+      "fields": [
+        {
+          "name": "quote",
+          "type": "FK → Quote",
+          "notes": ""
+        },
+        {
+          "name": "plant_variant",
+          "type": "FK → Plant Variant",
+          "notes": ""
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "notes": ""
+        },
+        {
+          "name": "unit_price",
+          "type": "decimal",
+          "notes": "defaults from variant trade/retail price; admin override allowed"
+        },
+        {
+          "name": "line_note",
+          "type": "string (nullable)",
+          "notes": "per-line, customer-visible; used for substitutions"
+        },
+        {
+          "name": "line_status",
+          "type": "enum",
+          "notes": "Active / Struck Through (substituted)"
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "prd_id": "prd-03",
+      "fields": [
+        {
+          "name": "order_number",
+          "type": "string",
+          "notes": "ORD-XXXX, matches the QU it converted from; retail orders get a fresh ORD"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "notes": "default = \"ORD-XXXX — Customer Name\"; overridable for trade shows etc."
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "notes": "Pending / Confirmed / Ready to Pick / Staged / Packed / Dispatched-Collected / Completed / Archived"
+        },
+        {
+          "name": "customer",
+          "type": "FK → Customer",
+          "notes": ""
+        },
+        {
+          "name": "source_quote",
+          "type": "FK → Quote (nullable)",
+          "notes": "null for retail and trade instant-buy orders"
+        },
+        {
+          "name": "delivery_method",
+          "type": "enum",
+          "notes": "Collection / DPD / Pallet / Dutch Trolley / MacPlants Van"
+        },
+        {
+          "name": "delivery_date",
+          "type": "date",
+          "notes": "for trade, customer-specified preferred date"
+        },
+        {
+          "name": "assigned_picker",
+          "type": "FK → User (nullable)",
+          "notes": "manually assigned by Admin from Ready-to-Pick stage"
+        },
+        {
+          "name": "notes",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "locked_post_xero",
+          "type": "boolean",
+          "notes": "true once final invoice posts to Xero — order becomes read-only"
+        }
+      ]
+    },
+    {
+      "name": "Order Line Item",
+      "prd_id": "prd-03",
+      "fields": [
+        {
+          "name": "order",
+          "type": "FK → Order",
+          "notes": ""
+        },
+        {
+          "name": "plant_variant",
+          "type": "FK → Plant Variant",
+          "notes": ""
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "notes": ""
+        },
+        {
+          "name": "unit_price",
+          "type": "decimal",
+          "notes": ""
+        },
+        {
+          "name": "line_note",
+          "type": "string (nullable)",
+          "notes": "per-line, customer-visible"
+        }
+      ]
+    },
+    {
+      "name": "Invoice",
+      "prd_id": "prd-03",
+      "fields": [
+        {
+          "name": "invoice_number",
+          "type": "string",
+          "notes": "INV-XXXX, auto-generated"
+        },
+        {
+          "name": "order",
+          "type": "FK → Order",
+          "notes": "multiple invoices per order possible (each material change pre-Xero supersedes the previous)"
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "notes": "Unpaid / Paid"
+        },
+        {
+          "name": "issued_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "due_at",
+          "type": "datetime",
+          "notes": "for trade, issued + 30 days"
+        },
+        {
+          "name": "posted_to_xero",
+          "type": "boolean",
+          "notes": ""
+        },
+        {
+          "name": "posted_to_xero_at",
+          "type": "datetime (nullable)",
+          "notes": "set 24h after dispatch/collection"
+        },
+        {
+          "name": "marked_paid_by",
+          "type": "FK → User (nullable)",
+          "notes": "manually marked by Ariane / finance"
+        },
+        {
+          "name": "marked_paid_at",
+          "type": "datetime (nullable)",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Email Notification",
+      "prd_id": "prd-3-1",
+      "fields": [
+        {
+          "name": "trigger",
+          "type": "enum",
+          "notes": "quote_sent / quote_approved / invoice_raised / order_confirmed / order_packed"
+        },
+        {
+          "name": "recipient",
+          "type": "string",
+          "notes": "email address"
+        },
+        {
+          "name": "subject",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "body",
+          "type": "string",
+          "notes": "full HTML body stored as a snapshot for audit"
+        },
+        {
+          "name": "linked_record",
+          "type": "FK (polymorphic)",
+          "notes": "Order / Quote / Invoice"
+        },
+        {
+          "name": "sent_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "sent_by",
+          "type": "FK → User (nullable)",
+          "notes": "null when system-triggered"
+        }
+      ]
+    },
+    {
+      "name": "Internal Notification",
+      "prd_id": "prd-3-1",
+      "fields": [
+        {
+          "name": "type",
+          "type": "enum",
+          "notes": "pending_order_stock_arrived / po_overdue / batch_ready_date_due / account_on_hold / new_trade_order / credit_limit_breach"
+        },
+        {
+          "name": "linked_record",
+          "type": "FK (polymorphic)",
+          "notes": "the relevant object"
+        },
+        {
+          "name": "audience_role",
+          "type": "enum",
+          "notes": "Admin / Sales / Warehouse"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "dismissed_by",
+          "type": "FK → User (nullable)",
+          "notes": ""
+        },
+        {
+          "name": "dismissed_at",
+          "type": "datetime (nullable)",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Order — delivery-related fields",
+      "prd_id": "prd-3-2",
+      "fields": [
+        {
+          "name": "delivery_method",
+          "type": "enum",
+          "notes": "Collection / DPD / Pallet / Dutch Trolley / MacPlants Van"
+        },
+        {
+          "name": "delivery_price",
+          "type": "decimal",
+          "notes": "auto for retail DPD; manual for Pallet / Dutch Trolley / Van; £0 for Collection"
+        },
+        {
+          "name": "delivery_date",
+          "type": "date",
+          "notes": "collection / carrier pickup date for non-DPD methods"
+        },
+        {
+          "name": "carrier_reference",
+          "type": "string (nullable)",
+          "notes": "DPD label number etc."
+        },
+        {
+          "name": "number_of_boxes",
+          "type": "integer (nullable)",
+          "notes": "captured at pack stage for multi-box orders"
+        }
+      ]
+    },
+    {
+      "name": "Refund / Credit Note",
+      "prd_id": "prd-3-3",
+      "fields": [
+        {
+          "name": "type",
+          "type": "enum",
+          "notes": "Refund (retail) / Credit Note (trade)"
+        },
+        {
+          "name": "order",
+          "type": "FK → Order",
+          "notes": ""
+        },
+        {
+          "name": "invoice",
+          "type": "FK → Invoice",
+          "notes": "the original invoice being reversed"
+        },
+        {
+          "name": "amount",
+          "type": "decimal",
+          "notes": ""
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "plants_returned",
+          "type": "boolean",
+          "notes": "if true, restock task is generated"
+        },
+        {
+          "name": "created_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "pushed_to_xero",
+          "type": "boolean",
+          "notes": ""
+        },
+        {
+          "name": "pushed_to_xero_at",
+          "type": "datetime (nullable)",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Task",
+      "prd_id": "prd-04",
+      "fields": [
+        {
+          "name": "title",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "notes": "Open / In Progress / Completed / Cancelled"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "notes": "Finance / Admin / Staff / Other"
+        },
+        {
+          "name": "priority",
+          "type": "enum",
+          "notes": "High / Medium / Low"
+        },
+        {
+          "name": "assignee",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "due_date",
+          "type": "date",
+          "notes": ""
+        },
+        {
+          "name": "attached_to",
+          "type": "FK (polymorphic, nullable)",
+          "notes": "Quote / Order / Invoice / PO / Plant Batch — null for standalone tasks"
+        },
+        {
+          "name": "source",
+          "type": "enum",
+          "notes": "Manual / Auto-generated (system trigger e.g. batch ready, PO overdue)"
+        },
+        {
+          "name": "notes",
+          "type": "string",
+          "notes": ""
+        },
+        {
+          "name": "created_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": ""
+        },
+        {
+          "name": "completed_by",
+          "type": "FK → User (nullable)",
+          "notes": ""
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime (nullable)",
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from": "Email Notification",
+      "to": "User",
+      "label": "sent_by (nullable)"
+    },
+    {
+      "from": "Internal Notification",
+      "to": "User",
+      "label": "dismissed_by (nullable)"
+    },
+    {
+      "from": "Invoice",
+      "to": "Order",
+      "label": "order"
+    },
+    {
+      "from": "Invoice",
+      "to": "User",
+      "label": "marked_paid_by (nullable)"
+    },
+    {
+      "from": "Order",
+      "to": "Customer",
+      "label": "customer"
+    },
+    {
+      "from": "Order",
+      "to": "Quote",
+      "label": "source_quote (nullable)"
+    },
+    {
+      "from": "Order",
+      "to": "User",
+      "label": "assigned_picker (nullable)"
+    },
+    {
+      "from": "Order Line Item",
+      "to": "Order",
+      "label": "order"
+    },
+    {
+      "from": "Order Line Item",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "Order",
+      "label": "reserved_against (nullable)"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "User",
+      "label": "last_updated_by"
+    },
+    {
+      "from": "Plant Variant",
+      "to": "Plant",
+      "label": "plant"
+    },
+    {
+      "from": "Purchase Order",
+      "to": "Supplier",
+      "label": "supplier"
+    },
+    {
+      "from": "Purchase Order",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Purchase Order",
+      "to": "User",
+      "label": "reconciled_by (nullable)"
+    },
+    {
+      "from": "Purchase Order Line Item",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Purchase Order Line Item",
+      "to": "Purchase Order",
+      "label": "purchase_order"
+    },
+    {
+      "from": "Quote",
+      "to": "Customer",
+      "label": "customer"
+    },
+    {
+      "from": "Quote",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Quote Line Item",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Quote Line Item",
+      "to": "Quote",
+      "label": "quote"
+    },
+    {
+      "from": "Refund / Credit Note",
+      "to": "Invoice",
+      "label": "invoice"
+    },
+    {
+      "from": "Refund / Credit Note",
+      "to": "Order",
+      "label": "order"
+    },
+    {
+      "from": "Refund / Credit Note",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Shrinkage Record",
+      "to": "Plant Batch",
+      "label": "plant_batch"
+    },
+    {
+      "from": "Shrinkage Record",
+      "to": "User",
+      "label": "recorded_by"
+    },
+    {
+      "from": "Task",
+      "to": "User",
+      "label": "assignee"
+    },
+    {
+      "from": "Task",
+      "to": "User",
+      "label": "completed_by (nullable)"
+    },
+    {
+      "from": "Task",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Trade Customer",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Trade Customer",
+      "to": "User",
+      "label": "portal_login"
+    },
+    {
+      "from": "User",
+      "to": "User",
+      "label": "created_by"
+    }
+  ]
+}

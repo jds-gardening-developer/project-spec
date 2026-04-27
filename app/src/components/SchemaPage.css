@@ -1,0 +1,119 @@
+/* SchemaPage layout — Plan 260427-gjf, Task 2.
+ *
+ * Reuses the same custom-property surface as the rest of the spec viewer
+ * (declared in app/src/styles.css). No new colours; Phase 4 owns full
+ * theming and will override these properties without editing this file.
+ */
+
+.schema-page {
+  padding: 24px 8px;
+  max-width: 80ch;
+}
+
+.schema-page__header h1 {
+  margin: 0 0 8px 0;
+  font-size: 1.6rem;
+}
+
+.schema-page__subtitle {
+  margin: 0 0 24px 0;
+  color: var(--sidebar-text);
+  opacity: 0.75;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+/* --- ER diagram card --- */
+.schema-page__diagram {
+  border: 1px solid var(--schema-card-border);
+  background: var(--schema-card-background);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 0 0 32px 0;
+  /* Diagrams can be wider than the column on small screens — let them scroll
+   * horizontally inside the card rather than overflow the page layout. */
+  overflow-x: auto;
+}
+
+.schema-page__diagram .mermaid-block {
+  /* MermaidBlock owns its inner styling; we just ensure the SVG sits flush
+   * inside our card without an extra outer margin. */
+  margin: 0;
+}
+
+/* --- Entity reference list --- */
+.schema-page__entities {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.schema-entity {
+  border: 1px solid var(--schema-card-border);
+  background: var(--schema-card-background);
+  border-left: 3px solid var(--schema-card-accent);
+  border-radius: 4px;
+  padding: 12px 16px;
+}
+
+.schema-entity h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: var(--schema-card-title-color);
+}
+
+.schema-entity__link {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+}
+
+.schema-entity__link a {
+  color: var(--cross-link-color);
+  text-decoration: none;
+}
+
+.schema-entity__link a:hover {
+  text-decoration: underline;
+}
+
+.schema-entity table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.schema-entity th,
+.schema-entity td {
+  border: 1px solid var(--schema-card-border);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.schema-entity th {
+  background: var(--schema-card-type-background);
+  color: var(--schema-card-title-color);
+  font-weight: 600;
+}
+
+.schema-entity td code {
+  background: var(--schema-card-type-background);
+  color: var(--schema-card-field-color);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+/* --- Loading + error states --- */
+.schema-page--loading,
+.schema-page--error {
+  padding: 32px 8px;
+}
+
+.schema-page--error p {
+  color: var(--mermaid-error-color);
+  background: var(--mermaid-error-background);
+  border: 1px solid var(--mermaid-error-color);
+  padding: 12px 16px;
+  border-radius: 4px;
+}

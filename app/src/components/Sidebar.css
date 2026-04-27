@@ -45,6 +45,14 @@
   padding: 0;
 }
 
+/* 260427-gjf: separator between the static Schema Index entry and the
+   dynamic PRD list below it. */
+.sidebar-list--static {
+  margin: 0 0 8px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
 .sidebar-item {
   margin: 0;
 }

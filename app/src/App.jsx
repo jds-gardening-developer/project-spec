@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import SpecViewer from './SpecViewer.jsx';
 import manifest from './manifest.json';
 import { Sidebar } from './components/Sidebar.jsx';
 import { SearchPanel } from './components/SearchPanel.jsx';
 import { useHashScroll } from './components/useHashScroll.js';
+import { useRoute } from './components/useRoute.js';
+
+// React.lazy ensures SchemaPage + its dynamic-imported schema-index.json land
+// in their own Vite chunks. The main bundle gains only the lazy() wrapper.
+const SchemaPage = lazy(() => import('./components/SchemaPage.jsx'));
 
 // Vite glob — resolved at build time. Keys are import paths relative to this file;
 // values are functions returning Promise<string of file contents>.
@@ -20,11 +25,14 @@ function loaderKeyFor(filename) {
 export default function App() {
   const [content, setContent] = useState(null);
   const [error, setError] = useState(null);
+  const route = useRoute();
 
   // Manifest is sorted newest-first by build-manifest.mjs.
   const newest = manifest[0];
 
-  useHashScroll(content);
+  // Gate hash-driven scroll to the spec route only — on #/schema we don't
+  // want useHashScroll to chase '/schema' as a heading id.
+  useHashScroll(route === 'spec' ? content : null);
 
   useEffect(() => {
     if (!newest) {
@@ -66,12 +74,20 @@ export default function App() {
     <div className="app-shell">
       <Sidebar />
       <main className="app-main">
-        <header>
-          <small>
-            Viewing: <code>project-spec/{newest?.filename}</code>
-          </small>
-        </header>
-        <SpecViewer markdown={content} />
+        {route === 'schema' ? (
+          <Suspense fallback={<p>Loading schema…</p>}>
+            <SchemaPage />
+          </Suspense>
+        ) : (
+          <>
+            <header>
+              <small>
+                Viewing: <code>project-spec/{newest?.filename}</code>
+              </small>
+            </header>
+            <SpecViewer markdown={content} />
+          </>
+        )}
       </main>
       <SearchPanel />
     </div>
