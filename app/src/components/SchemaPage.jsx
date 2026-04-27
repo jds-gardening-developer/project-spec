@@ -140,7 +140,6 @@ function DiagramViewport({ children }) {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [fullscreen, setFullscreen] = useState(false);
   const dragRef = useRef(null);
-  const hasCenteredRef = useRef(false);
 
   // Capture (and cache) the SVG's natural size from getBBox the first time it's
   // available. Returns the cached size on subsequent calls so getBBox isn't
@@ -271,68 +270,50 @@ function DiagramViewport({ children }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [fullscreen]);
 
-  // Once the SVG renders: capture natural size + centre the viewport on the
-  // focal entity ("Task") so the user has a meaningful starting point. Falls
-  // back to centring the whole diagram if the focal entity isn't found.
-  //
-  // Mermaid wraps the diagram in `<g transform="translate(...)">`, so the
-  // text element's getBBox returns element-local coords that don't reflect the
-  // on-screen position. We use the rendered DOMRect instead — by then the
-  // zoom-attribute effect has already sized the SVG to natural*INITIAL_ZOOM,
-  // and pan is still (0, 0), so the rect's centre minus the canvas origin is
-  // the focal entity's screen-space offset that we need to cancel out.
+  // Capture natural size when the SVG appears (so Fit/Center work). Do NOT
+  // auto-center on mount — that proved race-prone with Mermaid's async render
+  // and pushed the diagram off-screen. Use the explicit "Center" button.
   useEffect(() => {
     const canvas = canvasRef.current;
-    const viewport = viewportRef.current;
-    if (!canvas || !viewport) return;
-    const tryCenter = () => {
-      if (hasCenteredRef.current) return;
-      const natural = getNaturalSize();
-      if (!natural) return;
-      const svg = canvas.querySelector('svg');
-      if (!svg) return;
-      // Need the SVG to have been resized to natural*zoom before measuring,
-      // otherwise the rendered rect reflects Mermaid's default size.
-      const svgRect = svg.getBoundingClientRect();
-      if (svgRect.width === 0 || svgRect.height === 0) return;
-
-      const labels = Array.from(svg.querySelectorAll('text'));
-      const focalLabel = labels.find((t) => t.textContent.trim() === FOCAL_ENTITY);
-
-      const vRect = viewport.getBoundingClientRect();
-      // Canvas's current screen origin (it's translate(0,0) at this point).
-      const canvasRect = canvas.getBoundingClientRect();
-
-      let focalCx, focalCy;
-      if (focalLabel) {
-        const lr = focalLabel.getBoundingClientRect();
-        // Convert to canvas-local coords (relative to canvas origin pre-pan).
-        focalCx = lr.left + lr.width / 2 - canvasRect.left;
-        focalCy = lr.top + lr.height / 2 - canvasRect.top;
-      } else {
-        // Fall back to centring the whole diagram.
-        focalCx = svgRect.width / 2;
-        focalCy = svgRect.height / 2;
-      }
-
-      setPan({
-        x: vRect.width / 2 - focalCx,
-        y: vRect.height / 2 - focalCy,
-      });
-      hasCenteredRef.current = true;
+    if (!canvas) return;
+    const tryCapture = () => {
+      if (naturalSizeRef.current) return;
+      getNaturalSize();
     };
-    // Try once now (in case SVG is already there from cache), then again on
-    // every mutation. We also retry on a short rAF chain because Mermaid's
-    // dangerouslySetInnerHTML insertion + our zoom-attribute effect both have
-    // to run before the SVG has its final on-screen size.
-    tryCenter();
-    requestAnimationFrame(() => {
-      requestAnimationFrame(tryCenter);
-    });
-    const observer = new MutationObserver(tryCenter);
+    tryCapture();
+    const observer = new MutationObserver(tryCapture);
     observer.observe(canvas, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, [getNaturalSize]);
+
+  // On-demand centering for the Center button. Reads the focal entity's
+  // current on-screen rect and computes the pan offset that puts it at the
+  // viewport centre. Reliable because by the time the user clicks, Mermaid
+  // is fully rendered and the zoom-attribute effect has settled.
+  const centerOnFocal = useCallback(() => {
+    const canvas = canvasRef.current;
+    const viewport = viewportRef.current;
+    if (!canvas || !viewport) return;
+    const svg = canvas.querySelector('svg');
+    if (!svg) return;
+    const labels = Array.from(svg.querySelectorAll('text'));
+    const focalLabel = labels.find((t) => t.textContent.trim() === FOCAL_ENTITY);
+    const target = focalLabel || svg;
+    const tRect = target.getBoundingClientRect();
+    if (tRect.width === 0 || tRect.height === 0) return;
+    const vRect = viewport.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    // Target's centre in canvas-local coords (account for current pan).
+    const targetCx = tRect.left + tRect.width / 2 - canvasRect.left;
+    const targetCy = tRect.top + tRect.height / 2 - canvasRect.top;
+    // Viewport centre in canvas-local coords.
+    const viewportCx = vRect.width / 2;
+    const viewportCy = vRect.height / 2;
+    setPan((p) => ({
+      x: p.x + (viewportCx - targetCx),
+      y: p.y + (viewportCy - targetCy),
+    }));
+  }, []);
 
   // Apply zoom to the SVG via width/height ATTRIBUTES (not CSS transform).
   // This forces the browser to re-rasterize the SVG vector at the new size, so
@@ -375,6 +356,7 @@ function DiagramViewport({ children }) {
         <span className="schema-diagram-zoom-display">{Math.round(zoom * 100)}%</span>
         <button type="button" onClick={() => zoomBy(1 / ZOOM_STEP)} aria-label="Zoom out">−</button>
         <button type="button" onClick={fit}>Fit</button>
+        <button type="button" onClick={centerOnFocal}>Center</button>
         <button type="button" onClick={reset}>1:1</button>
         <button type="button" onClick={() => setFullscreen((v) => !v)}>
           {fullscreen ? 'Close' : 'Fullscreen'}
