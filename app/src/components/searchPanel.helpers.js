@@ -13,7 +13,7 @@
  *
  * SECURITY (T-03-05-01): buildSnippet returns Array<{type, text}> — segment
  * list, NOT an HTML string. SearchPanel.jsx renders each segment as React
- * text or a <mark> element via normal JSX — NO dangerouslySetInnerHTML.
+ * text or a <mark> element via normal JSX — never via raw HTML injection.
  * This eliminates XSS at the type level.
  */
 
@@ -59,7 +59,7 @@ export function formatBreadcrumb(prd_id, _level) {
  * buildSnippet(body, query, maxLen) — segment list with <mark> ranges.
  *
  * Returns Array<{type: 'text'|'mark', text: string}>. SearchPanel renders
- * each segment as React text or a <mark> element — no dangerouslySetInnerHTML.
+ * each segment as React text or a <mark> element — no raw HTML injection.
  *
  * Behavior:
  *   - Empty body → [].
