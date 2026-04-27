@@ -106,13 +106,13 @@ describe('buildErDiagramSource', () => {
     assert.match(out, /^erDiagram\n/);
   });
 
-  it('declares every entity as a bare quoted name (entity-only diagram)', () => {
+  it('declares every entity as a quoted name with an attribute block', () => {
     const out = buildErDiagramSource(FAKE);
-    assert.match(out, /^ {4}"Plant"$/m);
-    assert.match(out, /^ {4}"Plant Variant"$/m);
-    // No attribute blocks — fields are rendered in the reference cards instead.
-    assert.doesNotMatch(out, /\{$/m);
-    assert.doesNotMatch(out, /^\s*\}$/m);
+    assert.match(out, /^ {4}"Plant" \{$/m);
+    assert.match(out, /^ {4}"Plant Variant" \{$/m);
+    // One closing brace per entity-with-fields (2 here).
+    const closes = out.match(/^ {4}\}$/gm) || [];
+    assert.equal(closes.length, 2);
   });
 
   it('emits one }o--|| edge per relationship with quoted endpoints + label', () => {
@@ -120,7 +120,7 @@ describe('buildErDiagramSource', () => {
     assert.match(out, /"Plant Variant" \}o--\|\| "Plant" : "plant"/);
   });
 
-  it('does not render fields inside the diagram (kept in reference cards instead)', () => {
+  it('renders all fields inside each entity (no cap)', () => {
     const big = {
       entities: [
         {
@@ -136,10 +136,37 @@ describe('buildErDiagramSource', () => {
       relationships: [],
     };
     const out = buildErDiagramSource(big);
-    // Only the bare entity name should be indented — no field lines.
-    const indented = out.split('\n').filter((l) => /^ {4}\S/.test(l));
-    assert.equal(indented.length, 1);
-    assert.match(indented[0], /^ {4}"Wide"$/);
+    const fieldLines = out.split('\n').filter((l) => /^ {8}\S/.test(l));
+    assert.equal(fieldLines.length, 20);
+  });
+
+  it('sanitises Mermaid-unsafe field names + types into [A-Za-z0-9_]', () => {
+    const data = {
+      entities: [
+        {
+          name: 'Plant Variant',
+          prd_id: 'prd-1-1',
+          fields: [
+            { name: 'plant', type: 'FK → Plant', notes: '' },
+            { name: 'created at', type: 'date (nullable)', notes: '' },
+          ],
+        },
+      ],
+      relationships: [],
+    };
+    const out = buildErDiagramSource(data);
+    // Each rendered field line: 8 spaces + type + space + name. Must contain
+    // only alphanumerics + single underscores between them — runs of underscores
+    // break the Mermaid parser.
+    const fieldLines = out.split('\n').filter((l) => /^ {8}\S/.test(l));
+    for (const line of fieldLines) {
+      // Strip leading whitespace, then check both tokens are mermaid-safe.
+      const tokens = line.trim().split(/\s+/);
+      assert.equal(tokens.length, 2, `expected "type name", got: ${line}`);
+      for (const tok of tokens) {
+        assert.match(tok, /^[A-Za-z0-9](?:[A-Za-z0-9]|_(?=[A-Za-z0-9]))*$/, `bad token: ${tok}`);
+      }
+    }
   });
 
   it('returns "erDiagram\\n" for malformed input', () => {
