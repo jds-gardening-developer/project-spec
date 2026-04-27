@@ -133,45 +133,65 @@ export default function SchemaPage({ initialData }) {
 function DiagramViewport({ children }) {
   const viewportRef = useRef(null);
   const canvasRef = useRef(null);
+  const naturalSizeRef = useRef(null); // { w, h } of the rendered SVG at scale=1
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [fullscreen, setFullscreen] = useState(false);
   const dragRef = useRef(null);
   const hasAutoFittedRef = useRef(false);
 
-  const fit = useCallback(() => {
-    const viewport = viewportRef.current;
+  // Capture (and cache) the SVG's natural size from getBBox the first time it's
+  // available. Returns the cached size on subsequent calls so getBBox isn't
+  // re-measured against an already-resized SVG.
+  const getNaturalSize = useCallback(() => {
+    if (naturalSizeRef.current) return naturalSizeRef.current;
     const canvas = canvasRef.current;
-    if (!viewport || !canvas) return false;
+    if (!canvas) return null;
     const svg = canvas.querySelector('svg');
-    if (!svg) return false;
-    // SVG natural dimensions — read from getBBox for the rendered geometry,
-    // or fall back to clientWidth/Height. Mermaid sets viewBox + width/height
-    // attributes, so getBoundingClientRect at zoom=1 gives natural size if we
-    // temporarily reset the transform — but easier: read the bbox directly.
-    let svgWidth, svgHeight;
+    if (!svg) return null;
+    let w = 0;
+    let h = 0;
     try {
       const bbox = svg.getBBox();
-      svgWidth = bbox.width;
-      svgHeight = bbox.height;
+      w = bbox.width;
+      h = bbox.height;
     } catch {
-      svgWidth = svg.clientWidth;
-      svgHeight = svg.clientHeight;
+      // ignore
     }
-    if (svgWidth === 0 || svgHeight === 0) return false;
+    if (!w || !h) {
+      // viewBox fallback — Mermaid emits a viewBox like "0 0 1234 567"
+      const vb = svg.getAttribute('viewBox');
+      if (vb) {
+        const parts = vb.split(/\s+/).map(Number);
+        if (parts.length === 4) {
+          w = parts[2];
+          h = parts[3];
+        }
+      }
+    }
+    if (!w || !h) return null;
+    naturalSizeRef.current = { w, h };
+    return naturalSizeRef.current;
+  }, []);
+
+  const fit = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return false;
+    const natural = getNaturalSize();
+    if (!natural) return false;
     const vRect = viewport.getBoundingClientRect();
     const fitScale = Math.min(
       ZOOM_MAX,
-      (vRect.width - FIT_PADDING * 2) / svgWidth,
-      (vRect.height - FIT_PADDING * 2) / svgHeight
+      (vRect.width - FIT_PADDING * 2) / natural.w,
+      (vRect.height - FIT_PADDING * 2) / natural.h
     );
     setZoom(fitScale);
     setPan({
-      x: (vRect.width - svgWidth * fitScale) / 2,
-      y: (vRect.height - svgHeight * fitScale) / 2,
+      x: (vRect.width - natural.w * fitScale) / 2,
+      y: (vRect.height - natural.h * fitScale) / 2,
     });
     return true;
-  }, []);
+  }, [getNaturalSize]);
 
   const reset = useCallback(() => {
     setZoom(1);
@@ -272,6 +292,33 @@ function DiagramViewport({ children }) {
     return () => cancelAnimationFrame(id);
   }, [fullscreen, fit]);
 
+  // Apply zoom to the SVG via width/height ATTRIBUTES (not CSS transform).
+  // This forces the browser to re-rasterize the SVG vector at the new size, so
+  // text stays crisp at any zoom level. CSS scale on the canvas div would
+  // stretch a low-resolution texture and produce blurry/illegible labels.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const apply = () => {
+      const natural = naturalSizeRef.current;
+      if (!natural) return;
+      const svg = canvas.querySelector('svg');
+      if (!svg) return;
+      const w = natural.w * zoom;
+      const h = natural.h * zoom;
+      svg.setAttribute('width', String(w));
+      svg.setAttribute('height', String(h));
+      svg.style.width = w + 'px';
+      svg.style.height = h + 'px';
+      svg.style.maxWidth = 'none';
+    };
+    apply();
+    // The SVG may not exist yet on first render; observe and reapply when it does.
+    const observer = new MutationObserver(apply);
+    observer.observe(canvas, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [zoom]);
+
   return (
     <div
       ref={viewportRef}
@@ -294,7 +341,7 @@ function DiagramViewport({ children }) {
       <div
         ref={canvasRef}
         className="schema-diagram-canvas"
-        style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+        style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}
       >
         {children}
       </div>

@@ -66,12 +66,15 @@
   position: absolute;
   top: 0;
   left: 0;
-  transform-origin: 0 0;
   /* Disable pointer events on the SVG so drag events bubble to the viewport.
    * The "View in spec →" links live OUTSIDE the diagram, so this is fine. */
   pointer-events: none;
   user-select: none;
-  will-change: transform;
+  /* Note: do NOT add `will-change: transform` here — it forces GPU layer
+   * compositing which rasterizes the SVG into a texture, so zooming via CSS
+   * scale stretches a low-resolution bitmap instead of re-rendering vector
+   * text. Translation alone (for pan) is fine; scale is applied via the SVG's
+   * own width/height attributes inside DiagramViewport. */
 }
 
 .schema-diagram-canvas .mermaid-block {
