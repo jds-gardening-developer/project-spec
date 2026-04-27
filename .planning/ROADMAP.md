@@ -65,7 +65,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User can press Cmd+K (macOS) or Ctrl+K (other platforms) and a search panel overlay opens with the spec content already indexed
   5. User can click any search result and the panel dismisses and the page scrolls to that section
 **Plans**: 5 plans
-- [ ] 03-01-foundation-PLAN.md — Layout shell wrapping App.jsx, useScrollToAnchor hook extraction, Sidebar/SearchPanel/useScrollSpy/useHashScroll stubs, minisearch dep, CSS custom-property surface, build-search-index script wired (Wave 1)
+- [x] 03-01-foundation-PLAN.md — Layout shell wrapping App.jsx, useScrollToAnchor hook extraction, Sidebar/SearchPanel/useScrollSpy/useHashScroll stubs, minisearch dep, CSS custom-property surface, build-search-index script wired (Wave 1)
 - [ ] 03-02-sidebar-PLAN.md — Real Sidebar with DOM-driven heading list, useScrollSpy via IntersectionObserver, click-to-scroll, mobile drawer (NAV-01..03, Wave 2)
 - [ ] 03-03-hash-deeplink-PLAN.md — Real useHashScroll one-shot effect on first content render with prefix-match fallback (NAV-04, Wave 2)
 - [ ] 03-04-search-index-PLAN.md — Real build-search-index.mjs walking newest dated spec into one record per heading; github-slugger devDep (SEA-02, Wave 2)
