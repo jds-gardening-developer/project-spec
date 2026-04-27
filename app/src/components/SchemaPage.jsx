@@ -136,7 +136,7 @@ function DiagramViewport({ children }) {
   const viewportRef = useRef(null);
   const canvasRef = useRef(null);
   const naturalSizeRef = useRef(null); // { w, h } of the rendered SVG at scale=1
-  const [zoom, setZoom] = useState(INITIAL_ZOOM);
+  const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [fullscreen, setFullscreen] = useState(false);
   const dragRef = useRef(null);
@@ -270,9 +270,8 @@ function DiagramViewport({ children }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [fullscreen]);
 
-  // Capture natural size when the SVG appears (so Fit/Center work). Do NOT
-  // auto-center on mount — that proved race-prone with Mermaid's async render
-  // and pushed the diagram off-screen. Use the explicit "Center" button.
+  // Capture natural size once the SVG appears (so the Fit button works), but
+  // do NOT auto-fit — the diagram opens at 100% native size by default.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -285,35 +284,6 @@ function DiagramViewport({ children }) {
     observer.observe(canvas, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, [getNaturalSize]);
-
-  // On-demand centering for the Center button. Reads the focal entity's
-  // current on-screen rect and computes the pan offset that puts it at the
-  // viewport centre. Reliable because by the time the user clicks, Mermaid
-  // is fully rendered and the zoom-attribute effect has settled.
-  const centerOnFocal = useCallback(() => {
-    const canvas = canvasRef.current;
-    const viewport = viewportRef.current;
-    if (!canvas || !viewport) return;
-    const svg = canvas.querySelector('svg');
-    if (!svg) return;
-    const labels = Array.from(svg.querySelectorAll('text'));
-    const focalLabel = labels.find((t) => t.textContent.trim() === FOCAL_ENTITY);
-    const target = focalLabel || svg;
-    const tRect = target.getBoundingClientRect();
-    if (tRect.width === 0 || tRect.height === 0) return;
-    const vRect = viewport.getBoundingClientRect();
-    const canvasRect = canvas.getBoundingClientRect();
-    // Target's centre in canvas-local coords (account for current pan).
-    const targetCx = tRect.left + tRect.width / 2 - canvasRect.left;
-    const targetCy = tRect.top + tRect.height / 2 - canvasRect.top;
-    // Viewport centre in canvas-local coords.
-    const viewportCx = vRect.width / 2;
-    const viewportCy = vRect.height / 2;
-    setPan((p) => ({
-      x: p.x + (viewportCx - targetCx),
-      y: p.y + (viewportCy - targetCy),
-    }));
-  }, []);
 
   // Apply zoom to the SVG via width/height ATTRIBUTES (not CSS transform).
   // This forces the browser to re-rasterize the SVG vector at the new size, so
@@ -356,7 +326,6 @@ function DiagramViewport({ children }) {
         <span className="schema-diagram-zoom-display">{Math.round(zoom * 100)}%</span>
         <button type="button" onClick={() => zoomBy(1 / ZOOM_STEP)} aria-label="Zoom out">−</button>
         <button type="button" onClick={fit}>Fit</button>
-        <button type="button" onClick={centerOnFocal}>Center</button>
         <button type="button" onClick={reset}>1:1</button>
         <button type="button" onClick={() => setFullscreen((v) => !v)}>
           {fullscreen ? 'Close' : 'Fullscreen'}
