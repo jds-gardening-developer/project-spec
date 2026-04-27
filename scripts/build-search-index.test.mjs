@@ -142,6 +142,24 @@ test("extractHeadingsAndBodies: H4+ are ignored — appear as body of preceding 
   assert.match(out[1].body, /after\./);
 });
 
+test("extractHeadingsAndBodies: indented heading (0–3 leading spaces) is still parsed as a heading", () => {
+  // CommonMark behavior — and the 2026-04-26 spec uses "  ## **PRD-1.1:..."
+  // in places. rehype-slug parses these as real H2s, so we must too.
+  const md = "  ## **PRD-1.1: Plant Variants**\n\nBody.";
+  const out = extractHeadingsAndBodies(md);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].level, 2);
+  assert.equal(out[0].title, "PRD-1.1: Plant Variants");
+  assert.equal(out[0].body, "Body.");
+});
+
+test("extractHeadingsAndBodies: 4-space-indented heading is NOT parsed (CommonMark would treat as code block start, but we only need the negative case)", () => {
+  const md = "    ## Not A Heading\n\nbody.";
+  const out = extractHeadingsAndBodies(md);
+  // No headings → no records.
+  assert.equal(out.length, 0);
+});
+
 // ---------- normalizeRecord ----------
 
 test("normalizeRecord: H2 PRD-1 → prd_id 'prd-1' and ctx.currentPrd updated", () => {
