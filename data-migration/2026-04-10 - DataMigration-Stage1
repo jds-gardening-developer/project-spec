@@ -1,0 +1,254 @@
+
+
+# GrowMaster + MacPlants Import Review
+
+## Executive Summary
+
+Data import from GrowMaster and MacPlants is now operational end-to-end:
+
+- Plants imported with deduplicated size business keys.
+- Customers imported including rows without email.
+- Vouchers imported.
+- Orders imported with historical line-item price snapshots and delivery costs.
+- Orders analytics tab added under Orders with league tables and revenue trend chart.
+
+## What Worked Well
+
+- Import scripts are now deterministic and repeatable with truncate + reload workflow.
+- Large datasets were processed in batches successfully.
+- Legacy GM key migration strategy worked without forcing a risky primary key rewrite.
+- Order import now supports nullable customer match fallback (email first, then name).
+- Analytics can be filtered by:
+
+- Time window (1 to 5 years)
+
+- Customer type (all, retail, trade)
+
+- Plant
+
+- Dashboard outputs now cover:
+
+- Best/worst plants
+
+- Best/worst customers
+
+- Best customers and preferred plants
+
+- Revenue line graph over time
+
+## Current Known Data Outcomes
+
+Based on latest import runs:
+
+- Plants CSV parsed: 6413
+- Plants created: 4661
+- Plant sizes created: 5848
+- Plant rows skipped: 565
+- Duplicate size IDs renamed: 468
+- Customers parsed/imported: 5512
+- Vouchers parsed/upserted: 32
+- Orders parsed: 124025
+- Orders grouped: 21710
+- Orders imported: 21710
+- Order items imported: 118008
+- Order items skipped: 6017
+
+Orders skip breakdown:
+
+- Missing gmkey key: 5733
+- Invalid price only: 159
+- Missing GM key + invalid price: 125
+
+Customer matching in imported orders:
+
+- Matched by email: 10091
+- Matched by name: 11607
+- Unmatched: 7
+- Ambiguous: 5
+
+## Questions To Ask Josh
+
+## Data Semantics and Rules
+
+1. Best-selling definition:
+
+- Should best/worst plants be ranked by quantity sold, revenue, or order count?
+- If multiple rankings are needed, which should be default?
+
+2. Worst-selling scope:
+
+- Should "worst" include only sold plants/customers, or also include never-sold catalog items/customers?
+
+3. Customer performance definition:
+
+- Should best/worst customers rank by total revenue, quantity, or order count?
+
+4. Time window basis:
+
+- Are windows strictly rolling (last 12/24/36/48/60 months) or calendar-aligned?
+
+5. Revenue recognition:
+
+- Should revenue include delivery cost in league tables and line charts?
+- Should VAT/tax handling be applied or ignored for now?
+
+## Data Mapping and Quality
+
+6. Missing GM keys (major skip source):
+
+- Can source exports be fixed so all order lines include a valid GM key?
+- Is there an acceptable fallback mapping rule when key is blank?
+
+7. Invalid prices:
+
+- Should blank/invalid historical prices be rejected (current) or defaulted (e.g., 0, current catalog price)?
+
+8. Unmatched/ambiguous customers:
+
+- For unmatched orders, should we create placeholder customers or keep `customerId` null?
+- For ambiguous name matches, should import stop and require manual mapping, or continue and flag?
+
+9. Customer type source of truth:
+
+- If customer type changes over time, should historical reports use:
+
+- current customer type, or
+
+- customer type at order time (snapshot requirement)?
+
+10. Plant-level filtering:
+
+- Should filtering be at plant level (current) or plant-size level for analytics?
+
+## Additional Questions To Improve Export Precision
+
+These are specifically about making the CSV export scripts deterministic and lossless.
+
+11. Delivery handling in combined orders
+
+- Should delivery be represented only in `deliveryPrice` per line (current), or as separate `DELIVERY CHARGE` lines too?
+- If an order has multiple delivery lines, should we sum them or keep first/last value?
+
+12. Retail size resolution fallback
+
+- When retail `size` is missing from raw order lines, is it acceptable to infer size from:
+
+- matching historical price + plant + customer type, then
+
+- single available pot for that plant/customer type?
+
+- If multiple candidate sizes remain, should we leave blank or choose a preferred size rule?
+
+13. Quantity policy
+
+- Confirm rule: skip lines where quantity is null, blank, non-numeric, or <= 0.
+- Any exceptions for returns/credits where negative quantity should be preserved?
+
+14. Price policy
+
+- For missing/invalid line price, should we:
+
+- skip line (strict),
+
+- fill from historical catalog price,
+
+- or set to 0 and flag?
+
+15. Cost policy across trade + retail
+
+- Trade has `cost`, retail usually does not.
+- Should retail `cost` stay blank (current) or be backfilled from a rule/table?
+
+16. Form field meaning and mapping
+
+- What is `form` and is it needed in the new system?
+- Is `form` in trade orders the same concept as `form` in plants?
+
+- example trade-style value: `cm 180-190`
+
+- example plants value: `Cut/seed`
+
+17. Trade order completeness and GM key quality
+
+- We need a fresh All Orders export from GrowMaster with corrected GM keys.
+
+18. Plant retail price coverage
+
+- Many plants have no retail price.
+- Should retail price be auto-calculated, or left empty with an `Action Required` flag?
+
+19. Order line price source of truth
+
+- Order items can show different prices across sources/snapshots.
+- Which exact price should be imported into the database as historical truth?
+
+20. Missing price handling in orders
+
+- Should orders with missing/invalid price be imported anyway?
+- If yes, should price be null, 0, or backfilled from a fallback rule?
+
+21. Customer dedupe policy in exports
+
+- Current matching preference is email first, then name when no email.
+- For same email with different names, should latest name always win?
+- For blank email + similar names (typos/case), should we fuzzy-merge or keep separate records?
+
+22. Email normalization rules
+
+- Should we always lowercase/trim email and strip obvious placeholders like `N/A`, `none`, `unknown`?
+- Should invalid email formats be kept as text or blanked?
+
+23. Voucher semantics
+
+- Voucher keys currently derive numeric value from key/title (e.g. `10GIF` -> 10).
+- Is that guaranteed forever, including electronic vouchers, or can voucher value diverge from key text?
+
+24. Order identity
+
+- In combined export, trade `orderId` comes from `Sales order number`, retail from `order id`.
+- Do you want to preserve source order numbers exactly, or can we generate consistent internal order numbers?
+- If source numbers are preserved, do we need a source prefix to avoid collisions (e.g. `T-022866`, `R-27014`)?
+
+25. Cost storage model
+
+- Where should cost be stored in the new system?
+- Should cost live on plant stock records, and do we need an editable cost field in stock management?
+
+26. Excluding non-plant lines
+
+- Besides delivery, should any other non-plant lines be excluded (voucher lines, admin lines, misc fees)?
+- If yes, provide a definitive gmkey/item-type blacklist.
+
+27. Required field contract for import
+
+- For final ERP/API import, which columns are mandatory vs optional in:
+
+- plants
+
+- customers
+
+- vouchers
+
+- orders
+
+28. Error handling strategy
+
+- On ambiguous mappings, should scripts:
+
+- fail fast,
+
+- skip and continue,
+
+- or write a reject file and continue?
+
+29. Reconciliation expectation
+
+- Do you want a per-run reconciliation report with counts by reason:
+
+- skipped quantity
+
+- missing GM key
+
+- invalid price
+
+- unmatched customer

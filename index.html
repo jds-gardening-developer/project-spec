@@ -15,6 +15,12 @@
       --theme-color: #2c8d4f;          /* MacPlants green */
       --theme-color-secondary: #1f6638;
     }
+    /* Reduce sidebar padding for compact navigation */
+    .sidebar ul { padding: 0; }
+    .sidebar li { margin: 0; padding: 0; }
+    .sidebar a { padding: 4px 8px; font-size: 14px; }
+    .sidebar ul ul { margin: 0 !important; }
+    .sidebar ul ul li { margin: 0 !important; }
     /* Tighter table cells so the schema tables don't sprawl */
     .markdown-section table { font-size: 14px; }
     .markdown-section table th,
@@ -38,11 +44,11 @@
       name: 'MacPlants ERP',
       repo: '',                              // fill in once the GitHub repo is live
       loadSidebar: false,                    // single-file mode — no _sidebar.md needed
-      subMaxLevel: 3,                        // auto-TOC includes h2 & h3
+      subMaxLevel: 1,                        // only show h2 (PRD) level; click to expand
       auto2top: true,                        // scroll to top on navigation
-      maxLevel: 4,                           // headings shown in TOC
+      maxLevel: 2,                           // only h2 headings in sidebar (PRD level)
       mergeNavbar: true,                     // tidier on mobile
-      homepage: 'README.md',
+      homepage: 'project-spec/2026-04-26.md',
       notFoundPage: true,
       executeScript: false,                  // never run inline JS from the markdown — safer
       search: {

@@ -7,6 +7,8 @@ const ZOOM_MIN = 0.25;
 const ZOOM_MAX = 8;
 const ZOOM_STEP = 1.2;
 const FIT_PADDING = 24;
+const INITIAL_ZOOM = 0.75;
+const FOCAL_ENTITY = 'Task'; // Centre the viewport on this entity on first render.
 
 /**
  * SchemaPage — interactive ER overview of every entity in the spec.
