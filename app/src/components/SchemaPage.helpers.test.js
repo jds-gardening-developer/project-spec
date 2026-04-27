@@ -102,9 +102,9 @@ describe('buildErDiagramSource', () => {
     ],
   };
 
-  it('starts with the literal "erDiagram" line', () => {
+  it('contains the literal "erDiagram" line after the init directive', () => {
     const out = buildErDiagramSource(FAKE);
-    assert.match(out, /^erDiagram\n/);
+    assert.match(out, /^%%\{init:.*?\}%%\nerDiagram\n/);
   });
 
   it('declares every entity with quoted name and an attribute block', () => {
@@ -141,10 +141,11 @@ describe('buildErDiagramSource', () => {
     assert.equal(indented.length, DIAGRAM_FIELD_CAP);
   });
 
-  it('returns "erDiagram\\n" for malformed input', () => {
-    assert.equal(buildErDiagramSource(null), 'erDiagram\n');
-    assert.equal(buildErDiagramSource({}), 'erDiagram\n');
-    assert.equal(buildErDiagramSource({ entities: 'not-an-array' }), 'erDiagram\n');
+  it('returns init directive + "erDiagram" for malformed input', () => {
+    for (const bad of [null, {}, { entities: 'not-an-array' }]) {
+      const out = buildErDiagramSource(bad);
+      assert.match(out, /^%%\{init:.*?\}%%\nerDiagram\n$/);
+    }
   });
 
   it('escapes embedded double-quotes in relationship labels', () => {

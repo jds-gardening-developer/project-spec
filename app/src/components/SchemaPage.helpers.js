@@ -41,9 +41,15 @@ export const DIAGRAM_FIELD_CAP = 6;
  * for empty / malformed input so the renderer still produces an empty diagram
  * frame instead of crashing.
  */
+// Per-render Mermaid config string — bumps ER font + entity sizing so labels
+// stay readable when SchemaPage's viewport scales the SVG. Applies only to this
+// diagram (not the inline mermaid blocks elsewhere in the spec).
+export const ER_INIT_DIRECTIVE =
+  "%%{init: {'theme':'default','themeVariables':{'fontSize':'18px'},'er':{'fontSize':18,'entityPadding':15,'minEntityWidth':140,'minEntityHeight':75}}}%%";
+
 export function buildErDiagramSource(data) {
-  if (!data || !Array.isArray(data.entities)) return 'erDiagram\n';
-  const lines = ['erDiagram'];
+  if (!data || !Array.isArray(data.entities)) return ER_INIT_DIRECTIVE + '\nerDiagram\n';
+  const lines = [ER_INIT_DIRECTIVE, 'erDiagram'];
 
   for (const entity of data.entities) {
     lines.push(`    "${entity.name}" {`);
