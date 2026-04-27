@@ -274,6 +274,13 @@ function DiagramViewport({ children }) {
   // Once the SVG renders: capture natural size + centre the viewport on the
   // focal entity ("Task") so the user has a meaningful starting point. Falls
   // back to centring the whole diagram if the focal entity isn't found.
+  //
+  // Mermaid wraps the diagram in `<g transform="translate(...)">`, so the
+  // text element's getBBox returns element-local coords that don't reflect the
+  // on-screen position. We use the rendered DOMRect instead — by then the
+  // zoom-attribute effect has already sized the SVG to natural*INITIAL_ZOOM,
+  // and pan is still (0, 0), so the rect's centre minus the canvas origin is
+  // the focal entity's screen-space offset that we need to cancel out.
   useEffect(() => {
     const canvas = canvasRef.current;
     const viewport = viewportRef.current;
@@ -284,31 +291,44 @@ function DiagramViewport({ children }) {
       if (!natural) return;
       const svg = canvas.querySelector('svg');
       if (!svg) return;
-      // Look for a text node whose content matches the focal entity name.
+      // Need the SVG to have been resized to natural*zoom before measuring,
+      // otherwise the rendered rect reflects Mermaid's default size.
+      const svgRect = svg.getBoundingClientRect();
+      if (svgRect.width === 0 || svgRect.height === 0) return;
+
       const labels = Array.from(svg.querySelectorAll('text'));
       const focalLabel = labels.find((t) => t.textContent.trim() === FOCAL_ENTITY);
+
       const vRect = viewport.getBoundingClientRect();
-      let focalX, focalY;
+      // Canvas's current screen origin (it's translate(0,0) at this point).
+      const canvasRect = canvas.getBoundingClientRect();
+
+      let focalCx, focalCy;
       if (focalLabel) {
-        try {
-          const bbox = focalLabel.getBBox();
-          focalX = bbox.x + bbox.width / 2;
-          focalY = bbox.y + bbox.height / 2;
-        } catch {
-          focalX = natural.w / 2;
-          focalY = natural.h / 2;
-        }
+        const lr = focalLabel.getBoundingClientRect();
+        // Convert to canvas-local coords (relative to canvas origin pre-pan).
+        focalCx = lr.left + lr.width / 2 - canvasRect.left;
+        focalCy = lr.top + lr.height / 2 - canvasRect.top;
       } else {
-        focalX = natural.w / 2;
-        focalY = natural.h / 2;
+        // Fall back to centring the whole diagram.
+        focalCx = svgRect.width / 2;
+        focalCy = svgRect.height / 2;
       }
+
       setPan({
-        x: vRect.width / 2 - focalX * INITIAL_ZOOM,
-        y: vRect.height / 2 - focalY * INITIAL_ZOOM,
+        x: vRect.width / 2 - focalCx,
+        y: vRect.height / 2 - focalCy,
       });
       hasCenteredRef.current = true;
     };
+    // Try once now (in case SVG is already there from cache), then again on
+    // every mutation. We also retry on a short rAF chain because Mermaid's
+    // dangerouslySetInnerHTML insertion + our zoom-attribute effect both have
+    // to run before the SVG has its final on-screen size.
     tryCenter();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(tryCenter);
+    });
     const observer = new MutationObserver(tryCenter);
     observer.observe(canvas, { childList: true, subtree: true });
     return () => observer.disconnect();
