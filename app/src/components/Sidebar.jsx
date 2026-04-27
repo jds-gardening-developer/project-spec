@@ -5,6 +5,7 @@ import {
   findActivePrd,
 } from './useScrollSpy.js';
 import { useScrollToAnchor } from './useScrollToAnchor.js';
+import { useRoute } from './useRoute.js';
 import './Sidebar.css';
 
 /**
@@ -54,6 +55,7 @@ export function Sidebar() {
   const [headings, setHeadings] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const scrollToAnchor = useScrollToAnchor();
+  const route = useRoute();
 
   // ----- Heading collection (D-18) -----
   useEffect(() => {
@@ -154,8 +156,31 @@ export function Sidebar() {
         aria-label="PRD navigation"
       >
         <nav id="sidebar-nav">
+          {/* 260427-gjf: static "Schema Index" entry — always visible above
+              the dynamic PRD list so the route is reachable from both the
+              spec view and the schema view. Active when route === 'schema'. */}
+          <ul className="sidebar-list sidebar-list--static">
+            <li className="sidebar-item">
+              <a
+                href="#/schema"
+                className={
+                  'sidebar-link sidebar-link--h2 sidebar-link--static' +
+                  (route === 'schema' ? ' sidebar-link--active' : '')
+                }
+                onClick={() => {
+                  // Let the browser update the hash naturally so useRoute's
+                  // hashchange listener fires; just close the mobile drawer.
+                  setDrawerOpen(false);
+                }}
+              >
+                Schema Index
+              </a>
+            </li>
+          </ul>
           {groups.length === 0 ? (
-            <p className="sidebar-empty">(no sections)</p>
+            <p className="sidebar-empty">
+              {route === 'schema' ? '(open the spec to see PRD nav)' : '(no sections)'}
+            </p>
           ) : (
             <ul className="sidebar-list">
               {groups.map((g) => {
