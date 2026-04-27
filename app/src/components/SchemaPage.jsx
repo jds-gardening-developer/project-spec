@@ -136,10 +136,11 @@ function DiagramViewport({ children }) {
   const viewportRef = useRef(null);
   const canvasRef = useRef(null);
   const naturalSizeRef = useRef(null); // { w, h } of the rendered SVG at scale=1
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(INITIAL_ZOOM);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [fullscreen, setFullscreen] = useState(false);
   const dragRef = useRef(null);
+  const hasCenteredRef = useRef(false);
 
   // Capture (and cache) the SVG's natural size from getBBox the first time it's
   // available. Returns the cached size on subsequent calls so getBBox isn't
@@ -270,17 +271,45 @@ function DiagramViewport({ children }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [fullscreen]);
 
-  // Capture natural size once the SVG appears (so the Fit button works), but
-  // do NOT auto-fit — the diagram opens at 100% native size by default.
+  // Once the SVG renders: capture natural size + centre the viewport on the
+  // focal entity ("Task") so the user has a meaningful starting point. Falls
+  // back to centring the whole diagram if the focal entity isn't found.
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const tryCapture = () => {
-      if (naturalSizeRef.current) return;
-      getNaturalSize();
+    const viewport = viewportRef.current;
+    if (!canvas || !viewport) return;
+    const tryCenter = () => {
+      if (hasCenteredRef.current) return;
+      const natural = getNaturalSize();
+      if (!natural) return;
+      const svg = canvas.querySelector('svg');
+      if (!svg) return;
+      // Look for a text node whose content matches the focal entity name.
+      const labels = Array.from(svg.querySelectorAll('text'));
+      const focalLabel = labels.find((t) => t.textContent.trim() === FOCAL_ENTITY);
+      const vRect = viewport.getBoundingClientRect();
+      let focalX, focalY;
+      if (focalLabel) {
+        try {
+          const bbox = focalLabel.getBBox();
+          focalX = bbox.x + bbox.width / 2;
+          focalY = bbox.y + bbox.height / 2;
+        } catch {
+          focalX = natural.w / 2;
+          focalY = natural.h / 2;
+        }
+      } else {
+        focalX = natural.w / 2;
+        focalY = natural.h / 2;
+      }
+      setPan({
+        x: vRect.width / 2 - focalX * INITIAL_ZOOM,
+        y: vRect.height / 2 - focalY * INITIAL_ZOOM,
+      });
+      hasCenteredRef.current = true;
     };
-    tryCapture();
-    const observer = new MutationObserver(tryCapture);
+    tryCenter();
+    const observer = new MutationObserver(tryCenter);
     observer.observe(canvas, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, [getNaturalSize]);
