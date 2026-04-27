@@ -1,6 +1,6 @@
 {
-  "source": "project-spec/2026-04-26.md",
-  "generated_at": "2026-04-27T13:51:07.386Z",
+  "source": "project-spec/2026-04-27.md",
+  "generated_at": "2026-04-27T14:05:48.805Z",
   "entities": [
     {
       "name": "User",
@@ -38,8 +38,8 @@
         },
         {
           "name": "last_login_at",
-          "type": "datetime (nullable)",
-          "notes": ""
+          "type": "datetime",
+          "notes": "nullable"
         }
       ]
     },
@@ -75,7 +75,7 @@
         {
           "name": "available_online",
           "type": "boolean",
-          "notes": "master webshop toggle; false = hidden everywhere"
+          "notes": "master webshop toggle; false \\= hidden everywhere"
         },
         {
           "name": "vat_applicable",
@@ -86,6 +86,11 @@
           "name": "special_plant",
           "type": "boolean",
           "notes": "applies to all pot sizes; flagged for hand-managed handling"
+        },
+        {
+          "name": "",
+          "type": "",
+          "notes": ""
         }
       ]
     },
@@ -106,7 +111,12 @@
         {
           "name": "sku",
           "type": "string",
-          "notes": "auto-generated; single source of truth across ERP, EPOS & labels"
+          "notes": "auto-generated; single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW"
+        },
+        {
+          "name": "Plant_ID",
+          "type": "",
+          "notes": "So it can communicate with the Label printer ?"
         },
         {
           "name": "cost_price",
@@ -126,7 +136,7 @@
         {
           "name": "dimensions",
           "type": "string (nullable)",
-          "notes": "DISCUSS — Stage 2 candidate"
+          "notes": "Text Field"
         },
         {
           "name": "available_on_webshop",
@@ -134,9 +144,9 @@
           "notes": "per pot size"
         },
         {
-          "name": "unavailable_on_webshop",
-          "type": "boolean",
-          "notes": "shippability override (e.g. too tall in winter)"
+          "name": "",
+          "type": "",
+          "notes": ""
         }
       ]
     },
@@ -218,7 +228,7 @@
         {
           "name": "reason_comment",
           "type": "string (nullable)",
-          "notes": "required when reason = Other"
+          "notes": "required when reason \\= Other"
         },
         {
           "name": "recorded_by",
@@ -244,7 +254,7 @@
         {
           "name": "status",
           "type": "enum",
-          "notes": "Draft / Requested / Accepted / Arrived / Reconciled / Cancelled"
+          "notes": "Draft / Requested / Accepted / Arrived / Reconciled / Archived"
         },
         {
           "name": "paid",
@@ -489,7 +499,7 @@
         {
           "name": "title",
           "type": "string",
-          "notes": "default = \"QU-XXXX — Customer Name\"; overridable"
+          "notes": "default \\= \"QU-XXXX — Customer Name\"; overridable"
         },
         {
           "name": "status",
@@ -576,7 +586,7 @@
         {
           "name": "title",
           "type": "string",
-          "notes": "default = \"ORD-XXXX — Customer Name\"; overridable for trade shows etc."
+          "notes": "default \\= \"ORD-XXXX — Customer Name\"; overridable for trade shows etc."
         },
         {
           "name": "status",
@@ -622,6 +632,16 @@
           "name": "locked_post_xero",
           "type": "boolean",
           "notes": "true once final invoice posts to Xero — order becomes read-only"
+        },
+        {
+          "name": "invoices",
+          "type": "array\\[Invoice\\]",
+          "notes": "Can store full invoice history \\- we may issue many invoices against 1 order as it could easily be updated"
+        },
+        {
+          "name": "",
+          "type": "",
+          "notes": ""
         }
       ]
     },
@@ -652,7 +672,7 @@
         {
           "name": "line_note",
           "type": "string (nullable)",
-          "notes": "per-line, customer-visible"
+          "notes": "per-line, customer-visible ‘Sub for x”"
         }
       ]
     },
@@ -683,7 +703,7 @@
         {
           "name": "due_at",
           "type": "datetime",
-          "notes": "for trade, issued + 30 days"
+          "notes": "for trade, issued \\+ 30 days"
         },
         {
           "name": "posted_to_xero",

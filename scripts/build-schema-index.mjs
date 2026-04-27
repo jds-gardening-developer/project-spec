@@ -58,7 +58,9 @@ const ENTITY_LABEL_RE = /^\*\*([^*]+)\*\*(?:\s*\*\([^)]+\)\*)?\s*$/;
 const FK_TYPE_RE = /^FK\s*→\s*(.+?)(?:\s*\(([^)]+)\))?\s*$/;
 
 const TABLE_HEADER_RE = /^\s*\|\s*Field\s*\|\s*Type\s*\|\s*Notes\s*\|\s*$/i;
-const TABLE_SEPARATOR_RE = /^\s*\|(?:\s*-+\s*\|){3}\s*$/;
+// GFM separator allows `---`, `:---`, `---:`, or `:---:` per cell for column
+// alignment. Some markdown editors emit `:----` with extra dashes.
+const TABLE_SEPARATOR_RE = /^\s*\|(?:\s*:?-+:?\s*\|){3}\s*$/;
 const TABLE_ROW_RE = /^\s*\|/;
 
 // ---------- pure helpers (exported for tests) ----------
@@ -140,33 +142,36 @@ export function parseEntitiesFromMarkdown(markdown) {
       continue;
     }
 
-    // ## heading — update currentPrdSlug if it matches a PRD-N(.M) form, else
-    //              keep the previous PRD slug (a non-PRD H2 like "Meeting
-    //              Action Items" doesn't reset the surrounding context — but
-    //              there are no Data Models inside non-PRD H2 sections in
-    //              practice, so the choice is academic).
-    const h2Match = line.match(/^ {0,3}##(?!#)\s+(.+?)\s*$/);
-    if (h2Match) {
-      const title = h2Match[1].replace(/\*\*(.+?)\*\*/g, "$1").trim();
+    // Generic heading match. The spec has used two heading conventions:
+    //   - Old (2026-04-26.md): `## PRD`, `### Data Model`, bare `**Entity**`
+    //   - New (2026-04-27.md): `# PRD`,  `## Data Model`,  `### **Entity**`
+    // We accept both: any heading whose text is a PRD identifier resets the
+    // PRD slug; any heading whose text is "Data Model" opens the data section;
+    // any other heading inside Data Model is treated as the entity name.
+    const headingMatch = line.match(/^ {0,3}(#{1,4})\s+(.+?)\s*$/);
+    if (headingMatch) {
+      const title = headingMatch[2].replace(/\*\*(.+?)\*\*/g, "$1").trim();
       const prdMatch = title.match(PRD_ID_RE);
       if (prdMatch) {
         currentPrdSlug = prdMatch[1].toLowerCase().replace(/\./g, "-");
-      } else {
-        currentPrdSlug = "";
+        inDataModel = false;
+        pendingEntity = null;
+        i += 1;
+        continue;
       }
-      // A new ## also closes any open Data Model section.
-      inDataModel = false;
-      pendingEntity = null;
-      i += 1;
-      continue;
-    }
-
-    // ### heading — toggle inDataModel.
-    const h3Match = line.match(/^ {0,3}###(?!#)\s+(.+?)\s*$/);
-    if (h3Match) {
-      const title = h3Match[1].replace(/\*\*(.+?)\*\*/g, "$1").trim();
-      inDataModel = title.toLowerCase() === "data model";
-      pendingEntity = null;
+      if (title.toLowerCase() === "data model") {
+        inDataModel = true;
+        pendingEntity = null;
+        i += 1;
+        continue;
+      }
+      // Any other heading while inside a Data Model section is the entity
+      // name (e.g. `### **User**`). Outside of Data Model, headings reset state.
+      if (inDataModel) {
+        pendingEntity = title;
+      } else {
+        // Plain heading outside a Data Model — leave context intact.
+      }
       i += 1;
       continue;
     }
