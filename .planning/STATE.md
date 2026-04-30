@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 Phase: 999.1 of 5 (schema index page)
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-27 - Completed quick task 260427-gjf: Schema index page
+Last activity: 2026-04-30 - Completed quick task 260430-v2w: Clarify Invoice supersede rule in PRD-03
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -82,6 +82,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260427-gjf | Schema index page — visual ER diagram + aggregated field reference | 2026-04-27 | 3cf6d50 | [260427-gjf-schema-index-page-visual-er-diagram-of-a](./quick/260427-gjf-schema-index-page-visual-er-diagram-of-a/) |
+| 260430-v2w | Clarify Invoice supersede rule in PRD-03 (add Superseded status + supersede-on-edit note) | 2026-04-30 | 1fe5c9c | [260430-v2w-clarify-invoice-supersede-rule-in-prd-03](./quick/260430-v2w-clarify-invoice-supersede-rule-in-prd-03/) |
 
 ## Session Continuity
 
