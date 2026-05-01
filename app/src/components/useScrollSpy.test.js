@@ -73,22 +73,22 @@ test('groupHeadingsByPrd Test 1: Empty input returns empty array', () => {
   assert.deepEqual(groupHeadingsByPrd([]), []);
 });
 
-test('groupHeadingsByPrd Test 2: Only H2s yields one group per H2 with empty children', () => {
+test('groupHeadingsByPrd Test 2: Only H1s with PRD- prefix yield one group per H1 with empty children', () => {
   const headings = [
-    { id: 'prd-1', level: 2, text: 'PRD-1: Plants' },
-    { id: 'prd-2', level: 2, text: 'PRD-2: Orders' },
+    { id: 'prd-0', level: 1, text: 'PRD-0: ERP Account Types' },
+    { id: 'prd-1', level: 1, text: 'PRD-1: Plants' },
   ];
   assert.deepEqual(groupHeadingsByPrd(headings), [
+    { id: 'prd-0', text: 'PRD-0: ERP Account Types', children: [] },
     { id: 'prd-1', text: 'PRD-1: Plants', children: [] },
-    { id: 'prd-2', text: 'PRD-2: Orders', children: [] },
   ]);
 });
 
-test('groupHeadingsByPrd Test 3: H2 followed by 2 H3s yields one group with 2 children', () => {
+test('groupHeadingsByPrd Test 3: PRD H1 followed by 2 H2s yields one group with 2 children', () => {
   const headings = [
-    { id: 'prd-1', level: 2, text: 'PRD-1' },
-    { id: 'what-is-it', level: 3, text: 'What Is It' },
-    { id: 'data-model', level: 3, text: 'Data Model' },
+    { id: 'prd-1', level: 1, text: 'PRD-1' },
+    { id: 'what-is-it', level: 2, text: 'What Is It' },
+    { id: 'data-model', level: 2, text: 'Data Model' },
   ];
   const result = groupHeadingsByPrd(headings);
   assert.equal(result.length, 1);
@@ -99,13 +99,13 @@ test('groupHeadingsByPrd Test 3: H2 followed by 2 H3s yields one group with 2 ch
   ]);
 });
 
-test('groupHeadingsByPrd Test 4: Two H2s with H3s between them assign correctly', () => {
+test('groupHeadingsByPrd Test 4: Two PRD H1s with H2s between them assign correctly', () => {
   const headings = [
-    { id: 'prd-1', level: 2, text: 'PRD-1' },
-    { id: 'what-is-it', level: 3, text: 'What Is It' },
-    { id: 'prd-2', level: 2, text: 'PRD-2' },
-    { id: 'data-model', level: 3, text: 'Data Model' },
-    { id: 'how-we-know', level: 3, text: 'How We Know' },
+    { id: 'prd-1', level: 1, text: 'PRD-1' },
+    { id: 'what-is-it', level: 2, text: 'What Is It' },
+    { id: 'prd-2', level: 1, text: 'PRD-2' },
+    { id: 'data-model', level: 2, text: 'Data Model' },
+    { id: 'how-we-know', level: 2, text: 'How We Know' },
   ];
   const result = groupHeadingsByPrd(headings);
   assert.equal(result.length, 2);
@@ -116,16 +116,59 @@ test('groupHeadingsByPrd Test 4: Two H2s with H3s between them assign correctly'
   ]);
 });
 
-test('groupHeadingsByPrd Test 5: H3 before any H2 is dropped (orphan)', () => {
+test('groupHeadingsByPrd Test 5: H2 before any H1 is dropped (orphan)', () => {
   const headings = [
-    { id: 'orphan', level: 3, text: 'Orphan H3' },
-    { id: 'prd-1', level: 2, text: 'PRD-1' },
-    { id: 'what-is-it', level: 3, text: 'What Is It' },
+    { id: 'orphan', level: 2, text: 'Orphan H2' },
+    { id: 'prd-1', level: 1, text: 'PRD-1' },
+    { id: 'what-is-it', level: 2, text: 'What Is It' },
   ];
   const result = groupHeadingsByPrd(headings);
   assert.equal(result.length, 1);
   assert.equal(result[0].id, 'prd-1');
   assert.deepEqual(result[0].children, [{ id: 'what-is-it', text: 'What Is It' }]);
+});
+
+test('groupHeadingsByPrd Test 6: Empty-text H1 is NOT a group', () => {
+  const headings = [
+    { id: '', level: 1, text: '' },
+    { id: 'prd-1', level: 1, text: 'PRD-1' },
+    { id: 'what-is-it', level: 2, text: 'What Is It' },
+  ];
+  const result = groupHeadingsByPrd(headings);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].id, 'prd-1');
+  assert.deepEqual(result[0].children, [{ id: 'what-is-it', text: 'What Is It' }]);
+});
+
+test('groupHeadingsByPrd Test 7: Non-PRD H1 is NOT a group, and its child H2s are dropped (no current group)', () => {
+  const headings = [
+    { id: 'meeting-items', level: 1, text: 'Meeting Action Items (April 2026)' },
+    { id: 'item-1', level: 2, text: 'Item 1' },
+    { id: 'prd-1', level: 1, text: 'PRD-1: Plants' },
+    { id: 'data-model', level: 2, text: 'Data Model' },
+  ];
+  const result = groupHeadingsByPrd(headings);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].id, 'prd-1');
+  assert.deepEqual(result[0].children, [{ id: 'data-model', text: 'Data Model' }]);
+});
+
+test('groupHeadingsByPrd Test 8: Lone H2 without a preceding PRD H1 is dropped (malformed)', () => {
+  const headings = [
+    { id: 'data-model', level: 2, text: 'Data Model' },
+  ];
+  assert.deepEqual(groupHeadingsByPrd(headings), []);
+});
+
+test('groupHeadingsByPrd Test 9: PRD- prefix filter is case-sensitive and exact prefix', () => {
+  const headings = [
+    { id: 'prd-foo', level: 1, text: 'prd-1: lowercase' },
+    { id: 'aprd', level: 1, text: 'APRD-1' },
+    { id: 'real', level: 1, text: 'PRD-1: Real' },
+  ];
+  const result = groupHeadingsByPrd(headings);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].id, 'real');
 });
 
 // ----------------------------------------------------------------------------
