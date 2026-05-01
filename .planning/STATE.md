@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 Phase: 999.1 of 5 (schema index page)
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-30 - Completed quick task 260430-v2w: Clarify Invoice supersede rule in PRD-03
+Last activity: 2026-05-01 - Completed quick task 260501-wll: Fix Sidebar to group by H1 (PRDs) with H2 children, filter to PRD- prefix
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -83,6 +83,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260427-gjf | Schema index page — visual ER diagram + aggregated field reference | 2026-04-27 | 3cf6d50 | [260427-gjf-schema-index-page-visual-er-diagram-of-a](./quick/260427-gjf-schema-index-page-visual-er-diagram-of-a/) |
 | 260430-v2w | Clarify Invoice supersede rule in PRD-03 (add Superseded status + supersede-on-edit note) | 2026-04-30 | 1fe5c9c | [260430-v2w-clarify-invoice-supersede-rule-in-prd-03](./quick/260430-v2w-clarify-invoice-supersede-rule-in-prd-03/) |
+| 260501-wll | Fix Sidebar to group by H1 (PRDs) with H2 children, filter to PRD- prefix | 2026-05-01 | e16b078 | [260501-wll-fix-sidebar-to-group-by-h1-prds-with-h2-](./quick/260501-wll-fix-sidebar-to-group-by-h1-prds-with-h2-/) |
 
 ## Session Continuity
 
