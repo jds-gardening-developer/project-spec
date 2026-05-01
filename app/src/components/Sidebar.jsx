@@ -13,9 +13,9 @@ import './Sidebar.css';
  *
  * Decisions:
  *   - D-18: heading source is the rendered DOM. After SpecViewer mounts we
- *     run `document.querySelectorAll('.spec-viewer h2[id], .spec-viewer h3[id]')`
+ *     run `document.querySelectorAll('.spec-viewer h1[id], .spec-viewer h2[id]')`
  *     to build the entry list. No parallel AST, no markdown re-parse.
- *   - D-01: H3 sub-headings auto-expand under the active PRD only. Computed
+ *   - D-01: H2 sub-sections auto-expand under the active PRD only. Computed
  *     by passing the flat id list through useScrollSpy + findActivePrd.
  *   - D-17: scroll-spy via IntersectionObserver (handled inside useScrollSpy).
  *   - D-03: active state = bold text + 3px left accent bar
@@ -42,10 +42,10 @@ const RECOLLECT_DEBOUNCE_MS = 200;
 
 function collectHeadings() {
   if (typeof document === 'undefined') return [];
-  const nodes = document.querySelectorAll('.spec-viewer h2[id], .spec-viewer h3[id]');
+  const nodes = document.querySelectorAll('.spec-viewer h1[id], .spec-viewer h2[id]');
   const out = [];
   for (const el of nodes) {
-    const level = el.tagName === 'H2' ? 2 : 3;
+    const level = el.tagName === 'H1' ? 1 : 2;
     out.push({ id: el.id, level, text: el.textContent || '' });
   }
   return out;
@@ -156,6 +156,11 @@ export function Sidebar() {
         aria-label="PRD navigation"
       >
         <nav id="sidebar-nav">
+          {/* Class names sidebar-link--h2 / --h3 are cosmetic group/child
+              indicators, intentionally decoupled from the underlying heading
+              level (which migrated H2->H1 and H3->H2 with the spec format
+              change). Do not rename — it would touch Sidebar.css and the
+              Schema Index static link for zero behavioral gain. */}
           {/* 260427-gjf: static "Schema Index" entry — always visible above
               the dynamic PRD list so the route is reachable from both the
               spec view and the schema view. Active when route === 'schema'. */}
