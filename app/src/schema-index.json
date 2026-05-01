@@ -1,6 +1,6 @@
 {
-  "source": "project-spec/2026-04-27.md",
-  "generated_at": "2026-04-27T14:05:48.805Z",
+  "source": "project-spec/2026-05-01.md",
+  "generated_at": "2026-05-01T22:47:20.146Z",
   "entities": [
     {
       "name": "User",
@@ -27,11 +27,6 @@
           "notes": ""
         },
         {
-          "name": "created_by",
-          "type": "FK → User",
-          "notes": ""
-        },
-        {
           "name": "created_at",
           "type": "datetime",
           "notes": ""
@@ -40,6 +35,11 @@
           "name": "last_login_at",
           "type": "datetime",
           "notes": "nullable"
+        },
+        {
+          "name": "",
+          "type": "",
+          "notes": ""
         }
       ]
     },
@@ -86,11 +86,6 @@
           "name": "special_plant",
           "type": "boolean",
           "notes": "applies to all pot sizes; flagged for hand-managed handling"
-        },
-        {
-          "name": "",
-          "type": "",
-          "notes": ""
         }
       ]
     },
@@ -111,12 +106,12 @@
         {
           "name": "sku",
           "type": "string",
-          "notes": "auto-generated; single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW"
+          "notes": "SKU generated as per industry standard.  single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW"
         },
         {
           "name": "Plant_ID",
           "type": "",
-          "notes": "So it can communicate with the Label printer ?"
+          "notes": "So it can communicate with the Label printer ? TO CONFIRM"
         },
         {
           "name": "cost_price",
@@ -683,7 +678,7 @@
         {
           "name": "invoice_number",
           "type": "string",
-          "notes": "INV-XXXX, auto-generated"
+          "notes": "INV-1234-01 (order number followed by 2 digits)"
         },
         {
           "name": "order",
@@ -693,7 +688,7 @@
         {
           "name": "status",
           "type": "enum",
-          "notes": "Unpaid / Paid"
+          "notes": "Unpaid / Paid / Superseeded"
         },
         {
           "name": "issued_at",
@@ -1133,11 +1128,6 @@
       "from": "Trade Customer",
       "to": "User",
       "label": "portal_login"
-    },
-    {
-      "from": "User",
-      "to": "User",
-      "label": "created_by"
     }
   ]
 }

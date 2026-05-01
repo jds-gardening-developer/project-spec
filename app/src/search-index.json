@@ -1,12 +1,5 @@
 [
   {
-    "id": "to-add-in",
-    "title": "To Add In",
-    "prd_id": null,
-    "level": 2,
-    "body": "Super Admin will have a screen to view the user action log — ordered by time, filterable by user. Shows all stock updates, order changes, and other admin actions from both ERP and PWA."
-  },
-  {
     "id": "prd-0-erp-account-types",
     "title": "PRD-0: ERP Account Types",
     "prd_id": null,
@@ -25,21 +18,28 @@
     "title": "User",
     "prd_id": null,
     "level": 3,
-    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| role | enum | Super Admin / Admin / Staff |\n| name | string |  |\n| email | string |  |\n| active | boolean |  |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| last\\_login\\_at | datetime | nullable |\n\n# \n\n#"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| role | enum | Super Admin / Admin / Staff |\n| name | string |  |\n| email | string |  |\n| active | boolean |  |\n| created\\_at | datetime |  |\n| last\\_login\\_at | datetime | nullable |\n|  |  |  |\n\n# \n\n# \n\n# \n\n# \n\n#"
   },
   {
-    "id": "prd-01",
-    "title": "PRD-0.1",
+    "id": "prd-01---login-permissions",
+    "title": "PRD-0.1 \\- Login Permissions",
     "prd_id": null,
     "level": 1,
-    "body": "Super Admin\n\n* **Super Admin** — Can Add / Remove Staff / See all updates made via user action log.\n\n* **Admin** — Full ERP Access (cannot add/remove staff)\n\n* **Staff Member** — PWA Access only (Not ERP login). Can CRUD stock/batches on PWA.\n\n**Note:** Super Admin \\= Josh only. Admin \\= Jake and office staff. Staff \\= nursery team on PWA."
+    "body": "Super Admin\n\n* **Super Admin** — Can Add & Remove Staff.  Can see all updates made via user action log on left hand side of screen \\- this is entitled ‘Logs’. Can do everything that admin can do \n\n* **Admin** — Full ERP Access. Create POs, Quotes, Orders, update stock. \n\n* **Staff Member** — PWA Access only (No ERP login). Can CRUD stock/batches on PWA.\n\n**Note:** Super Admin \\= Josh only. Admin \\= Jake and office staff. Staff \\= nursery team on PWA."
+  },
+  {
+    "id": "prd---02---stock-updates-for-super-admin",
+    "title": "PRD \\- 0.2 \\- Stock Updates for Super Admin",
+    "prd_id": null,
+    "level": 2,
+    "body": ""
   },
   {
     "id": "what-it-must-do",
     "title": "What It Must Do",
     "prd_id": null,
     "level": 2,
-    "body": "- On the left hand side of the screen there will be a menu item called “Update”, only the Super Admin will be able to view this  \n- This will detail all the updates that have happened in the past 1 / 3 Months by each staff member.  Every stock update made by staff members on their PWA  \n- Every stock update made by admins on the ERP"
+    "body": "- On the left hand side of the screen there will be a menu item called “Stock Updates”, only the Super Admin will be able to view this  \n- This will detail all the updates that have happened in the past 1 month by each staff member.  Every stock update made by staff members on their PWA  \n- Every stock update made by admins on the ERP\n\n| Field | Type | Notes |\n| ----- | ----- | ----- |\n| **timestamp** | **datetime** | **when the action occurred** |\n| **user** | **FK → User** | **who performed the action** |\n| **action\\_type** | **enum** | **quantity\\_adjust / status\\_change / location\\_change / batch\\_deleted** |\n| **plant\\_batch** | **FK → Plant Batch** | **the affected batch** |\n| **plant\\_variant** | **FK → Plant Variant** | **denormalised for fast filtering by SKU** |\n| **sku** | **str…"
   },
   {
     "id": "how-do-we-know-it-is-done-",
@@ -67,14 +67,14 @@
     "title": "Plant",
     "prd_id": null,
     "level": 3,
-    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| name | string |  |\n| latin\\_name | string |  |\n| category | string | e.g. herbaceous / shrub / climber |\n| description | string |  |\n| care\\_instructions | string |  |\n| available\\_online | boolean | master webshop toggle; false \\= hidden everywhere |\n| vat\\_applicable | boolean | applies to all pot sizes of this plant |\n| special\\_plant | boolean | applies to all pot sizes; flagged for hand-managed handling |\n|  |  |  |"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| name | string |  |\n| latin\\_name | string |  |\n| category | string | e.g. herbaceous / shrub / climber |\n| description | string |  |\n| care\\_instructions | string |  |\n| available\\_online | boolean | master webshop toggle; false \\= hidden everywhere |\n| vat\\_applicable | boolean | applies to all pot sizes of this plant |\n| special\\_plant | boolean | applies to all pot sizes; flagged for hand-managed handling |"
   },
   {
     "id": "plant-variant",
     "title": "Plant Variant",
     "prd_id": null,
     "level": 3,
-    "body": "*(one per pot size; a Plant has many)*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| plant | FK → Plant |  |\n| pot\\_size | enum | 7cm / 9cm / 1L / 2L / 3L / etc. |\n| sku | string | auto-generated; single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW |\n| Plant\\_ID |  | So it can communicate with the Label printer ? |\n| cost\\_price | decimal |  |\n| trade\\_price | decimal |  |\n| retail\\_price | decimal |  |\n| dimensions | string (nullable) | Text Field |\n| available\\_on\\_webshop | boolean | per pot size |\n|  |  |  |"
+    "body": "*(one per pot size; a Plant has many)*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| plant | FK → Plant |  |\n| pot\\_size | enum | 7cm / 9cm / 1L / 2L / 3L / etc. |\n| sku | string | SKU generated as per industry standard.  single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW |\n| Plant\\_ID |  | So it can communicate with the Label printer ? TO CONFIRM  |\n| cost\\_price | decimal |  |\n| trade\\_price | decimal |  |\n| retail\\_price | decimal |  |\n| dimensions | string (nullable) | Text Field |\n| available\\_on\\_webshop | boolean | per pot size |\n|  |  |  |"
   },
   {
     "id": "plant-batch",
@@ -235,7 +235,7 @@
     "title": "Trade Customer Single Page",
     "prd_id": null,
     "level": 3,
-    "body": "* Customer detail screen (single page): When an admin clicks on a customer, they see:\n\n  * Current balance — outstanding unpaid invoice total\n\n  * Order / quote / invoice history\n\n* Allow admin to set customer credit limit. This is different for every trade customer so this must be adjustable on trade customer single page.\n\n* Every trade customer has 30 day payment terms\n\n* **Over-credit-limit flow:** When a customer attempts to place an order OVER their credit limit, the system should present a payment screen that lets the customer pay for the order immediately by card (Stripe). This removes friction — the customer can keep ordering, they just need to pay upfront in FULL. The user will see a message 'You cannot place an order that exceeds your credit limit, please order within your credit…"
+    "body": "* Customer detail screen (single page): When an admin clicks on a customer, they see:\n\n  * Current balance — outstanding unpaid invoice total\n\n  * Order / quote / invoice history\n\n* Allow admin to set customer credit limit. This is different for every trade customer so this must be adjustable on trade customer single page.\n\n* Every trade customer has 30 day payment terms\n\n* **Over-credit-limit flow:** When a customer attempts to place an order OVER their credit limit on the trade portal, the system should present a payment screen that lets the customer pay for the order immediately by card (Stripe). This removes friction — the customer can keep ordering, they just need to pay upfront in FULL. The user will see a message 'You cannot place an order that exceeds your credit limit, please orde…"
   },
   {
     "id": "how-we-know-its-done-2",
@@ -319,21 +319,14 @@
     "title": "Invoice",
     "prd_id": null,
     "level": 3,
-    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| invoice\\_number | string | INV-XXXX, auto-generated |\n| order | FK → Order | multiple invoices per order possible (each material change pre-Xero supersedes the previous) |\n| status | enum | Unpaid / Paid |\n| issued\\_at | datetime |  |\n| due\\_at | datetime | for trade, issued \\+ 30 days |\n| posted\\_to\\_xero | boolean |  |\n| posted\\_to\\_xero\\_at | datetime (nullable) | set 24h after dispatch/collection |\n| marked\\_paid\\_by | FK → User (nullable) | manually marked by Ariane / finance |\n| marked\\_paid\\_at | datetime (nullable) |  |\n\n**Note:** Derived (not stored): an invoice's subtotal, VAT, and grand total are computed from the line items of the order it points to. Once an invoice is posted to Xero, the order is locked, so the computation b…"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| invoice\\_number | string | INV-1234-01 (order number followed by 2 digits) |\n| order | FK → Order | multiple invoices per order possible (each material change pre-Xero supersedes the previous) |\n| status | enum | Unpaid / Paid / Superseeded |\n| issued\\_at | datetime |  |\n| due\\_at | datetime | for trade, issued \\+ 30 days |\n| posted\\_to\\_xero | boolean |  |\n| posted\\_to\\_xero\\_at | datetime (nullable) | set 24h after dispatch/collection |\n| marked\\_paid\\_by | FK → User (nullable) | manually marked by Ariane / finance |\n| marked\\_paid\\_at | datetime (nullable) |  |\n\n**Note:** Derived (not stored): an invoice's subtotal, VAT, and grand total are computed from the line items of the order it points to. Once an invoice is posted to Xero, the…"
   },
   {
     "id": "quote--order",
     "title": "Quote → Order",
     "prd_id": null,
     "level": 2,
-    "body": "When a QUOTE is raised it is given a number — QUO-1234. This number stays the same throughout the entire ORDER LIFECYCLE. Prefixes change per stage for easy searching: QU-1234 (quote) → ORD-1234 (order). Same numeric ID, different prefixes."
-  },
-  {
-    "id": "quote-phase",
-    "title": "Quote Phase",
-    "prd_id": null,
-    "level": 3,
-    "body": "* **Draft** — created but not sent to the customer\n\n* **Sent** — customer been sent quote, we're waiting on their decision\n\n* **Pending** — customer accepted but not all stock is available yet\n\n* **Approved** — all stock available, awaiting payment from customer to proceed.\n\n* **Rejected** — customer declined (terminal, end of the road)\n\n* **Expired** — Quotes expires after 2 weeks automatically \\- REQUIRED \n\n* **Archived** \\-"
+    "body": "When a QUOTE is raised it is given a number — QUO-1234.  We store only the number in the DB.  This number stays the same throughout the entire ORDER LIFECYCLE. Prefixes change per stage.: QU-1234 (quote) → ORD-1234 (order). \n\n**Quote Phase**\n\n* **Draft** — created but not sent to the customer\n\n* **Sent** — customer been sent quote, we're waiting on their decision\n\n* **Pending** — customer accepted but not all stock is available yet\n\n* **Approved** — all stock available, awaiting payment from customer to proceed.\n\n* **Rejected** — customer declined (terminal, end of the road)\n\n* **Expired** — Quotes expires after 2 weeks automatically \\- REQUIRED \n\n* **Archived** \\-"
   },
   {
     "id": "order-phase",
@@ -347,7 +340,7 @@
     "title": "Invoice Phase",
     "prd_id": null,
     "level": 3,
-    "body": "If the client has ordered the plants on CREDIT then an invoice is sent to them once the plants have been dispatched ( The Order is still marked as UNPAID. It is the Job of Finance to mark the invoice as paid on the ERP when the payment arrives.  An Order is marked as paid if there is an Invoice within that Order which is marked as Paid ?"
+    "body": "If a client orders plants on credit, an invoice is generated when the order is created in the ERP. This invoice is **not sent to Xero at this stage** (see *Xero Posting Flow* below). It is the responsibility of Finance to mark the invoice as **Paid** in the ERP once payment is received \\- this is manual and will be done by Finance team.\n\n#### **One Active Invoice per Order**\n\nAn order may have multiple invoices over its lifetime, but **only one invoice is active at any given time**:\n\n* The **most recently generated invoice** is considered the *active* invoice.  \n* All previous invoices are retained for audit purposes and marked as `Superseded`.\n\n  #### **Invoice Supersession (Pre-Xero)**\n\nIf an order is edited before the final invoice is posted to Xero (e.g. changes to line items, quantiti…"
   },
   {
     "id": "credit-notes",
@@ -368,7 +361,7 @@
     "title": "Order Lifecycle \\- What Is It",
     "prd_id": null,
     "level": 2,
-    "body": "The engine that runs the entire order lifecycle — from initial quote through to final delivery and invoicing.\n\nTrade customers can request a quote & then buy plants\n\nTrade customers can see LIVE AVAILABILITY of all the plants which are in stock and 'Trade Ready' from the portal, they can BUY INSTANTLY. Very important to move the friction of them wanting to purchase, should be as easy as possible, too easy even.\n\nRetail orders go straight to the Order Phase. The customer adds the their desired items in the cart on the WP site. The checkout page takes them to the ERP. They see their basket and are prompted to pay."
+    "body": "The engine that runs the entire order lifecycle — from initial quote through to final delivery and invoicing.\n\nTrade customers can request a quote & then buy plants\n\nTrade customers can see LIVE AVAILABILITY of all the plants which are in stock and 'Trade Ready' from the portal, they can BUY INSTANTLY. Very important to move the friction of them wanting to purchase, should be as easy as possible, too easy even.\n\nRetail orders go straight to the Order Phase. The customer adds this to their desired items in the cart on the WP site. The checkout page takes them to the ERP. They see their basket and are prompted to pay."
   },
   {
     "id": "what-it-must-do-4",
@@ -403,7 +396,7 @@
     "title": "Xero Posting Flow (IMPORTANT — changed this meeting)",
     "prd_id": null,
     "level": 3,
-    "body": "**Previous assumption:** An invoice gets sent to Xero as soon as an order is created.\n\n**New flow** (to avoid messy edits/deletions in Xero when orders change):\n\n* Quote accepted → Order create on ERP & Invoice will be generated automatically on ERP. NOT sent to Xero.\n\n* Customer is sent an email with the PDF attachment of the Invoice.\n\n* Order can be freely edited on the ERP during its lifecycle (adjust quantities, swap lines, add notes). The invoice updates automatically.\n\n* Once the order is Dispatched / Collected, the final invoice is posted to Xero (suggested: 24 hours after dispatch/collection — to be confirmed with Ariane).\n\n* Once posted to Xero, the invoice becomes read-only on the ERP. Any correction must go through the credit note flow.\n\n* Payment reconciliation in Xero is by ba…"
+    "body": "**Previous assumption:** An invoice gets sent to Xero as soon as an order is created.\n\n**New flow** (to avoid messy edits/deletions in Xero when orders change):\n\n* Quote accepted → Order create on ERP & Invoice will be generated automatically on ERP. NOT sent to Xero.\n\n* Customer is sent an email with the PDF attachment of the Invoice.\n\n* Order can be freely edited on the ERP during its lifecycle (adjust quantities, swap lines, add notes). The invoice updates automatically.\n\n* Once the order is Dispatched / Collected, the final invoice is posted to Xero when the order is marked as ‘Complete’\n\n* Once posted to Xero, the invoice becomes read-only on the ERP. Any correction must go through the credit note flow.\n\n* \n\n* Payment reconciliation in Xero is by bank feed — Ariane matches payments to…"
   },
   {
     "id": "how-we-know-its-done-3",
@@ -480,7 +473,7 @@
     "title": "What It Must Do",
     "prd_id": null,
     "level": 2,
-    "body": "Support five fulfilment methods:\n\n* **Collection** — Free. Available for both retail (via website) and trade. Retail customers CAN order online for collection and should be able to pay online at checkout.\n\n* **DPD** — Retail only for stage 1 (automatic pricing — use current website logic). Not allowed for trade via the trade portal right now. Note: future consideration for trade DPD with a percentage markup (10–20%) on DPD costs, as some London-based trade customers want this.\n\n* **Pallet** — Add manually to invoice (price \\+ set date for collection by carrier).\n\n* **Dutch Trolley** — Add manually to invoice (price \\+ set date for collection by Groveport).\n\n* **MacPlants Van** — Add manually to invoice (price based on mileage \\+ set date).\n\nAdditional rules:\n\n* **Collection:** available an…"
+    "body": "Support five fulfilment methods:\n\n* **Collection** — Free. Available for both retail (via website) and trade. Retail customers CAN order online for collection and should be able to pay online at checkout.\n\n* **DPD** — All retail website orders will use DPD as courier or Collection. (automatic pricing — use current website logic). Trade customers can use DPD as well, admin will enter in how much this will cost. \n\n* **Pallet** — Add manually to invoice (price \\+ set date for collection by carrier).\n\n* **Dutch Trolley** — Add manually to invoice (price \\+ set date for collection by Groveport).\n\n* **MacPlants Van** — Add manually to invoice (price based on mileage \\+ set date).\n\nAdditional rules:\n\n* **Collection:** available any business day. Orders approved before midday can be ready next wor…"
   },
   {
     "id": "how-we-know-its-done-5",
@@ -592,7 +585,7 @@
     "title": "What Is It",
     "prd_id": null,
     "level": 2,
-    "body": "The operational glue that keeps nothing falling through the cracks. Tasks capture every action that needs a human to do something — from verifying a batch is ready, to reconciling a PO, to responding to a new trade order. Notifications keep both staff and customers informed as orders move through their lifecycle. This replaces the current situation where reminders live on Post-its, or in scattered emails.\n\nInterna Tasks surface on the ERP dashboard and in-app:\n\n* Pending orders that can now be approved (stock has arrived).\n\n* Overdue supplier POs.\n\n* Batch ready-date tasks awaiting verification.\n\n* New trade orders awaiting response."
+    "body": "The operational glue that keeps nothing falling through the cracks. Tasks capture every action that needs a human to do something — from verifying a batch is ready, to reconciling a PO, to responding to a new trade order. Notifications keep both staff and customers informed as orders move through their lifecycle. This replaces the current situation where reminders live on Post-its, or in scattered emails.\n\nInternal Tasks surface on the ERP dashboard and in-app:\n\n* Pending orders that can now be approved (stock has arrived).\n\n* Overdue supplier POs.\n\n* Batch ready-date tasks awaiting verification.\n\n* New trade orders awaiting response."
   },
   {
     "id": "what-it-must-do-8",
@@ -609,8 +602,15 @@
     "body": "MacPlants Users: Admin, Staff Customers: Retail, Trade"
   },
   {
-    "id": "51-admin-portal--super-admin-portal",
-    "title": "5.1 Admin Portal — Super Admin portal",
+    "id": "50-super-admin-portal",
+    "title": "5.0 Super Admin portal",
+    "prd_id": null,
+    "level": 2,
+    "body": ".[staff.macplants.co.uk/login](http://staff.macplants.co.uk/login)"
+  },
+  {
+    "id": "51-admin-portal",
+    "title": "5.1 Admin Portal",
     "prd_id": null,
     "level": 2,
     "body": ".staff.macplants.co.uk/login"
@@ -728,8 +728,15 @@
     "body": "* Admin lands on the dashboard after login.\n\n* Sales revenue, order count, average order value, plants picked, orders dispatched, outstanding invoices, and pipeline value all show live data with period comparisons.\n\n* Retail vs trade split is visible on revenue and order-count widgets.\n\n* All operational widgets (pending quotes, awaiting payment, pending stock, due ready today, due dispatch today, new trade orders, open tasks) show live counts and link through to filtered lists.\n\n* Exception widgets (overdue POs, on-hold activity, credit breaches, long-lead orders) surface the right records.\n\n* Pending orders with newly available stock are visibly flagged and can be confirmed directly.\n\n* Every widget is clickable and takes the user to the underlying detail screen.\n\n* Figures refresh witho…"
   },
   {
-    "id": "prd-6-wordpress--erp-api-contract",
-    "title": "PRD-6: WordPress & ERP API Contract",
+    "id": "prd-06-epos-now-integration---stage-2",
+    "title": "PRD-06: EPOS Now Integration \\- Stage 2",
+    "prd_id": null,
+    "level": 1,
+    "body": "In Stage 1 the shop till keeps running on EPOS Now exactly as it does today. The ERP runs alongside it. The two systems are not yet plugged together — but we ensure that **the SKUs match across both systems  \\-** This will mean that future integrations are possible.\n\nFor the first stage plants which are Retail Ready & have the location SHOP will not be available online.\n\nWhen plants are moved to the SHOP they are not available online. This means we won’t sell the same plant twice\n\nAt the end of every day an ADMIN will export all orders, upload these to the ERP which will update the stock.  This will be easy to do as SKUs will match.\n\nThe code generated will be based on a pattern \\- TBD.  Look into Industry Standard SKU Pattern. \n\n# \n\n#"
+  },
+  {
+    "id": "prd-7-wordpress--erp-api-contract",
+    "title": "PRD-7: WordPress & ERP API Contract",
     "prd_id": null,
     "level": 1,
     "body": ""

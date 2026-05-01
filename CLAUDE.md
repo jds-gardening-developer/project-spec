@@ -1,3 +1,15 @@
+<!-- HANDBOOK:start -->
+## Handbook — read this first
+
+The handbook is split across small files under [Handbook/](Handbook/) and inlined here via `@`-imports. Edit the source files, not this section.
+
+@Handbook/about.md
+
+@Handbook/working-style.md
+
+@Handbook/reply-format.md
+<!-- HANDBOOK:end -->
+
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 

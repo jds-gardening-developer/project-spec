@@ -1,0 +1,79 @@
+THe whoel reason for this problem is that sometimes macplants does take a deposit, customers will then wait 3 months and pick up the plants then.  We want to be able to allow for this flow.  COuld this be possible, we have 2 invoices attached to the order and they need to pay both.  That would be handy.  Want an elgant solution and keep the Xero ping until the very end
+
+11:01 PM
+Claude responded: Yes, this is very solvable — and actually if we get the model right here, the deposit flow falls out for free and fixes the post-payment edit problem we just d…
+
+Architected multi-invoice model reconciling deposits with Xero timing constraints
+Architected multi-invoice model reconciling deposits with Xero timing constraints
+Yes, this is very solvable — and actually if we get the model right here, the deposit flow falls out for free and fixes the post-payment edit problem we just discussed. Let me walk you through it.
+
+The mental model shift
+
+Up to now we've been treating an invoice as a snapshot of the whole order. That's why supersession felt necessary — if the order changes, the snapshot is stale, so we throw it away and make a new one. But it also means the model can only ever have one "real" invoice at a time, which is exactly why deposits don't fit.
+
+The cleaner model: an invoice is a claim for a portion of the order's value, not a snapshot of the whole thing. An order can have several invoices live at once. The order's payment state is just the sum of those invoices and the payments against them.
+
+Once you make that shift, deposits, balance invoices, supplementary invoices, and the post-payment-edit case all work the same way.
+
+Add an Invoice Type field
+
+type: enum  (Deposit / Balance / Full / Supplementary)
+amount: decimal  (the portion of the order this invoice covers)
+Default is Full for the standard flow. Deposit and Balance are used together for the deposit flow. Supplementary handles upward edits after payment.
+
+The existing rule still holds: the sum of all non-Superseded invoices on an order equals the order total. That's the invariant — enforce it everywhere.
+
+How the deposit flow looks
+
+Customer commits to a £1,000 order with delivery in 3 months.
+Order is created in Confirmed status. Stock is reserved (this is the actual functional reason for taking a deposit — it locks the stock).
+Staff clicks "Split into Deposit + Balance" on the order. A modal asks for the deposit amount (£300). System generates:
+Invoice 1: Deposit, £300, Unpaid
+Invoice 2: Balance, £700, Unpaid
+Customer pays Invoice 1 (Stripe link, bank transfer, whatever). Invoice 1 → Paid. Order is "Partially Paid (£300 of £1,000)".
+Three months pass. Stock is reserved the entire time.
+Order moves through Ready to Pick → Staged → Packed → Dispatched as normal.
+Customer pays Invoice 2 before/at collection. Invoice 2 → Paid. Order is "Paid".
+Order completes 24 hours after dispatch.
+The standard (non-deposit) flow is identical, just with one invoice
+
+Order created → Invoice 1 (Full, £1,000, Unpaid) auto-generated → pre-dispatch edits supersede this single invoice (same as today) → customer pays → done. Nothing changes for the 95% case.
+
+The post-payment edit case (from the previous question) becomes trivial
+
+Customer paid Invoice 1 for £400. Order needs to go up to £450. System generates Invoice 2 (Supplementary, £50, Unpaid). Both invoices coexist; the order is now "Partially Paid (£400 of £450)". No supersession of a paid invoice ever happens. Clean.
+
+If the order needs to go down, that's a credit note against the paid invoice (PRD-3.3), same as before.
+
+Now — the Xero timing question. This needs honest examination.
+
+Your instinct is "keep the Xero ping at the very end." That instinct came from a real pain point: Ariane re-doing Xero work when orders change. But that pain only happens when an unpaid invoice gets edited. A paid deposit invoice will never be edited — it's a completed transaction. So the original reason to delay Xero posting doesn't apply to paid invoices.
+
+I'd recommend the rule become: invoices post to Xero when paid, OR 24h after dispatch — whichever comes first.
+
+Deposit gets paid in May → that invoice posts to Xero in May.
+Balance gets paid at collection in August → that invoice posts to Xero in August (or 24h after dispatch if unpaid on credit terms).
+A standard credit-terms order: invoice posts to Xero 24h after dispatch, paid or not — exactly as today.
+This preserves Ariane's pain relief (no edits to Xero-posted invoices) while letting the deposit money show up in Xero when it actually arrives, which is what her bank reconciliation needs anyway.
+
+One thing worth verifying with Ariane / your accountant before locking this in
+
+UK VAT rules generally treat a deposit as a tax point — meaning VAT is due at the point the deposit is received, not at final delivery. If that's right, then sitting on a paid deposit for 3 months without it appearing in Xero would be an actual HMRC issue, not just a workflow inconvenience. The "post on payment" rule above handles this correctly, but it's worth Ariane confirming explicitly so the dev team knows it's a hard requirement, not just a nice-to-have.
+
+Three changes to the PRD
+
+Delete the "Deposits — MacPlants does not take deposits" paragraph. It's no longer true and contradicts this flow. Replace with the deposit flow described above.
+Add type and amount fields to the Invoice schema. Add the invariant: sum of non-Superseded invoice amounts on an order equals the order total.
+Update the Xero posting rule: "An invoice posts to Xero when it is marked Paid, OR 24 hours after order dispatch/collection — whichever comes first. Once posted to Xero, an invoice is read-only."
+
+An invoice can be generated from an order.
+An invoice will be all the items on an order
+
+
+
+One implementation note for the devs
+
+The existing spec has order numbering as ORD-1234 with invoice numbering INV-1234-01, INV-1234-02 etc. With this model, you'd have e.g. INV-1234-01 (Deposit) and INV-1234-02 (Balance) coexisting and both posting to Xero independently. Confirm with Ariane that Xero is happy receiving two invoices with sequential numbers tied to the same order — it should be fine, but worth checking her Xero workflow.
+
+This model is genuinely elegant once you see it: deposits, supplementary invoices, and standard invoices are all the same thing — claims for portions of an order total. One unified concept replaces three special cases.
+
