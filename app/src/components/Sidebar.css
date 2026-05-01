@@ -57,6 +57,41 @@
   margin: 0;
 }
 
+/* 260501-wll: row that pairs the leaf logo (home button) with the
+   Schema Index link. Logo on the left, label fills the rest. */
+.sidebar-static-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar-static-row .sidebar-link {
+  flex: 1 1 auto;
+}
+
+.sidebar-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  color: #2c8d4f; /* MacPlants green — matches CLAUDE.md brand constraint. */
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 120ms ease;
+}
+
+.sidebar-logo:hover,
+.sidebar-logo:focus-visible {
+  background: var(--sidebar-hover-bg);
+  outline: none;
+}
+
+.sidebar-logo-icon {
+  display: block;
+}
+
 .sidebar-link {
   display: block;
   padding: 6px 8px 6px 12px;

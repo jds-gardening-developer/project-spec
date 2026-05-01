@@ -163,9 +163,47 @@ export function Sidebar() {
               Schema Index static link for zero behavioral gain. */}
           {/* 260427-gjf: static "Schema Index" entry — always visible above
               the dynamic PRD list so the route is reachable from both the
-              spec view and the schema view. Active when route === 'schema'. */}
+              spec view and the schema view. Active when route === 'schema'.
+              260501-wll: leaf logo added on the same row — clicking it clears
+              the hash and scrolls to top, returning to the spec home. */}
           <ul className="sidebar-list sidebar-list--static">
-            <li className="sidebar-item">
+            <li className="sidebar-item sidebar-static-row">
+              <a
+                href="#/"
+                className="sidebar-logo"
+                aria-label="Home — back to spec"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    if (window.location.hash) {
+                      window.location.hash = '';
+                    }
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                  setDrawerOpen(false);
+                }}
+              >
+                <svg
+                  className="sidebar-logo-icon"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3 21c0-9 7-17 18-18-1 11-9 18-18 18z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M3 21l9-9"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    fill="none"
+                    opacity="0.55"
+                  />
+                </svg>
+              </a>
               <a
                 href="#/schema"
                 className={
