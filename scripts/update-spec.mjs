@@ -16,6 +16,11 @@
  * then either accept it (`mv README.proposed.md README.md`) or discard it and try again.
  */
 
+// TODO(2026-05-02): This script still reads README.md as input, but README.md has been
+// removed (project-spec/YYYY-MM-DD.md snapshots are now canonical). Repoint at the
+// newest snapshot before next use, and update CONTRIBUTING.md's "Folding meeting
+// transcripts" section to match the new behaviour.
+
 import Anthropic from "@anthropic-ai/sdk";
 import fs from "node:fs";
 import path from "node:path";

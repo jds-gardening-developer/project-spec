@@ -39,23 +39,24 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 
 ## Languages
 - JavaScript (ES Modules) — Used in `scripts/update-spec.mjs` for tooling
-- HTML5 — Used in `index.html` as the Docsify viewer entry point
-- Markdown — Used for the actual specification content (`README.md`, `project-spec/2026-04-26.md`)
-- CSS (inline `<style>` block in `index.html`) — Theming overrides for Docsify
+- HTML5 — Used in `app/index.html` as the Vite entry point
+- Markdown — Used for the actual specification content (dated snapshots in `project-spec/YYYY-MM-DD.md`)
+- CSS — Component-scoped styles inside `app/src/`
 ## Runtime
 - Node.js >=20 (declared in `package.json` `engines` field)
-- Browser (any modern evergreen browser) for the rendered Docsify site
+- Browser (any modern evergreen browser) for the rendered React viewer
 - npm (lockfile version 3 — `package-lock.json` present)
 - Lockfile: present (`package-lock.json`)
 ## Frameworks
-- Docsify v4 — Client-side markdown documentation site generator. Loaded via `https://cdn.jsdelivr.net/npm/docsify@4` in `index.html`
-- Docsify Vue theme — `https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css`
-- `docsify@4/lib/plugins/search.min.js` — Full-text search (Ctrl+K)
-- `docsify-pagination` — Previous/Next navigation
-- `docsify-copy-code@2` — Copy-to-clipboard buttons on code blocks
-- `prismjs@1` (bash + json components) — Syntax highlighting
-- Not detected (no test framework, no test files, no test scripts in `package.json`)
-- `docsify-cli@4` — Local dev server, invoked via `npx docsify-cli@4 serve .` (the `npm run dev` script). Not declared as a dependency — pulled on demand.
+- Vite 5 — Build tool and dev server. Configured in `app/vite.config.js`; root is `app/`, dev port is 5173, `server.fs.allow` is widened to the repo root so the viewer can import markdown from `../project-spec/`.
+- React 18 + ReactDOM 18 — UI runtime.
+- `@vitejs/plugin-react` — Vite's React plugin (devDependency).
+- `react-markdown` 9 + `remark-gfm` 4 — Markdown rendering with GitHub-flavoured tables/strikethrough. Custom renderers handle cross-links and Data Model tables.
+- `mermaid` 10 — Diagram rendering, dynamic-imported to keep the main bundle small.
+- `minisearch` 7 — Client-side search over a build-time-generated index.
+- `marked` 18, `rehype-slug` 6, `github-slugger` 2 — Markdown utilities used by the build scripts (manifest, search index, schema index).
+- Test runner: Node's built-in `node --test`, run via `npm test` against `app/src/components/*.test.js` and `scripts/*.test.js`.
+- No Docsify, no CDN-loaded framework. The site is a built SPA.
 ## Key Dependencies
 - `@anthropic-ai/sdk` ^0.90.0 — Anthropic Claude API client used by `scripts/update-spec.mjs` to fold meeting transcripts into the spec
 - `dotenv` ^16.4.5 — Loads `ANTHROPIC_API_KEY` from `.env` for the update script
@@ -68,27 +69,30 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - `ANTHROPIC_API_KEY` is required to run `scripts/update-spec.mjs`. Loaded via `import "dotenv/config"` from a `.env` file at the repo root.
 - A `.env.example` is referenced by the script's error message (`"Copy .env.example to .env and fill it in."`) and by `CONTRIBUTING.md`. Neither `.env` nor `.env.example` is currently present at the repo root.
 - No `.gitignore` file is present in the working tree.
-- `netlify.toml` — Declares `publish = "."`, empty build command, and Cache-Control headers (300s max-age) for `/README.md` and `/index.html`.
+- `netlify.toml` — Declares `publish = "app/dist"`, `command = "npm run build"`, a 300s `must-revalidate` Cache-Control header for `/index.html`, and a SPA fallback redirect (`/*` → `/index.html`).
 - `package.json` — Declares `"type": "module"` so all `.js`/`.mjs` files are ESM by default.
 - No `tsconfig.json`, no bundler config (Webpack/Vite/esbuild), no linter config (ESLint/Biome), no formatter config (Prettier).
-- `homepage: 'project-spec/2026-04-26.md'` — Current spec entry
-- `loadSidebar: false` — Single-file mode, sidebar generated from headings
-- `subMaxLevel: 1`, `maxLevel: 2` — Only h2 headings shown in sidebar
-- `executeScript: false` — Inline JS in markdown is never executed (security)
-- `search` plugin: 1-day cache, depth 4, `paths: 'auto'`
-- Theme color: `#2c8d4f` (MacPlants green)
+- Viewer reads every `project-spec/*.md` at build time and auto-selects the newest by ISO date.
+- Build scripts (run via `predev` and `prebuild` hooks):
+  - `scripts/build-manifest.mjs` — emits a manifest of dated snapshots.
+  - `scripts/build-search-index.mjs` — emits a MiniSearch-ready index.
+  - `scripts/build-schema-index.mjs` — emits an aggregated schema index for the schema page.
+- Search via MiniSearch 7 (client-side, build-time index).
+- Mermaid is dynamic-imported on demand.
+- Brand colour: MacPlants green `#2c8d4f`.
 ## Platform Requirements
 - Node.js 20 or newer
 - npm (for `npm install`, `npm run dev`)
 - An Anthropic API key (only required for the `update-spec` workflow, not for local viewing)
-- A browser (for viewing the rendered site at `http://localhost:3000` after `npm run dev`)
+- A browser (for viewing the rendered site at `http://localhost:5173` after `npm run dev`)
 - Netlify (static hosting). Auto-deploys on push to `main` per `CONTRIBUTING.md`.
 - Repository: `https://github.com/jds-gardening-developer/project-spec.git` (per `.git/config`).
 - No server, no database, no build step — Netlify serves the repo root verbatim.
 ## Project Type Summary
-- Docsify (CDN) renders markdown in the browser at request time.
-- Netlify serves the static files.
-- The only Node.js code is the optional `scripts/update-spec.mjs` tool for AI-assisted spec updates.
+- Vite builds a static React SPA from `app/` into `app/dist/`.
+- Netlify runs `npm run build` and serves `app/dist/`.
+- `scripts/build-manifest.mjs`, `scripts/build-search-index.mjs`, and `scripts/build-schema-index.mjs` run at build time to generate the manifest, search index, and schema index that the viewer consumes.
+- `scripts/update-spec.mjs` is an optional Node CLI for AI-assisted spec updates; it is not part of the deploy pipeline.
 <!-- GSD:stack-end -->
 
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
@@ -99,12 +103,12 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Dated spec snapshots: `YYYY-MM-DD.md` under `project-spec/` — e.g. `project-spec/2026-04-26.md`. One file per snapshot, ISO date as the filename.
 - Meeting transcripts: `YYYY-MM-DD-<slug>.md` under `transcripts/` — e.g. `transcripts/2026-04-25-erp-walkthrough.md` (per `CONTRIBUTING.md` line 46).
 - Output artefacts the script produces: `README.proposed.md`, `update-summary.md`, `update-raw.md` — written to the repo root, intended to be reviewed and then either renamed in or deleted.
-- Top-level docs: `UPPERCASE.md` for repo-meta files (`README.md`, `CONTRIBUTING.md`).
+- Top-level docs: `UPPERCASE.md` for repo-meta files (e.g. `CONTRIBUTING.md`, `CLAUDE.md`).
 - Local helpers: `camelCase` — e.g. `extract(tag, text)` in `scripts/update-spec.mjs:127`.
 - Path / module-level constants that are configuration-like: `SCREAMING_SNAKE_CASE` — `SPEC_PATH`, `SYSTEM_PROMPT`, `USER_MESSAGE` in `scripts/update-spec.mjs:35,50,97`.
 - Plain values used for flow: `camelCase` — `transcriptPath`, `spec`, `transcript`, `client`, `response`, `fullText`, `updatedSpec`, `changeSummary`, `startedAt`, `elapsed`.
 - PRD numbering is canonical: `PRD-0`, `PRD-1`, `PRD-1.1`, `PRD-3.4`, `PRD-XX` (placeholder). Numbers are *immutable* once assigned (`CONTRIBUTING.md` line 40, `scripts/update-spec.mjs:62`). New sections insert in place without renumbering existing ones.
-- Section headings use markdown bold inside the heading: `## **PRD-1: Plant Database & Inventory**`. This is consistent across `README.md` and `project-spec/2026-04-26.md`.
+- Section headings use markdown bold inside the heading: `## **PRD-1: Plant Database & Inventory**`. This is consistent across every snapshot in `project-spec/`.
 ## Code Style
 - ESM throughout (`package.json` line 6: `"type": "module"`). All scripts use `.mjs` extension and `import` / top-level `await`.
 - Built-in modules use the `node:` prefix — `import fs from "node:fs"`, `import path from "node:path"` (`scripts/update-spec.mjs:20-21`).
@@ -130,11 +134,17 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Model identifier is hard-coded as a string literal: `model: "claude-opus-4-7"` (`scripts/update-spec.mjs:117`). When the model rolls forward, edit the literal.
 - Paths are resolved with `path.resolve(...)` against the script's CWD (the repo root) — the script asserts this by checking for `README.md` and exits if not found (`scripts/update-spec.mjs:35-39`).
 ## NPM Scripts
-- `npm run dev` — `npx docsify-cli@4 serve .` — local preview on http://localhost:3000 with hot reload.
+- `npm run dev` — `vite --config app/vite.config.js` — local preview on http://localhost:5173 with HMR. The `predev` hook regenerates the manifest, search index, and schema index first.
+- `npm run build` — `vite build --config app/vite.config.js` — production build into `app/dist/`. The `prebuild` hook regenerates the same artefacts.
+- `npm run preview` — `vite preview --config app/vite.config.js` — serve the built `app/dist/` locally to sanity-check production output.
+- `npm run build-manifest` / `build-search-index` / `build-schema-index` — run any of the build-time content scripts directly.
+- `npm run md-to-clipboard` — convert the latest `project-spec/*.md` to HTML and copy to the macOS clipboard for Google Docs paste.
+- `npm run pull-doc` — pull a Google Doc into the repo as a transcript.
+- `npm test` — `node --test` against `app/src/components/*.test.js` and `scripts/*.test.js`.
 - `npm run update-spec` — `node scripts/update-spec.mjs` — wraps the helper script. Invoked as `npm run update-spec -- transcripts/<file>.md` or directly as `node scripts/update-spec.mjs <file>`.
 ## Markdown / Spec Conventions
-- `CONTRIBUTING.md` declares `README.md` as the single source of truth (line 3): "The single source of truth is `README.md`. Every change is just an edit to that file."
-- In practice the working spec is `project-spec/2026-04-26.md` and Docsify's `homepage` points there (`index.html:51`). `README.md` mirrors that content for GitHub rendering. New dated snapshots get added under `project-spec/` and `index.html` is updated to point at them (`README.md:42-56`).
+- The single source of truth is the newest dated snapshot under `project-spec/YYYY-MM-DD.md`. The viewer reads every snapshot at build time and auto-selects the newest by ISO date. `README.md` has been removed.
+- New dated snapshots are added by copying the current latest `project-spec/<date>.md` to `project-spec/YYYY-MM-DD.md` (today's ISO date) and editing the new file. The viewer picks it up automatically on next build.
 - `#` — document title only (one per file).
 - `##` — PRD section: `## **PRD-N: Title**` or `## **Section Name**` for non-PRD sections like "Meeting Action Items".
 - `###` — sub-section: `### **What Is It**`, `### **What It Must Do**`, `### **How We Know It's Done**`, `### **Data Model**`. These four sub-sections are the standard skeleton of a PRD.
@@ -154,20 +164,18 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Append-only: new items are added; resolved items are removed only when a meeting closes them out (`CONTRIBUTING.md` line 99).
 - Inline references use the form `(see PRD-X.Y)` — e.g. `see PRD-3.4`, `see PRD-1`. A future link checker is contemplated in `CONTRIBUTING.md:133`.
 - Typos, smart quotes, escape characters (`\.`, `\+`, `\>`, `\_`), formatting tweaks. Cosmetic fixes are out of scope for normal edits and explicitly forbidden for the auto-update script (`CONTRIBUTING.md` line 98, `scripts/update-spec.mjs:77-79`).
-## Docsify / Viewer Conventions
-- Single-file mode — `loadSidebar: false` (`index.html:46`). The sidebar is generated from headings, not from a `_sidebar.md` file. Don't introduce one without a deliberate reason.
-- `executeScript: false` (`index.html:53`) — inline JS in markdown will not be executed. Keep this off; the spec is content-only.
-- `homepage` is the *current* dated spec file (`index.html:51`). When a new snapshot is created, update only this line — see the procedure in `README.md:42-56`.
-- `subMaxLevel` and `maxLevel` are both pinned to 1/2 to keep the sidebar to PRD-level only (`index.html:48-49`). Click-to-expand reveals deeper levels.
-- Theme color is the MacPlants green `#2c8d4f`, defined as a CSS custom property in `:root` (`index.html:14-17`). Reuse the variable rather than hard-coding the colour again.
-- All assets are loaded from jsDelivr CDNs pinned to a major version (`docsify@4`, `docsify-copy-code@2`, `prismjs@1`). Don't switch to floating versions.
+## Vite / React Viewer Conventions
+- Vite root is `app/` (per `app/vite.config.js`). The Vite entry HTML lives at `app/index.html`. Do not place a top-level `index.html` at the repo root — Netlify deploys `app/dist/`, not the repo root.
+- Build scripts in `scripts/build-*.mjs` run via the `predev` and `prebuild` npm hooks; they emit JSON artefacts the viewer imports at startup. If the viewer can't find these artefacts, run `npm run build-manifest` (etc.) directly.
+- Markdown is imported into the bundle via `import.meta.glob('../../project-spec/*.md', { query: '?raw' })`. Vite needs `server.fs.allow` widened to include the repo root for this to work in dev — the config already does this.
+- Brand colour stays MacPlants green `#2c8d4f`. Reuse the CSS custom property defined in the app rather than hard-coding the hex again.
 ## Deployment Conventions
-- `publish = "."` and `command = ""` — no build step. Netlify serves the repo root as static files (`netlify.toml:5-6`).
-- Both `README.md` and `index.html` get a 5-minute `must-revalidate` cache so spec edits go live quickly (`netlify.toml:9-18`). Mirror this header pattern if a future asset has the same freshness requirements.
-- No redirects or rewrites — Docsify handles client-side routing (`netlify.toml:20-22`).
+- `publish = "app/dist"` and `command = "npm run build"` — Netlify runs the Vite build and serves the resulting static SPA.
+- `/index.html` gets a 5-minute `must-revalidate` cache so spec edits go live quickly.
+- SPA fallback redirect (`/*` → `/index.html`, status 200) handles client-side routing for the React viewer.
 ## Conventions Stated in CONTRIBUTING.md
 - Node.js 20+ required (`CONTRIBUTING.md:23`).
-- `README.md` is the single source of truth (`CONTRIBUTING.md:3`).
+- Dated snapshots in `project-spec/YYYY-MM-DD.md` are the single source of truth (the viewer auto-selects the newest by ISO date).
 - Section numbering is canonical — add in place, don't reshuffle (`CONTRIBUTING.md:40`).
 - Transcripts go in `transcripts/` with a date-prefixed filename (`CONTRIBUTING.md:46`).
 - The auto-update script writes proposals (`README.proposed.md`, `update-summary.md`) — never overwrites `README.md` directly (`CONTRIBUTING.md:62-66`).
@@ -178,29 +186,29 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 ## Architecture
 
 ## Pattern Overview
-- Zero build pipeline — `index.html` loads Docsify from a CDN and renders markdown at runtime in the browser
-- Single-source-of-truth content model — one canonical markdown file (`README.md`) is the spec; dated snapshots in `project-spec/` provide the audit trail
+- Vite-built static SPA — `app/` is the Vite root; `npm run build` produces `app/dist/` which Netlify publishes
+- Single-source-of-truth content model — dated snapshots in `project-spec/YYYY-MM-DD.md` are canonical; the viewer auto-selects the newest by ISO date
 - Detached tooling layer — `scripts/update-spec.mjs` is a one-shot Node CLI that calls the Anthropic API to fold meeting transcripts into the spec; it never runs in the browser and is not part of the deploy
-- Deploy-as-serve — Netlify treats the repo root as the publish directory; there is no compiled artifact
+- Build-time content generation — `scripts/build-manifest.mjs`, `scripts/build-search-index.mjs`, `scripts/build-schema-index.mjs` emit JSON artefacts the viewer consumes
 ## Layers
-- Purpose: Holds the human-readable specification and its versioned snapshots
-- Location: `README.md`, `project-spec/`
+- Purpose: Holds the human-readable specification as dated snapshots
+- Location: `project-spec/YYYY-MM-DD.md`
 - Contains: Long-form markdown documents (PRD-numbered sections, Data Model tables, action items)
 - Depends on: Nothing — pure markdown
-- Used by: The presentation layer (Docsify) at runtime; the tooling layer (`scripts/update-spec.mjs`) when folding in meeting outcomes
+- Used by: The presentation layer (the Vite-built React viewer in `app/`, which imports markdown via `import.meta.glob`); the tooling layer (`scripts/update-spec.mjs` historically; currently flagged with a TODO since it still reads `README.md`)
 - Purpose: Renders the spec in a browser as a navigable, searchable site
-- Location: `index.html`
-- Contains: Docsify configuration (`window.$docsify`), inline theme CSS, CDN `<script>` tags for Docsify core and plugins
-- Depends on: jsdelivr CDN (`docsify@4`, `docsify-pagination`, `docsify-copy-code`, `prismjs@1`)
-- Used by: End users hitting the deployed Netlify URL or running `npm run dev`
+- Location: `app/` (Vite root)
+- Contains: React components under `app/src/`, the Vite entry HTML at `app/index.html`, build config at `app/vite.config.js`
+- Depends on: `react`, `react-dom`, `react-markdown`, `remark-gfm`, `mermaid`, `minisearch`; build-time artefacts emitted by the `scripts/build-*.mjs` scripts
+- Used by: End users hitting the deployed Netlify URL, or the maintainer running `npm run dev`
 - Purpose: Automates folding a meeting transcript into the spec via Claude
 - Location: `scripts/update-spec.mjs`
-- Contains: One Node ESM script that reads `README.md` + a transcript path, calls Anthropic, writes `README.proposed.md` and `update-summary.md` for human review
+- Contains: One Node ESM script that reads `README.md` + a transcript path, calls Anthropic, writes `README.proposed.md` and `update-summary.md` for human review. **Note:** `README.md` has been removed from the repo, so this script is currently broken and carries a TODO header; it must be repointed at the newest `project-spec/*.md` snapshot before next use.
 - Depends on: `@anthropic-ai/sdk`, `dotenv`, Node 20+, `ANTHROPIC_API_KEY` env var
 - Used by: The spec maintainer manually via `node scripts/update-spec.mjs <transcript>`; never runs in production
 - Purpose: Serves the static repo root to the public internet
 - Location: `netlify.toml`
-- Contains: Netlify build config (`publish = "."`, empty `command`), Cache-Control headers for `/README.md` and `/index.html`
+- Contains: Netlify build config (`publish = "app/dist"`, `command = "npm run build"`), a 5-minute `must-revalidate` Cache-Control header for `/index.html`, and a SPA fallback redirect (`/*` → `/index.html`)
 - Depends on: Netlify's static hosting + GitHub push trigger
 - Used by: All deployed traffic
 - Purpose: Holds raw meeting transcripts that feed the tooling layer
@@ -210,44 +218,44 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Used by: `scripts/update-spec.mjs` as a CLI argument
 ## Data Flow
 - No application state — the site is read-only
-- All "state" is git history (commits to `README.md` + dated files in `project-spec/`)
-- Docsify caches search index for 24 hours client-side (`maxAge: 86400000`)
+- All "state" is git history (commits to dated files in `project-spec/`)
+- Search uses a build-time-generated MiniSearch index loaded as a JSON artefact at startup; no runtime caching layer beyond the browser's normal asset cache
 ## Key Abstractions
 - Purpose: Canonical product requirements document with stable PRD-numbered section identifiers
-- Examples: `README.md`, `project-spec/2026-04-26.md`
+- Examples: `project-spec/2026-04-26.md`, `project-spec/2026-05-02.md`
 - Pattern: Long markdown with hierarchical PRD-X.Y headings; Data Model tables in fixed 3-column format (Field | Type | Notes); only persisted fields listed (no derived/computed values)
 - Purpose: Immutable point-in-time record of the spec
 - Examples: `project-spec/2026-04-26.md`
-- Pattern: Filename is `YYYY-MM-DD.md`; one snapshot per significant revision; pointed at by `homepage` in `index.html`
+- Pattern: Filename is `YYYY-MM-DD.md`; one snapshot per significant revision; the viewer reads every file and auto-selects the newest by ISO date
 - Purpose: Raw meeting record that feeds the LLM update flow
 - Examples: `transcripts/2026-04-25-erp-walkthrough.md` (per `CONTRIBUTING.md` convention; folder currently empty apart from `.gitkeep`)
 - Pattern: Filename is `YYYY-MM-DD-<slug>.md`; passed as the sole CLI arg to `scripts/update-spec.mjs`
 - Purpose: LLM output staged for human review before promotion
 - Examples: `README.proposed.md`, `update-summary.md` (both written to repo root by the script, neither committed long-term)
 - Pattern: Promoted via `mv README.proposed.md README.md` or discarded with `rm`
-- Purpose: All site-rendering behaviour (homepage, sidebar depth, search, pagination, copy-code) declared in one place
-- Examples: `window.$docsify = { ... }` in `index.html` lines 43-72
-- Pattern: Plain JS object literal; no separate config file
+- Purpose: All site-rendering behaviour lives in the React component tree under `app/src/`
+- Examples: `app/src/App.jsx` (or equivalent root component), individual viewers/components for the schema page, sidebar, search box, etc.
+- Pattern: React components consume build-time JSON artefacts (manifest, search index, schema index) plus markdown imported via `import.meta.glob`
 ## Entry Points
-- Location: `index.html`
+- Location: `app/index.html` (built into `app/dist/index.html` and served by Netlify)
 - Triggers: HTTP GET on the Netlify-served root
-- Responsibilities: Load Docsify + plugins from CDN, declare `window.$docsify` config, render `homepage` markdown into `#app`
-- Location: `package.json` script `dev` → `npx docsify-cli@4 serve .`
+- Responsibilities: Load the React bundle produced by Vite, mount the viewer into `#root`, fetch the dated `project-spec/*.md` snapshots that were imported at build time
+- Location: `package.json` script `dev` → `vite --config app/vite.config.js` (with `predev` running the build-* scripts first)
 - Triggers: Maintainer runs `npm run dev`
-- Responsibilities: Serves the repo root on `http://localhost:3000` with hot-reload on `README.md` saves
+- Responsibilities: Vite dev server on `http://localhost:5173` with HMR on edits to `app/src/**` and `project-spec/*.md`
 - Location: `scripts/update-spec.mjs` (invoked via `npm run update-spec` → `node scripts/update-spec.mjs` or directly with a transcript arg)
 - Triggers: Maintainer runs the script after a meeting
 - Responsibilities: Validate args + env, read spec + transcript, call Anthropic, parse XML-tagged response, write `README.proposed.md` + `update-summary.md`
 - Location: `netlify.toml`
 - Triggers: `git push` to `main` (configured in Netlify UI per `CONTRIBUTING.md`)
-- Responsibilities: Publish the repo root as static files; apply Cache-Control headers to `/README.md` and `/index.html` (`max-age=300, must-revalidate`)
+- Responsibilities: Run `npm run build` and publish `app/dist/` as static files; apply a 5-minute `must-revalidate` Cache-Control header to `/index.html`; SPA fallback redirect (`/*` → `/index.html`, status 200) handles client-side routing
 ## Error Handling
 - Missing CLI arg → `console.error` + `process.exit(1)` (`scripts/update-spec.mjs:26-29`)
 - Missing transcript file → `console.error` + `process.exit(1)` (`scripts/update-spec.mjs:30-33`)
 - Missing `README.md` (script run from wrong directory) → `console.error` + `process.exit(1)` (`scripts/update-spec.mjs:36-39`)
 - Missing `ANTHROPIC_API_KEY` → `console.error` + `process.exit(1)` (`scripts/update-spec.mjs:41-44`)
 - Malformed Anthropic response (no `<updated_spec>` tag) → write raw response to `update-raw.md` for inspection, then exit 1 (`scripts/update-spec.mjs:136-140`)
-- Unknown route in browser → Docsify shows the built-in 404 page (`notFoundPage: true` in `index.html:52`)
+- Unknown route in browser → Netlify's SPA fallback redirects `/*` to `/index.html` and the React viewer renders its own not-found state
 ## Cross-Cutting Concerns
 <!-- GSD:architecture-end -->
 

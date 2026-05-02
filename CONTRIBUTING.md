@@ -1,19 +1,35 @@
 # Working with this Repo
 
-This repo holds the **MacPlants ERP specification** and serves it as a static documentation site via [Docsify](https://docsify.js.org). The single source of truth is [`README.md`](./README.md). Every change is just an edit to that file.
+This repo holds the **MacPlants ERP specification**, served as a static Vite + React site. The viewer lives under [`app/`](./app); the canonical content lives under [`project-spec/`](./project-spec) as dated snapshots.
 
 ## Who this guide is for
 
-- **Developers** building the ERP — read the spec at the deployed site or directly here on GitHub.
-- **You / spec maintainer** — you also need to know how to run the site locally, deploy it, and fold meeting outcomes back in.
+- **Developers** building the ERP — read the spec at the deployed Netlify URL or browse `project-spec/` directly on GitHub.
+- **You / spec maintainer** — you also need to know how to run the viewer locally, deploy it, and fold meeting outcomes back in.
 - **Stakeholders (Jake, David, Ariane, etc.)** — they don't need this guide. They just visit the deployed URL.
+
+---
+
+## Where the spec lives
+
+The single source of truth is the newest dated snapshot under `project-spec/`:
+
+```
+project-spec/
+  2026-04-26.md
+  2026-05-02.md   ← most recent; what the viewer auto-loads
+```
+
+The viewer reads every `project-spec/*.md` at build time (via `scripts/build-manifest.mjs`) and auto-selects the newest by ISO date. Older snapshots stay available via git history.
+
+`README.md` is gone. Don't recreate it.
 
 ---
 
 ## Reading the spec
 
-- **On the live site** (after Netlify deploy): open the URL, use Ctrl+K to search, click any heading in the sidebar to jump.
-- **On GitHub**: `README.md` renders as the repo landing page.
+- **On the live site** (after Netlify deploy): open the URL, use the search bar, click any heading in the sidebar.
+- **On GitHub**: open the latest file in `project-spec/` directly.
 - **Locally**: see "Running locally" below.
 
 ---
@@ -27,79 +43,42 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. The spec hot-reloads when you save `README.md`.
+Open http://localhost:5173. The viewer hot-reloads when you save any file under `project-spec/`.
+
+`npm run dev` also runs the build-manifest, search-index, and schema-index scripts via the `predev` hook, so the sidebar, search, and schema page reflect the current snapshots.
 
 ---
 
 ## Editing the spec
 
-1. Edit `README.md` directly.
-2. Commit and push.
-3. Netlify auto-deploys on push to `main`.
+You have two options:
 
-The structure of `README.md` is treated as canonical — section numbering (`PRD-0`, `PRD-1`, etc.) should not change. Add new sections in the right place, don't reshuffle.
+1. **Edit the latest snapshot in place.** Open `project-spec/<latest>.md`, edit, commit, push.
+2. **Cut a new snapshot.** Copy the latest file to `project-spec/YYYY-MM-DD.md` (today's ISO date), edit it, commit, push.
+
+Use option 2 when a meeting or significant revision lands and you want a clean before/after. Use option 1 for small clarifications and typo fixes.
+
+Either way, push to `main` and Netlify auto-deploys.
+
+### Spec conventions (sacred — don't break)
+
+- **PRD numbering is immutable.** Don't rename, reorder, or remove `PRD-N` headings. Add new sections in place; don't reshuffle.
+- **Data Model tables** stay in 3-column markdown format: `Field | Type | Notes`. List **only core persisted fields** — no computed/derived values (totals, balances, lifetime values).
+- **Field names** use `snake_case`; underscores in markdown are escaped as `\_` (e.g. `created\_by`, `latin\_name`). Don't "fix" these escapes.
+- **Action items** live in `## **Meeting Action Items (Month YYYY)**` near the end of the spec. Append-only — resolved items get removed only when a meeting closes them out.
+- **Stage 1 / Stage 2** items are tagged in the "Scope Decisions Summary" section. Don't promote/demote between stages unless a meeting explicitly does so.
+- **Cross-references** use `(see PRD-X.Y)`.
+- **No cosmetic fixes.** Typos, smart quotes, escape characters — out of scope for normal edits.
 
 ---
 
 ## Folding a meeting transcript into the spec
 
-After every spec-relevant meeting, drop the transcript into `transcripts/` (e.g. `transcripts/2026-04-25-erp-walkthrough.md`) and run the update script.
+Drop the transcript into `transcripts/` (e.g. `transcripts/2026-04-25-erp-walkthrough.md`).
 
-### One-time setup
+`scripts/update-spec.mjs` exists for AI-assisted folding via Claude, BUT it currently still reads `README.md` (which has been removed) and has not yet been repointed at the latest `project-spec/*.md` snapshot. Until that's fixed, fold transcripts in by hand: read the transcript, edit the latest snapshot, commit.
 
-```bash
-cp .env.example .env
-# Edit .env and paste in your ANTHROPIC_API_KEY
-npm install
-```
-
-### Running the update
-
-```bash
-node scripts/update-spec.mjs transcripts/2026-04-25-erp-walkthrough.md
-```
-
-The script does NOT overwrite `README.md`. It writes:
-
-- `README.proposed.md` — the proposed updated spec
-- `update-summary.md` — what changed and why
-
-Review the diff:
-
-```bash
-git diff --no-index README.md README.proposed.md
-cat update-summary.md
-```
-
-Accept the proposal:
-
-```bash
-mv README.proposed.md README.md
-rm update-summary.md
-git add README.md transcripts/
-git commit -m "Fold in 2026-04-25 ERP walkthrough"
-git push
-```
-
-Discard:
-
-```bash
-rm README.proposed.md update-summary.md
-```
-
-### Rules the script follows
-
-The script is given a tight system prompt that mirrors how the spec has been maintained so far:
-
-- Don't rename, reorder, or remove existing PRD sections.
-- Only amend where the meeting genuinely updates the spec — re-discussion of already-correct material is ignored.
-- Add new detail as new bullets within existing sections; only add a brand-new PRD section when the topic genuinely doesn't have a home.
-- Data Model tables stay in the 3-column format and only list persisted fields.
-- Don't fix cosmetic issues (typos, escape characters).
-- Append to the action-items list; resolve action items the meeting closes out.
-- Don't promote/demote items between Stage 1 and Stage 2 unless the meeting explicitly does so.
-
-If the script's output is wrong in some way, just discard the proposal and either re-run with a cleaner transcript or fold the changes in by hand.
+When the script is repointed, this section will be updated to match.
 
 ---
 
@@ -109,26 +88,13 @@ If the script's output is wrong in some way, just discard the proposal and eithe
 
 1. Push the repo to GitHub.
 2. In Netlify: **Add new site → Import from GitHub** → pick this repo.
-3. Build settings: leave **Build command** blank, **Publish directory** = `.` (the repo root). `netlify.toml` already encodes this so you shouldn't have to type anything.
-4. Deploy. Done — the live URL appears in 30 seconds.
+3. Build settings come from `netlify.toml` (`command = "npm run build"`, `publish = "app/dist"`). You shouldn't have to type anything in the UI.
+4. Deploy.
 
 ### Subsequent deploys
 
-Just push to `main`. Netlify rebuilds and ships automatically.
+Push to `main`. Netlify rebuilds and ships automatically.
 
 ### Custom domain
 
 In Netlify → **Site settings → Domain management → Add custom domain** (e.g. `spec.macplants.co.uk`). Netlify will give you the DNS records to point at it.
-
----
-
-## Adding more interactivity later
-
-The spec is currently a single markdown file rendered by Docsify. If you want richer interactivity — clickable order-lifecycle diagrams, a dedicated schema explorer that pulls all the Data Model tables onto one page, embedded mockups — those can be added as Docsify plugins or by replacing Docsify with a custom React app while keeping `README.md` as the source of truth.
-
-Concrete ideas, in rough order of effort:
-
-1. **Mermaid diagrams in the spec** — add `docsify-mermaid` and embed flow diagrams directly in `README.md` for the order lifecycle, PO flow, etc.
-2. **Schema explorer page** — a small custom Docsify plugin that scans `README.md` for tables under "Data Model" headings and renders them on a dedicated `#/schema` route.
-3. **Cross-link checker** — a CI script that fails the build if a `(see PRD-X.Y)` reference points at a section that doesn't exist.
-4. **Live ERP data overlay** — once the ERP API exists in staging, the docs site can call it to show real plant counts / recent orders inline as live examples.
