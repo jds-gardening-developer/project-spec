@@ -1,21 +1,17 @@
-# Netlify config — Docsify is fully client-side so there's nothing to build.
-# Netlify just serves the repo root as static files.
+# Netlify config — Vite + React build for the MacPlants ERP spec viewer.
 
 [build]
-  publish = "."
-  command = ""
+  publish = "app/dist"
+  command = "npm run build"
 
-# Cache the spec markdown briefly so updates show up quickly on deploy
-[[headers]]
-  for = "/README.md"
-  [headers.values]
-    Cache-Control = "public, max-age=300, must-revalidate"
-
-# Cache static HTML & long-lived assets aggressively
+# Cache the built HTML briefly so spec snapshots show up quickly on deploy.
 [[headers]]
   for = "/index.html"
   [headers.values]
     Cache-Control = "public, max-age=300, must-revalidate"
 
-# Pretty URLs: visiting /erp resolves to /README.md content via Docsify routing,
-# so no rewrites are needed. Docsify handles client-side routing.
+# SPA fallback — Vite produces a single-page app, so unknown routes serve index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
