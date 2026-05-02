@@ -207,7 +207,7 @@
     "title": "Trade Customer",
     "prd_id": null,
     "level": 3,
-    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| business\\_name | string |  |\n| customer\\_type | enum | Landscaper / Garden Designer / Contractor / Garden Centre / etc. |\n| contact\\_name | string |  |\n| email | string |  |\n| phone | string |  |\n| billing\\_address | string |  |\n| delivery\\_address | string |  |\n| credit\\_limit | decimal | adjustable per customer |\n| payment\\_terms\\_days | integer | default 30 for all trade |\n| account\\_status | enum | Active / On Hold |\n| portal\\_login | FK → User | linked User account for trade portal access |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n\n**Note:** Derived (not stored): current\\_balance is the sum of unpaid invoices linked to this customer; This is are query-time aggregates over the Invoice table."
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| business\\_name | string |  |\n| customer\\_type | enum | Landscaper / Garden Designer / Contractor / Garden Centre / etc. |\n| contact\\_name | string |  |\n| email | string |  |\n| phone | string |  |\n| billing\\_address | string |  |\n| delivery\\_address | string |  |\n| credit\\_limit | decimal | adjustable per customer |\n| payment\\_terms\\_days | integer | default 30 for all trade |\n| account\\_status | enum | Active / On Hold |\n| portal\\_login | FK → User | linked User account for trade portal access |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n\n**Note:** Derived (not stored), all computed at query-time over the Invoice and Credit Note tables (see PRD-3.2):\n\n* `outstanding\\_balance` — sum of unpaid invoice totals linked to thi…"
   },
   {
     "id": "what-is-it-2",
@@ -235,7 +235,7 @@
     "title": "Trade Customer Single Page",
     "prd_id": null,
     "level": 3,
-    "body": "* Customer detail screen (single page): When an admin clicks on a customer, they see:\n\n  * Current balance — outstanding unpaid invoice total\n\n  * Order / quote / invoice history\n\n* Allow admin to set customer credit limit. This is different for every trade customer so this must be adjustable on trade customer single page.\n\n* Every trade customer has 30 day payment terms\n\n* **Over-credit-limit flow:** When a customer attempts to place an order OVER their credit limit on the trade portal, the system should present a payment screen that lets the customer pay for the order immediately by card (Stripe). This removes friction — the customer can keep ordering, they just need to pay upfront in FULL. The user will see a message 'You cannot place an order that exceeds your credit limit, please orde…"
+    "body": "* Customer detail screen (single page): When an admin clicks on a customer, they see:\n\n  * **Outstanding balance** — sum of unpaid invoice totals.\n\n  * **Available credit** — unallocated credit on account (Issued credit notes minus allocations). Clicking opens the list of contributing credit notes and any allocations already applied (see PRD-3.2).\n\n  * **Current balance** — the net of the two above. Positive = customer owes MacPlants; negative = MacPlants holds credit on account.\n\n  * Order / quote / invoice history\n\n* Allow admin to set customer credit limit. This is different for every trade customer so this must be adjustable on trade customer single page.\n\n* Every trade customer has 30 day payment terms\n\n* **Over-credit-limit flow:** When a customer attempts to place an order OVER thei…"
   },
   {
     "id": "how-we-know-its-done-2",
@@ -466,28 +466,63 @@
     "title": "Refund / Credit Note",
     "prd_id": null,
     "level": 3,
-    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| type | enum | Refund (retail) / Credit Note (trade) |\n| order | FK → Order |  |\n| invoice | FK → Invoice | the original invoice being reversed |\n| amount | decimal |  |\n| reason | string |  |\n| plants\\_returned | boolean | if true, restock task is generated |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| pushed\\_to\\_xero | boolean |  |\n| pushed\\_to\\_xero\\_at | datetime (nullable) |  |"
+    "body": "| Field | Type | Notes |\n| :---- | :---- | :---- |\n| type | enum | Refund (retail) / Credit Note (trade) |\n| order | FK → Order |  |\n| invoice | FK → Invoice | the original invoice being reversed |\n| amount | decimal |  |\n| reason | string |  |\n| plants\\_returned | boolean | if true, restock task is generated |\n| external\\_reference | string (nullable) | Stripe refund ID for retail refunds; bank transfer reference for the rare trade cash-back handled outside the ERP |\n| created\\_by | FK → User |  |\n| created\\_at | datetime |  |\n| pushed\\_to\\_xero | boolean |  |\n| pushed\\_to\\_xero\\_at | datetime (nullable) |  |"
+  },
+  {
+    "id": "credit-note-allocation",
+    "title": "Credit Note Allocation",
+    "prd_id": null,
+    "level": 3,
+    "body": "*Records the application of a Credit Note balance against a future Invoice. Credit notes only — refunds do not allocate. A trade customer has many; a Credit Note has many.*\n\n| Field | Type | Notes |\n| :---- | :---- | :---- |\n| credit\\_note | FK → Refund/Credit Note |  |\n| invoice | FK → Invoice | the invoice the credit balance is applied against |\n| amount | decimal |  |\n| allocated\\_by | FK → User |  |\n| allocated\\_at | datetime |  |"
   },
   {
     "id": "what-is-it-4",
     "title": "What Is It",
     "prd_id": null,
     "level": 2,
-    "body": "When a customer returns plants, changes their mind after completion, or receives something they don't want, the ERP must be able to issue either a refund (retail) or a credit note (trade)."
+    "body": "When a customer returns plants, changes their mind after completion, the ERP must be able to issue either a refund (retail) or a credit note (trade)."
   },
   {
     "id": "what-it-must-do-6",
     "title": "What It Must Do",
     "prd_id": null,
     "level": 2,
-    "body": "* Any order, once complete — can be Refunded or Credit Noted. A button on the order screen provides this action.  This initiates the Refund Flow\n\n* **Retail customers → Refund.** Money is returned to the customer's bank account. The refund is pushed to Xero so the accounts reflect the reversal. The sale is no longer counted in ERP reporting.\n\n* **Trade customers → Credit Note.** A credit balance is applied to the customer's account for future use. The credit note is pushed to Xero. Physical cash transfers back to a trade customer are rare — the default is a credit note.\n\n* **Returned plants:** If plants are physically returned and still viable, a TO DO task is created for staff to add them back into stock (choose location, batch, status). If the plants are dead/not viable, this is recorded…"
+    "body": ""
+  },
+  {
+    "id": "refund-flow-retail-customers",
+    "title": "Refund Flow (Retail Customers)",
+    "prd_id": null,
+    "level": 3,
+    "body": "Triggered from any completed retail order via the Refund button on the order screen. Refunds are admin-issued — no separate approval gate.\n\n* **Stripe handles the actual money movement.** Retail orders are paid via Stripe at checkout, so refunds are processed directly in the Stripe interface (outside the ERP). The admin then returns to the ERP, clicks Refund, enters amount + reason, and captures the Stripe refund ID in `external_reference`.\n\n* **Xero reconciliation is handled manually by Arian.** When the refund is logged in the ERP, the system auto-creates a Finance task on the order, assigned to Arian (see PRD-04). Arian creates the matching credit note in Xero against the original invoice as part of his bank-feed reconciliation work, then completes the task — which sets `pushed_to_xero…"
+  },
+  {
+    "id": "credit-note-flow-trade-customers",
+    "title": "Credit Note Flow (Trade Customers)",
+    "prd_id": null,
+    "level": 3,
+    "body": "Triggered from any completed trade order via the Credit Note button on the order screen. Admin-issued, no separate approval gate.\n\n* **No cash moves at issue.** A credit balance is added to the trade customer's account for future use. The credit note is still an accounting document — it adjusts VAT and the customer's Xero balance — so it must reach Xero.\n\n* **Xero reconciliation is handled manually by Arian.** When the credit note is logged in the ERP, the system auto-creates a Finance task on the order, assigned to Arian (see PRD-04). Arian creates the matching credit note in Xero as part of his reconciliation work, then completes the task — which sets `pushed_to_xero = true` on the credit note record. Same pattern as refunds and invoice payments.\n\n* **Lifecycle states:**\n\n  * **Draft** —…"
+  },
+  {
+    "id": "returned-plants-applies-to-both-flows",
+    "title": "Returned Plants (applies to both flows)",
+    "prd_id": null,
+    "level": 3,
+    "body": "If plants are physically returned and still viable, a TO DO task is created for staff to add them back into stock (choose location, batch, status — see PRD-1). If the plants are dead/not viable, this is recorded as shrinkage (see PRD-1 — Shrinkage Record)."
+  },
+  {
+    "id": "audit-trail-applies-to-both-flows",
+    "title": "Audit Trail (applies to both flows)",
+    "prd_id": null,
+    "level": 3,
+    "body": "Every refund, credit note, and credit note allocation is audited — who raised it, when, against which order/invoice, for what amount, and the reason. All entries appear in the order's Billing History grouped under their originating invoice."
   },
   {
     "id": "how-we-know-its-done-5",
     "title": "How We Know It's Done",
     "prd_id": null,
     "level": 2,
-    "body": "* A Refund button appears on every retail order; a Credit Note button on every trade order. Both are available regardless of order status.\n\n* Refunds push to Xero correctly; credit notes push to Xero and apply to the trade customer's account balance.\n\n* Returned viable plants generate a restock task; dead returns are captured as shrinkage.\n\n* Order billing history reflects refunds and credit notes.\n\n* Full audit trail on all refund / credit note actions."
+    "body": "* A Refund button appears on every completed retail order; a Credit Note button on every completed trade order. The opposite button does not appear on the other customer type.\n\n* Retail refund flow: admin processes the refund in Stripe, then logs it in the ERP with the Stripe refund ID captured in `external_reference`. The system auto-creates a Finance task on the order for Arian. Arian creates the matching credit note in Xero during reconciliation and completes the task, flipping the refund to Issued. The order and refund records are retained in the ERP indefinitely; the refunded amount is netted off the sale value in dashboard / sales reporting.\n\n* Pre-Xero delete works: an admin can hard-delete a Draft refund (mistakes), which also closes the auto-created Finance task. Issued refunds ca…"
   },
   {
     "id": "prd-04-staff-member-tasks",
@@ -585,7 +620,7 @@
     "title": "Trade Customer Portal",
     "prd_id": null,
     "level": 3,
-    "body": "* Trade customers log in with credentials created by Macplants staff. No self-registration.\n\n* Customers can search plants by name.\n\n* All plants are shown on the portal unless marked as \"unavailable.\" Even plants that are currently out of stock are visible — Macplants can always reject the order. Plants marked as unavailable are hidden entirely.\n\n* Retail-ready stock is excluded from the trade portal. Trade customers can ONLY buy retail-ready plants via the shop or mail order.\n\n* Stock quantities ARE shown on the trade portal (earlier concern about hiding quantities for \"special\" plants was dropped — of \\~1,200 plants, only \\~20 are truly special. These will be flagged via internal notes rather than hiding quantities across the board).\n\n* Customers can build a quote/order with plant lines…"
+    "body": "* Trade customers log in with credentials created by Macplants staff. No self-registration.\n\n* Customers see their account financial summary at the top of the portal: **Outstanding balance** (unpaid invoices), **Available credit** (unallocated credit notes), and **Current balance** (the net of the two — positive = owed to MacPlants, negative = MacPlants holds credit). Clicking expands to a full history of invoices and credit notes, with any allocations already applied. Available credit is offered as an option at checkout when raising a new order (see PRD-3.2).\n\n* Customers can search plants by name.\n\n* All plants are shown on the portal unless marked as \"unavailable.\" Even plants that are currently out of stock are visible — Macplants can always reject the order. Plants marked as unavailab…"
   },
   {
     "id": "internal-quote-builder-admin-side",

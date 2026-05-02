@@ -1,6 +1,6 @@
 {
   "source": "project-spec/2026-05-02.md",
-  "generated_at": "2026-05-02T09:55:08.131Z",
+  "generated_at": "2026-05-02T13:51:14.176Z",
   "entities": [
     {
       "name": "User",
@@ -798,6 +798,11 @@
           "notes": "if true, restock task is generated"
         },
         {
+          "name": "external_reference",
+          "type": "string (nullable)",
+          "notes": "Stripe refund ID for retail refunds; bank transfer reference for the rare trade cash-back handled outside the ERP"
+        },
+        {
           "name": "created_by",
           "type": "FK → User",
           "notes": ""
@@ -815,6 +820,37 @@
         {
           "name": "pushed_to_xero_at",
           "type": "datetime (nullable)",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Credit Note Allocation",
+      "prd_id": "prd-3-2",
+      "fields": [
+        {
+          "name": "credit_note",
+          "type": "FK → Refund/Credit Note",
+          "notes": ""
+        },
+        {
+          "name": "invoice",
+          "type": "FK → Invoice",
+          "notes": "the invoice the credit balance is applied against"
+        },
+        {
+          "name": "amount",
+          "type": "decimal",
+          "notes": ""
+        },
+        {
+          "name": "allocated_by",
+          "type": "FK → User",
+          "notes": ""
+        },
+        {
+          "name": "allocated_at",
+          "type": "datetime",
           "notes": ""
         }
       ]
@@ -897,6 +933,21 @@
     }
   ],
   "relationships": [
+    {
+      "from": "Credit Note Allocation",
+      "to": "Invoice",
+      "label": "invoice"
+    },
+    {
+      "from": "Credit Note Allocation",
+      "to": "Refund/Credit Note",
+      "label": "credit_note"
+    },
+    {
+      "from": "Credit Note Allocation",
+      "to": "User",
+      "label": "allocated_by"
+    },
     {
       "from": "Invoice",
       "to": "Order",
