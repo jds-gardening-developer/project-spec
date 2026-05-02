@@ -28,6 +28,18 @@ describe('parseHashRoute', () => {
     assert.equal(parseHashRoute('#/schema/foo/bar'), 'schema');
   });
 
+  it("'#/stage-2' → 'stage-2'", () => {
+    assert.equal(parseHashRoute('#/stage-2'), 'stage-2');
+  });
+
+  it("'#stage-2' → 'stage-2' (tolerant of missing leading slash)", () => {
+    assert.equal(parseHashRoute('#stage-2'), 'stage-2');
+  });
+
+  it("'#/stage-2/anything' → 'stage-2'", () => {
+    assert.equal(parseHashRoute('#/stage-2/foo'), 'stage-2');
+  });
+
   it("'#/prd-1-1' → 'spec'", () => {
     assert.equal(parseHashRoute('#/prd-1-1'), 'spec');
   });

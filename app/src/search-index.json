@@ -473,14 +473,14 @@
     "title": "What Is It",
     "prd_id": null,
     "level": 2,
-    "body": "When a customer returns plants, changes their mind after completion, or receives something they don't want, the ERP must be able to issue either a refund (retail) or a credit note (trade). This was not originally in scope but was raised as a clear Stage 1 requirement — returns happen regularly enough that a manual workaround would create pain."
+    "body": "When a customer returns plants, changes their mind after completion, or receives something they don't want, the ERP must be able to issue either a refund (retail) or a credit note (trade)."
   },
   {
     "id": "what-it-must-do-6",
     "title": "What It Must Do",
     "prd_id": null,
     "level": 2,
-    "body": "* Any order, at any stage — including after completion and after the invoice has been posted to Xero — can be Refunded or Credit Noted. A button on the order screen provides this action.\n\n* **Retail customers → Refund.** Money is returned to the customer's bank account. The refund is pushed to Xero so the accounts reflect the reversal. The sale is no longer counted in ERP reporting.\n\n* **Trade customers → Credit Note.** A credit balance is applied to the customer's account for future use. The credit note is pushed to Xero. Physical cash transfers back to a trade customer are rare — the default is a credit note.\n\n* **Returned plants:** If plants are physically returned and still viable, a TO DO task is created for staff to add them back into stock (choose location, batch, status). If the pl…"
+    "body": "* Any order, once complete — can be Refunded or Credit Noted. A button on the order screen provides this action.  This initiates the Refund Flow\n\n* **Retail customers → Refund.** Money is returned to the customer's bank account. The refund is pushed to Xero so the accounts reflect the reversal. The sale is no longer counted in ERP reporting.\n\n* **Trade customers → Credit Note.** A credit balance is applied to the customer's account for future use. The credit note is pushed to Xero. Physical cash transfers back to a trade customer are rare — the default is a credit note.\n\n* **Returned plants:** If plants are physically returned and still viable, a TO DO task is created for staff to add them back into stock (choose location, batch, status). If the plants are dead/not viable, this is recorded…"
   },
   {
     "id": "how-we-know-its-done-5",

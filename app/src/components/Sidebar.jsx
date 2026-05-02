@@ -219,6 +219,20 @@ export function Sidebar() {
                 Schema Index
               </a>
             </li>
+            <li className="sidebar-item">
+              <a
+                href="#/stage-2"
+                className={
+                  'sidebar-link sidebar-link--h2 sidebar-link--static' +
+                  (route === 'stage-2' ? ' sidebar-link--active' : '')
+                }
+                onClick={() => {
+                  setDrawerOpen(false);
+                }}
+              >
+                Stage 2
+              </a>
+            </li>
           </ul>
           {groups.length === 0 ? (
             <p className="sidebar-empty">
