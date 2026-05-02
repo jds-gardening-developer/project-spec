@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { useTheme } from './useTheme.js';
 import './MermaidPre.css';
 
 /**
@@ -20,30 +21,37 @@ import './MermaidPre.css';
  * introduces concurrent renders, queue calls through a module-level promise chain.
  */
 
-// Module-level singleton: initialize mermaid only once across all MermaidBlocks.
+// Module-level singleton: load mermaid once; re-initialize when theme changes.
 let mermaidPromise = null;
-function loadMermaid() {
-  if (mermaidPromise) return mermaidPromise;
-  mermaidPromise = import('mermaid').then((mod) => {
-    const mermaid = mod.default || mod;
-    mermaid.initialize({
-      startOnLoad: false,
-      securityLevel: 'strict',
-      theme: 'default',
-      // ER diagram defaults are tiny — the SchemaPage uses ER for the schema map.
-      // Per-diagram %%{init}%% directives are ignored under strict securityLevel,
-      // so we bump these globally. The spec uses flowchart/sequence diagrams (not
-      // ER) so this only takes effect on the SchemaPage.
-      er: {
-        fontSize: 18,
-        entityPadding: 15,
-        minEntityWidth: 160,
-        minEntityHeight: 80,
-      },
-    });
+let currentMermaidTheme = null;
+
+function initMermaid(mermaid, theme) {
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'strict',
+    theme: theme === 'dark' ? 'dark' : 'default',
+    // ER diagram defaults are tiny — the SchemaPage uses ER for the schema map.
+    // Per-diagram %%{init}%% directives are ignored under strict securityLevel,
+    // so we bump these globally. The spec uses flowchart/sequence diagrams (not
+    // ER) so this only takes effect on the SchemaPage.
+    er: {
+      fontSize: 18,
+      entityPadding: 15,
+      minEntityWidth: 160,
+      minEntityHeight: 80,
+    },
+  });
+  currentMermaidTheme = theme;
+}
+
+function loadMermaid(theme) {
+  if (!mermaidPromise) {
+    mermaidPromise = import('mermaid').then((mod) => mod.default || mod);
+  }
+  return mermaidPromise.then((mermaid) => {
+    if (currentMermaidTheme !== theme) initMermaid(mermaid, theme);
     return mermaid;
   });
-  return mermaidPromise;
 }
 
 function extractSource(children) {
@@ -68,6 +76,7 @@ export function MermaidBlock({ children }) {
   const containerRef = useRef(null);
   const [error, setError] = useState(null);
   const [svg, setSvg] = useState(null);
+  const [theme] = useTheme();
 
   useEffect(() => {
     let cancelled = false;
@@ -75,7 +84,7 @@ export function MermaidBlock({ children }) {
       setError('empty mermaid block');
       return;
     }
-    loadMermaid().then((mermaid) => {
+    loadMermaid(theme).then((mermaid) => {
       if (cancelled) return;
       // mermaid.render returns Promise<{svg, bindFunctions?}>. It throws on parse error.
       mermaid
@@ -100,7 +109,7 @@ export function MermaidBlock({ children }) {
     return () => {
       cancelled = true;
     };
-  }, [source, safeId]);
+  }, [source, safeId, theme]);
 
   if (error) {
     // D-03: visible banner ABOVE the original source so the author sees both.

@@ -1,6 +1,6 @@
 {
-  "source": "project-spec/2026-05-01.md",
-  "generated_at": "2026-05-01T22:47:20.146Z",
+  "source": "project-spec/2026-05-02.md",
+  "generated_at": "2026-05-02T01:04:15.326Z",
   "entities": [
     {
       "name": "User",
@@ -9,7 +9,7 @@
         {
           "name": "role",
           "type": "enum",
-          "notes": "Super Admin / Admin / Staff"
+          "notes": "Super Admin / Admin"
         },
         {
           "name": "name",
@@ -35,11 +35,6 @@
           "name": "last_login_at",
           "type": "datetime",
           "notes": "nullable"
-        },
-        {
-          "name": "",
-          "type": "",
-          "notes": ""
         }
       ]
     },
@@ -634,6 +629,21 @@
           "notes": "Can store full invoice history \\- we may issue many invoices against 1 order as it could easily be updated"
         },
         {
+          "name": "deposit_amount",
+          "type": "decimal (nullable)",
+          "notes": "the amount the customer was asked to pay to lock the order in. Defaults to 50% of order subtotal (ex VAT) when admin clicks \"Request Deposit\"; admin can override. Null when no deposit was taken."
+        },
+        {
+          "name": "deposit_requested_at",
+          "type": "datetime (nullable)",
+          "notes": "when the deposit request was sent to the customer"
+        },
+        {
+          "name": "deposit_received_at",
+          "type": "datetime (nullable)",
+          "notes": "when the deposit cash landed (Stripe deposit-kind webhook OR manual mark by Finance for bank transfers)"
+        },
+        {
           "name": "",
           "type": "",
           "notes": ""
@@ -723,85 +733,8 @@
       ]
     },
     {
-      "name": "Email Notification",
-      "prd_id": "prd-3-1",
-      "fields": [
-        {
-          "name": "trigger",
-          "type": "enum",
-          "notes": "quote_sent / quote_approved / invoice_raised / order_confirmed / order_packed"
-        },
-        {
-          "name": "recipient",
-          "type": "string",
-          "notes": "email address"
-        },
-        {
-          "name": "subject",
-          "type": "string",
-          "notes": ""
-        },
-        {
-          "name": "body",
-          "type": "string",
-          "notes": "full HTML body stored as a snapshot for audit"
-        },
-        {
-          "name": "linked_record",
-          "type": "FK (polymorphic)",
-          "notes": "Order / Quote / Invoice"
-        },
-        {
-          "name": "sent_at",
-          "type": "datetime",
-          "notes": ""
-        },
-        {
-          "name": "sent_by",
-          "type": "FK → User (nullable)",
-          "notes": "null when system-triggered"
-        }
-      ]
-    },
-    {
-      "name": "Internal Notification",
-      "prd_id": "prd-3-1",
-      "fields": [
-        {
-          "name": "type",
-          "type": "enum",
-          "notes": "pending_order_stock_arrived / po_overdue / batch_ready_date_due / account_on_hold / new_trade_order / credit_limit_breach"
-        },
-        {
-          "name": "linked_record",
-          "type": "FK (polymorphic)",
-          "notes": "the relevant object"
-        },
-        {
-          "name": "audience_role",
-          "type": "enum",
-          "notes": "Admin / Sales / Warehouse"
-        },
-        {
-          "name": "created_at",
-          "type": "datetime",
-          "notes": ""
-        },
-        {
-          "name": "dismissed_by",
-          "type": "FK → User (nullable)",
-          "notes": ""
-        },
-        {
-          "name": "dismissed_at",
-          "type": "datetime (nullable)",
-          "notes": ""
-        }
-      ]
-    },
-    {
       "name": "Order — delivery-related fields",
-      "prd_id": "prd-3-2",
+      "prd_id": "prd-3-1",
       "fields": [
         {
           "name": "delivery_method",
@@ -832,7 +765,7 @@
     },
     {
       "name": "Refund / Credit Note",
-      "prd_id": "prd-3-3",
+      "prd_id": "prd-3-2",
       "fields": [
         {
           "name": "type",
@@ -964,16 +897,6 @@
     }
   ],
   "relationships": [
-    {
-      "from": "Email Notification",
-      "to": "User",
-      "label": "sent_by (nullable)"
-    },
-    {
-      "from": "Internal Notification",
-      "to": "User",
-      "label": "dismissed_by (nullable)"
-    },
     {
       "from": "Invoice",
       "to": "Order",

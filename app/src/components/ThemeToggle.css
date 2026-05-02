@@ -1,0 +1,33 @@
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 100;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--sidebar-border, #e1e4e8);
+  background: var(--sidebar-bg, #ffffff);
+  color: var(--sidebar-text, #24292e);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+
+.theme-toggle:hover {
+  background: var(--sidebar-hover-bg, #f0f3f5);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--sidebar-active-bar, #2c8d4f);
+  outline-offset: 2px;
+}

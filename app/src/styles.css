@@ -8,7 +8,9 @@ body {
   margin: 0;
   padding: 16px;
   color: #222;
-  background: #fff;
+  background: #f4f4f2;
+  font-size: 19px;
+  line-height: 1.65;
 }
 
 #root {
@@ -88,4 +90,50 @@ body {
   .app-shell {
     gap: 0;
   }
+}
+
+/* --- Dark mode overrides ---
+   Toggled by ThemeToggle, which sets data-theme="dark" on <html>.
+   The pre-mount script in index.html also sets it before paint to avoid flash. */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --schema-card-border: #30363d;
+  --schema-card-background: #161b22;
+  --schema-card-accent: #3fb950;
+  --schema-card-title-color: #c9d1d9;
+  --schema-card-field-color: #c9d1d9;
+  --schema-card-type-background: #21262d;
+  --schema-card-type-color: #c9d1d9;
+  --schema-card-notes-color: #8b949e;
+
+  --cross-link-color: #58a6ff;
+  --cross-link-broken-color: #6e7681;
+
+  --copy-button-color: #8b949e;
+  --copy-button-color-success: #3fb950;
+  --copy-button-background: transparent;
+
+  --mermaid-error-color: #f85149;
+  --mermaid-error-background: #2d1416;
+
+  --sidebar-bg: #161b22;
+  --sidebar-border: #30363d;
+  --sidebar-text: #c9d1d9;
+  --sidebar-text-active: #ffffff;
+  --sidebar-active-bar: #3fb950;
+  --sidebar-hover-bg: #21262d;
+
+  --search-modal-bg: #161b22;
+  --search-modal-backdrop: rgba(0, 0, 0, 0.7);
+  --search-modal-border: #30363d;
+
+  --search-result-highlight: #966600;
+  --search-result-active-bg: #21262d;
+  --search-result-context: #8b949e;
+}
+
+html[data-theme="dark"] body {
+  background: #161617;
+  color: #e1e4e8;
 }

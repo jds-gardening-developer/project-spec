@@ -3,6 +3,7 @@ import SpecViewer from './SpecViewer.jsx';
 import manifest from './manifest.json';
 import { Sidebar } from './components/Sidebar.jsx';
 import { SearchPanel } from './components/SearchPanel.jsx';
+import { ThemeToggle } from './components/ThemeToggle.jsx';
 import { useHashScroll } from './components/useHashScroll.js';
 import { useRoute } from './components/useRoute.js';
 
@@ -64,32 +65,38 @@ export default function App() {
 
   if (error) {
     return (
-      <main>
-        <p style={{ color: 'crimson' }}>Error: {error}</p>
-      </main>
+      <>
+        <ThemeToggle />
+        <main>
+          <p style={{ color: 'crimson' }}>Error: {error}</p>
+        </main>
+      </>
     );
   }
 
   return (
-    <div className="app-shell">
-      <Sidebar />
-      <main className="app-main">
-        {route === 'schema' ? (
-          <Suspense fallback={<p>Loading schema…</p>}>
-            <SchemaPage />
-          </Suspense>
-        ) : (
-          <>
-            <header>
-              <small>
-                Viewing: <code>project-spec/{newest?.filename}</code>
-              </small>
-            </header>
-            <SpecViewer markdown={content} />
-          </>
-        )}
-      </main>
-      <SearchPanel />
-    </div>
+    <>
+      <ThemeToggle />
+      <div className="app-shell">
+        <Sidebar />
+        <main className="app-main">
+          {route === 'schema' ? (
+            <Suspense fallback={<p>Loading schema…</p>}>
+              <SchemaPage />
+            </Suspense>
+          ) : (
+            <>
+              <header>
+                <small>
+                  Viewing: <code>project-spec/{newest?.filename}</code>
+                </small>
+              </header>
+              <SpecViewer markdown={content} />
+            </>
+          )}
+        </main>
+        <SearchPanel />
+      </div>
+    </>
   );
 }
