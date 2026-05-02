@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 Phase: 999.1 of 5 (schema index page)
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-05-01 - Completed quick task 260501-wvd: Add scripts/md-to-clipboard.mjs to convert latest project-spec markdown to HTML and copy to macOS clipboard for Google Docs paste
+Last activity: 2026-05-01 - Completed quick task 260502-1dr: Add limited deposit-request feature to ERP spec
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -85,6 +85,7 @@ None yet.
 | 260430-v2w | Clarify Invoice supersede rule in PRD-03 (add Superseded status + supersede-on-edit note) | 2026-04-30 | 1fe5c9c | [260430-v2w-clarify-invoice-supersede-rule-in-prd-03](./quick/260430-v2w-clarify-invoice-supersede-rule-in-prd-03/) |
 | 260501-wll | Fix Sidebar to group by H1 (PRDs) with H2 children, filter to PRD- prefix | 2026-05-01 | e16b078 | [260501-wll-fix-sidebar-to-group-by-h1-prds-with-h2-](./quick/260501-wll-fix-sidebar-to-group-by-h1-prds-with-h2-/) |
 | 260501-wvd | Add scripts/md-to-clipboard.mjs to convert latest project-spec markdown to HTML and copy to macOS clipboard for Google Docs paste | 2026-05-01 | 8f75cf9 | [260501-wvd-add-scripts-md-to-clipboard-mjs-to-conve](./quick/260501-wvd-add-scripts-md-to-clipboard-mjs-to-conve/) |
+| 260502-1dr | Add limited deposit-request feature to ERP spec | 2026-05-01 | 99b1161 | [260502-1dr-add-limited-deposit-request-feature-to-e](./quick/260502-1dr-add-limited-deposit-request-feature-to-e/) |
 
 ## Session Continuity
 
