@@ -26,7 +26,7 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - **Search library**: FlexSearch or MiniSearch (decision deferred to research/planning) — must be client-side, build-time-indexed, <20KB
 - **Diagram library**: Mermaid (latest stable) — rendered via dynamic import to keep main bundle small
 - **Runtime**: Node 20+ for build (already required for the existing tooling layer)
-- **Deploy**: Netlify (existing; switch from `publish = "."` to `publish = "dist"`, add `command = "npm run build"`)
+- **Deploy**: Vercel (configured via `vercel.json`: `buildCommand: "npm run build"`, `outputDirectory: "app/dist"`, SPA rewrite)
 - **Branch**: work continues on `web-app-refactor` (already checked out; uncommitted refactor will be folded in)
 - **No backend**: viewer stays a static SPA — no server, database, or auth
 - **Performance**: must render the existing 70KB spec without lag; first-paint target similar to Docsify (<1s on broadband)
@@ -69,7 +69,7 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - `ANTHROPIC_API_KEY` is required to run `scripts/update-spec.mjs`. Loaded via `import "dotenv/config"` from a `.env` file at the repo root.
 - A `.env.example` is referenced by the script's error message (`"Copy .env.example to .env and fill it in."`) and by `CONTRIBUTING.md`. Neither `.env` nor `.env.example` is currently present at the repo root.
 - No `.gitignore` file is present in the working tree.
-- `netlify.toml` — Declares `publish = "app/dist"`, `command = "npm run build"`, a 300s `must-revalidate` Cache-Control header for `/index.html`, and a SPA fallback redirect (`/*` → `/index.html`).
+- `vercel.json` — Declares `buildCommand: "npm run build"`, `outputDirectory: "app/dist"`, a 300s `must-revalidate` Cache-Control header for `/index.html`, and a SPA rewrite (`/(.*)` → `/index.html`).
 - `package.json` — Declares `"type": "module"` so all `.js`/`.mjs` files are ESM by default.
 - No `tsconfig.json`, no bundler config (Webpack/Vite/esbuild), no linter config (ESLint/Biome), no formatter config (Prettier).
 - Viewer reads every `project-spec/*.md` at build time and auto-selects the newest by ISO date.
@@ -85,12 +85,12 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - npm (for `npm install`, `npm run dev`)
 - An Anthropic API key (only required for the `update-spec` workflow, not for local viewing)
 - A browser (for viewing the rendered site at `http://localhost:5173` after `npm run dev`)
-- Netlify (static hosting). Auto-deploys on push to `main` per `CONTRIBUTING.md`.
+- Vercel (static hosting). Auto-deploys on push to `main` per `CONTRIBUTING.md`.
 - Repository: `https://github.com/jds-gardening-developer/project-spec.git` (per `.git/config`).
-- No server, no database, no build step — Netlify serves the repo root verbatim.
+- No server, no database — Vercel runs the Vite build and serves `app/dist/`.
 ## Project Type Summary
 - Vite builds a static React SPA from `app/` into `app/dist/`.
-- Netlify runs `npm run build` and serves `app/dist/`.
+- Vercel runs `npm run build` and serves `app/dist/`.
 - `scripts/build-manifest.mjs`, `scripts/build-search-index.mjs`, and `scripts/build-schema-index.mjs` run at build time to generate the manifest, search index, and schema index that the viewer consumes.
 - `scripts/update-spec.mjs` is an optional Node CLI for AI-assisted spec updates; it is not part of the deploy pipeline.
 <!-- GSD:stack-end -->
@@ -165,12 +165,12 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Inline references use the form `(see PRD-X.Y)` — e.g. `see PRD-3.4`, `see PRD-1`. A future link checker is contemplated in `CONTRIBUTING.md:133`.
 - Typos, smart quotes, escape characters (`\.`, `\+`, `\>`, `\_`), formatting tweaks. Cosmetic fixes are out of scope for normal edits and explicitly forbidden for the auto-update script (`CONTRIBUTING.md` line 98, `scripts/update-spec.mjs:77-79`).
 ## Vite / React Viewer Conventions
-- Vite root is `app/` (per `app/vite.config.js`). The Vite entry HTML lives at `app/index.html`. Do not place a top-level `index.html` at the repo root — Netlify deploys `app/dist/`, not the repo root.
+- Vite root is `app/` (per `app/vite.config.js`). The Vite entry HTML lives at `app/index.html`. Do not place a top-level `index.html` at the repo root — Vercel deploys `app/dist/`, not the repo root.
 - Build scripts in `scripts/build-*.mjs` run via the `predev` and `prebuild` npm hooks; they emit JSON artefacts the viewer imports at startup. If the viewer can't find these artefacts, run `npm run build-manifest` (etc.) directly.
 - Markdown is imported into the bundle via `import.meta.glob('../../project-spec/*.md', { query: '?raw' })`. Vite needs `server.fs.allow` widened to include the repo root for this to work in dev — the config already does this.
 - Brand colour stays MacPlants green `#2c8d4f`. Reuse the CSS custom property defined in the app rather than hard-coding the hex again.
 ## Deployment Conventions
-- `publish = "app/dist"` and `command = "npm run build"` — Netlify runs the Vite build and serves the resulting static SPA.
+- `outputDirectory: "app/dist"` and `buildCommand: "npm run build"` — Vercel runs the Vite build and serves the resulting static SPA.
 - `/index.html` gets a 5-minute `must-revalidate` cache so spec edits go live quickly.
 - SPA fallback redirect (`/*` → `/index.html`, status 200) handles client-side routing for the React viewer.
 ## Conventions Stated in CONTRIBUTING.md
@@ -186,7 +186,7 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 ## Architecture
 
 ## Pattern Overview
-- Vite-built static SPA — `app/` is the Vite root; `npm run build` produces `app/dist/` which Netlify publishes
+- Vite-built static SPA — `app/` is the Vite root; `npm run build` produces `app/dist/` which Vercel publishes
 - Single-source-of-truth content model — dated snapshots in `project-spec/YYYY-MM-DD.md` are canonical; the viewer auto-selects the newest by ISO date
 - Detached tooling layer — `scripts/update-spec.mjs` is a one-shot Node CLI that calls the Anthropic API to fold meeting transcripts into the spec; it never runs in the browser and is not part of the deploy
 - Build-time content generation — `scripts/build-manifest.mjs`, `scripts/build-search-index.mjs`, `scripts/build-schema-index.mjs` emit JSON artefacts the viewer consumes
@@ -200,16 +200,16 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Location: `app/` (Vite root)
 - Contains: React components under `app/src/`, the Vite entry HTML at `app/index.html`, build config at `app/vite.config.js`
 - Depends on: `react`, `react-dom`, `react-markdown`, `remark-gfm`, `mermaid`, `minisearch`; build-time artefacts emitted by the `scripts/build-*.mjs` scripts
-- Used by: End users hitting the deployed Netlify URL, or the maintainer running `npm run dev`
+- Used by: End users hitting the deployed Vercel URL, or the maintainer running `npm run dev`
 - Purpose: Automates folding a meeting transcript into the spec via Claude
 - Location: `scripts/update-spec.mjs`
 - Contains: One Node ESM script that reads `README.md` + a transcript path, calls Anthropic, writes `README.proposed.md` and `update-summary.md` for human review. **Note:** `README.md` has been removed from the repo, so this script is currently broken and carries a TODO header; it must be repointed at the newest `project-spec/*.md` snapshot before next use.
 - Depends on: `@anthropic-ai/sdk`, `dotenv`, Node 20+, `ANTHROPIC_API_KEY` env var
 - Used by: The spec maintainer manually via `node scripts/update-spec.mjs <transcript>`; never runs in production
 - Purpose: Serves the static repo root to the public internet
-- Location: `netlify.toml`
-- Contains: Netlify build config (`publish = "app/dist"`, `command = "npm run build"`), a 5-minute `must-revalidate` Cache-Control header for `/index.html`, and a SPA fallback redirect (`/*` → `/index.html`)
-- Depends on: Netlify's static hosting + GitHub push trigger
+- Location: `vercel.json`
+- Contains: Vercel build config (`outputDirectory: "app/dist"`, `buildCommand: "npm run build"`), a 5-minute `must-revalidate` Cache-Control header for `/index.html`, and a SPA rewrite (`/(.*)` → `/index.html`)
+- Depends on: Vercel's static hosting + GitHub push trigger
 - Used by: All deployed traffic
 - Purpose: Holds raw meeting transcripts that feed the tooling layer
 - Location: `transcripts/` (currently only contains `.gitkeep`)
@@ -237,8 +237,8 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Examples: `app/src/App.jsx` (or equivalent root component), individual viewers/components for the schema page, sidebar, search box, etc.
 - Pattern: React components consume build-time JSON artefacts (manifest, search index, schema index) plus markdown imported via `import.meta.glob`
 ## Entry Points
-- Location: `app/index.html` (built into `app/dist/index.html` and served by Netlify)
-- Triggers: HTTP GET on the Netlify-served root
+- Location: `app/index.html` (built into `app/dist/index.html` and served by Vercel)
+- Triggers: HTTP GET on the Vercel-served root
 - Responsibilities: Load the React bundle produced by Vite, mount the viewer into `#root`, fetch the dated `project-spec/*.md` snapshots that were imported at build time
 - Location: `package.json` script `dev` → `vite --config app/vite.config.js` (with `predev` running the build-* scripts first)
 - Triggers: Maintainer runs `npm run dev`
@@ -246,8 +246,8 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Location: `scripts/update-spec.mjs` (invoked via `npm run update-spec` → `node scripts/update-spec.mjs` or directly with a transcript arg)
 - Triggers: Maintainer runs the script after a meeting
 - Responsibilities: Validate args + env, read spec + transcript, call Anthropic, parse XML-tagged response, write `README.proposed.md` + `update-summary.md`
-- Location: `netlify.toml`
-- Triggers: `git push` to `main` (configured in Netlify UI per `CONTRIBUTING.md`)
+- Location: `vercel.json`
+- Triggers: `git push` to `main` (configured in Vercel UI per `CONTRIBUTING.md`)
 - Responsibilities: Run `npm run build` and publish `app/dist/` as static files; apply a 5-minute `must-revalidate` Cache-Control header to `/index.html`; SPA fallback redirect (`/*` → `/index.html`, status 200) handles client-side routing
 ## Error Handling
 - Missing CLI arg → `console.error` + `process.exit(1)` (`scripts/update-spec.mjs:26-29`)
@@ -255,7 +255,7 @@ A small, lightweight Vite + React app that renders the MacPlants ERP project spe
 - Missing `README.md` (script run from wrong directory) → `console.error` + `process.exit(1)` (`scripts/update-spec.mjs:36-39`)
 - Missing `ANTHROPIC_API_KEY` → `console.error` + `process.exit(1)` (`scripts/update-spec.mjs:41-44`)
 - Malformed Anthropic response (no `<updated_spec>` tag) → write raw response to `update-raw.md` for inspection, then exit 1 (`scripts/update-spec.mjs:136-140`)
-- Unknown route in browser → Netlify's SPA fallback redirects `/*` to `/index.html` and the React viewer renders its own not-found state
+- Unknown route in browser → Vercel's SPA rewrite serves `/index.html` and the React viewer renders its own not-found state
 ## Cross-Cutting Concerns
 <!-- GSD:architecture-end -->
 
@@ -278,7 +278,7 @@ Use these entry points:
 **Documentation and repo-meta edits do NOT go through GSD** (project preference, 2026-05-02). Edit them directly with Edit/Write and commit normally:
 - Spec snapshots in `project-spec/*.md`
 - Project docs: `CLAUDE.md`, `CONTRIBUTING.md`, `Handbook/*.md`, any restored `README.md`
-- Repo-meta config: `netlify.toml`, `package.json` description, `.gitignore`
+- Repo-meta config: `vercel.json`, `package.json` description, `.gitignore`
 
 Borderline cases (doc + small code tweak): ask once rather than defaulting to GSD ceremony.
 <!-- GSD:workflow-end -->

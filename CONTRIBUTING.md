@@ -4,7 +4,7 @@ This repo holds the **MacPlants ERP specification**, served as a static Vite + R
 
 ## Who this guide is for
 
-- **Developers** building the ERP — read the spec at the deployed Netlify URL or browse `project-spec/` directly on GitHub.
+- **Developers** building the ERP — read the spec at the deployed Vercel URL or browse `project-spec/` directly on GitHub.
 - **You / spec maintainer** — you also need to know how to run the viewer locally, deploy it, and fold meeting outcomes back in.
 - **Stakeholders (Jake, David, Ariane, etc.)** — they don't need this guide. They just visit the deployed URL.
 
@@ -28,7 +28,7 @@ The viewer reads every `project-spec/*.md` at build time (via `scripts/build-man
 
 ## Reading the spec
 
-- **On the live site** (after Netlify deploy): open the URL, use the search bar, click any heading in the sidebar.
+- **On the live site** (after Vercel deploy): open the URL, use the search bar, click any heading in the sidebar.
 - **On GitHub**: open the latest file in `project-spec/` directly.
 - **Locally**: see "Running locally" below.
 
@@ -58,7 +58,7 @@ You have two options:
 
 Use option 2 when a meeting or significant revision lands and you want a clean before/after. Use option 1 for small clarifications and typo fixes.
 
-Either way, push to `main` and Netlify auto-deploys.
+Either way, push to `main` and Vercel auto-deploys.
 
 ### Spec conventions (sacred — don't break)
 
@@ -82,19 +82,19 @@ When the script is repointed, this section will be updated to match.
 
 ---
 
-## Deploying to Netlify
+## Deploying to Vercel
 
 ### First-time setup
 
 1. Push the repo to GitHub.
-2. In Netlify: **Add new site → Import from GitHub** → pick this repo.
-3. Build settings come from `netlify.toml` (`command = "npm run build"`, `publish = "app/dist"`). You shouldn't have to type anything in the UI.
+2. In Vercel: **Add New… → Project → Import Git Repository** → pick this repo.
+3. Build settings come from `vercel.json` (`buildCommand: "npm run build"`, `outputDirectory: "app/dist"`, SPA rewrite to `/index.html`). You shouldn't have to type anything in the UI.
 4. Deploy.
 
 ### Subsequent deploys
 
-Push to `main`. Netlify rebuilds and ships automatically.
+Push to `main`. Vercel rebuilds and ships automatically.
 
 ### Custom domain
 
-In Netlify → **Site settings → Domain management → Add custom domain** (e.g. `spec.macplants.co.uk`). Netlify will give you the DNS records to point at it.
+In Vercel → **Project → Settings → Domains → Add** (e.g. `spec.macplants.co.uk`). Vercel will give you the DNS records to point at it.
