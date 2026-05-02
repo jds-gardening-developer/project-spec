@@ -268,14 +268,19 @@ No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skill
 <!-- GSD:workflow-start source:GSD defaults -->
 ## GSD Workflow Enforcement
 
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
+For source code changes (`app/src/**`, `scripts/*.mjs` logic, `vite.config.js`, anything with regression risk), start work through a GSD command so planning artifacts and execution context stay in sync.
 
 Use these entry points:
-- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
+- `/gsd-quick` for ad-hoc source-code fixes
 - `/gsd-debug` for investigation and bug fixing
 - `/gsd-execute-phase` for planned phase work
 
-Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+**Documentation and repo-meta edits do NOT go through GSD** (project preference, 2026-05-02). Edit them directly with Edit/Write and commit normally:
+- Spec snapshots in `project-spec/*.md`
+- Project docs: `CLAUDE.md`, `CONTRIBUTING.md`, `Handbook/*.md`, any restored `README.md`
+- Repo-meta config: `netlify.toml`, `package.json` description, `.gitignore`
+
+Borderline cases (doc + small code tweak): ask once rather than defaulting to GSD ceremony.
 <!-- GSD:workflow-end -->
 
 
