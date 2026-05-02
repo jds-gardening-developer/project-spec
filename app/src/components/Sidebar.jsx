@@ -37,7 +37,6 @@ import './Sidebar.css';
  *     re-collection.
  */
 
-const MAX_PAINT_RETRIES = 3;
 const RECOLLECT_DEBOUNCE_MS = 200;
 
 function collectHeadings() {
@@ -62,40 +61,43 @@ export function Sidebar() {
     if (typeof document === 'undefined') return;
 
     let cancelled = false;
-    let retries = 0;
-    let observer = null;
+    let contentObserver = null;
+    let bodyObserver = null;
     let debounceTimer = null;
 
-    function attemptCollect() {
-      if (cancelled) return;
-      const root = document.querySelector('.spec-viewer');
-      if (!root) {
-        if (retries < MAX_PAINT_RETRIES) {
-          retries += 1;
-          requestAnimationFrame(attemptCollect);
-        }
-        // Give up silently after MAX_PAINT_RETRIES — sidebar shows empty.
-        return;
-      }
-
-      // Initial collection.
+    function attachContentObserver(root) {
       setHeadings(collectHeadings());
-
-      // Subsequent re-collection on content mutation (T-03-02-03 debounced).
-      observer = new MutationObserver(() => {
+      contentObserver = new MutationObserver(() => {
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
           if (!cancelled) setHeadings(collectHeadings());
         }, RECOLLECT_DEBOUNCE_MS);
       });
-      observer.observe(root, { childList: true, subtree: true });
+      contentObserver.observe(root, { childList: true, subtree: true });
     }
 
-    requestAnimationFrame(attemptCollect);
+    const root = document.querySelector('.spec-viewer');
+    if (root) {
+      attachContentObserver(root);
+    } else {
+      // Markdown loads async; .spec-viewer may not exist on mount. Watch the
+      // body until it appears, then switch to the content observer.
+      bodyObserver = new MutationObserver(() => {
+        if (cancelled) return;
+        const r = document.querySelector('.spec-viewer');
+        if (r) {
+          bodyObserver.disconnect();
+          bodyObserver = null;
+          attachContentObserver(r);
+        }
+      });
+      bodyObserver.observe(document.body, { childList: true, subtree: true });
+    }
 
     return () => {
       cancelled = true;
-      if (observer) observer.disconnect();
+      if (contentObserver) contentObserver.disconnect();
+      if (bodyObserver) bodyObserver.disconnect();
       if (debounceTimer) clearTimeout(debounceTimer);
     };
   }, []);

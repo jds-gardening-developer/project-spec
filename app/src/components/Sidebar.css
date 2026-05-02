@@ -31,6 +31,11 @@
     max-width: 320px;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
   }
+  /* When the drawer is open, push nav content below the fixed hamburger
+     button (top:12 + ~32px tap target) so the first link is fully visible. */
+  .sidebar[data-drawer-open="true"] nav {
+    padding-top: 56px;
+  }
 }
 
 /* --- Plan 03-02: list, items, active-state, mobile hamburger (D-01..D-04) --- */
