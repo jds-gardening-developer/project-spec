@@ -25,7 +25,7 @@
     "title": "PRD-0.1 \\- Login Permissions",
     "prd_id": null,
     "level": 1,
-    "body": "Super Admin\n\n* **Super Admin** — Can do everything that admin can do.\nCan Add & Remove Staff.  \nCan view all updates made via user action log - accessible through main menu -- see PRD 0.2.\n\n* **Admin** — Full ERP Access. Create POs, Quotes, Orders, update stock. \n\n* **Staff Member** — PWA Access only (No ERP login).\n\n**Note:** Super Admin \\= Josh only. Admin \\= Jake and office staff. Staff \\= nursery team on PWA."
+    "body": "The ERP and customer portals support four login roles. **Staff members do not have a login** — they use the PWA only for stock updates and cannot access the ERP or any customer portal.\n\n* **Super Admin** — Full ERP access plus the ability to add/remove staff PWA accounts and view the user-action audit log (see PRD-0.2). Super Admin = Josh only.\n\n* **Admin** — Full ERP access. Create POs, quotes, and orders; update stock; manage customers. Admin = Jake and office staff.\n\n* **Trade Customer** — Logs into the trade portal to search plants, request quotes, and place orders against account credit (see PRD-2.1.1).\n\n* **Retail Customer** — Logs into the retail portal to browse retail-ready stock and place mail-order purchases (see PRD-2.1.2).\n\n* **Staff Member (no login)** — Nursery team. Uses th…"
   },
   {
     "id": "prd---02---stock-updates-for-super-admin",
@@ -564,42 +564,42 @@
     "title": "PRD-05: ERP Portals \\- DISCUSS WITH TEAM",
     "prd_id": null,
     "level": 1,
-    "body": "MacPlants Users: Admin, Staff Customers: Retail, Trade"
+    "body": "This PRD breaks down each login portal — its URL and what the user sees once inside. The role definitions live in PRD-0.1; this PRD is the per-portal counterpart. **Staff members do not log in anywhere** (see PRD-0.1) — they use the PWA only.\n\nMacPlants users: Super Admin, Admin. Customers: Retail, Trade."
   },
   {
     "id": "50-super-admin-portal",
-    "title": "5.0 Super Admin portal",
+    "title": "5.0 Super Admin Portal",
     "prd_id": null,
     "level": 2,
-    "body": ".[staff.macplants.co.uk/login](http://staff.macplants.co.uk/login)"
+    "body": "* **Login URL:** [staff.macplants.co.uk/login](http://staff.macplants.co.uk/login)\n* **Who:** Josh only (see PRD-0.1).\n* **What they see:** Everything the Admin portal shows, plus a \"Logs\" / \"Stock Updates\" menu item that opens the user-action audit log (see PRD-0.2), and the staff-management screen for adding/removing staff PWA accounts."
   },
   {
     "id": "51-admin-portal",
     "title": "5.1 Admin Portal",
     "prd_id": null,
     "level": 2,
-    "body": ".staff.macplants.co.uk/login"
+    "body": "* **Login URL:** staff.macplants.co.uk/login\n* **Who:** Jake and office staff (see PRD-0.1).\n* **What they see:** Full ERP minus Super-Admin-only tools. Manage POs (PRD-1.1), customers (PRD-2), quotes/orders (PRD-03), refunds and credit notes (PRD-3.2), and stock (PRD-1)."
   },
   {
     "id": "52-staff-portal",
     "title": "5.2 Staff Portal",
     "prd_id": null,
     "level": 2,
-    "body": ".staff.macplants.co.uk/login"
+    "body": "Staff members do **not** log into the ERP or any web portal. They use the PWA only for stock updates. See PRD-0.1."
   },
   {
     "id": "53-retail-customer-portal",
     "title": "5.3 Retail Customer Portal",
     "prd_id": null,
     "level": 2,
-    "body": ".retail.macplants.co.uk/login"
+    "body": "* **Login URL:** retail.macplants.co.uk/login\n* **Who:** Retail customers (see PRD-2.1.2). Credentials are created by MacPlants staff — no self-registration.\n* **What they see:** Retail-ready stock for browsing and mail-order purchases, plus their order history."
   },
   {
     "id": "54-trade-customer-portal",
     "title": "5.4 Trade Customer Portal",
     "prd_id": null,
     "level": 2,
-    "body": "Login URL: /.trade.macplants.co.uk/login Integration: Stripe"
+    "body": "* **Login URL:** trade.macplants.co.uk/login\n* **Integration:** Stripe (for top-ups when a basket exceeds the trade customer's credit limit).\n* **Who:** Trade customers (see PRD-2.1.1). Credentials are created by MacPlants staff — no self-registration.\n* **What they see:** Non-retail-ready stock with quantities and trade pricing, account financial summary (outstanding balance, available credit, current balance), and the quote-or-instant-buy purchase paths described below."
   },
   {
     "id": "what-is-it-6",

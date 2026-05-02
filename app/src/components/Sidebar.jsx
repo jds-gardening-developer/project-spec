@@ -167,6 +167,27 @@ export function Sidebar() {
               260501-wll: leaf logo added on the same row — clicking it clears
               the hash and scrolls to top, returning to the spec home. */}
           <ul className="sidebar-list sidebar-list--static">
+            <li className="sidebar-item">
+              <a
+                href="#/"
+                className={
+                  'sidebar-link sidebar-link--h2 sidebar-link--static' +
+                  (route === 'spec' ? ' sidebar-link--active' : '')
+                }
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    if (window.location.hash) {
+                      window.location.hash = '';
+                    }
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                  setDrawerOpen(false);
+                }}
+              >
+                Home
+              </a>
+            </li>
             <li className="sidebar-item sidebar-static-row">
               <a
                 href="#/"

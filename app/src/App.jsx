@@ -2,8 +2,8 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import SpecViewer from './SpecViewer.jsx';
 import manifest from './manifest.json';
 import { Sidebar } from './components/Sidebar.jsx';
-import { MobileTocBar } from './components/MobileTocBar.jsx';
 import { SearchPanel } from './components/SearchPanel.jsx';
+import { BackToTop } from './components/BackToTop.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 import { useHashScroll } from './components/useHashScroll.js';
 import { useRoute } from './components/useRoute.js';
@@ -125,7 +125,6 @@ export default function App() {
             </>
           ) : (
             <>
-              <MobileTocBar />
               <header>
                 <small>
                   Viewing: <code>project-spec/{newest?.filename}</code>
@@ -137,6 +136,7 @@ export default function App() {
         </main>
         <SearchPanel />
       </div>
+      <BackToTop />
     </>
   );
 }

@@ -1,0 +1,37 @@
+.back-to-top {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #2c8d4f;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease, background 120ms ease;
+  z-index: 60;
+}
+
+.back-to-top--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover,
+.back-to-top:focus-visible {
+  background: #257a43;
+  outline: none;
+}
+
+.back-to-top:focus-visible {
+  box-shadow: 0 0 0 3px rgba(44, 141, 79, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
