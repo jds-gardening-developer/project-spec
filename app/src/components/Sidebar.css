@@ -143,6 +143,16 @@
   font-size: 13px;
 }
 
+.sidebar-section-label {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--sidebar-text);
+  opacity: 0.55;
+}
+
 /* Hamburger — visible only below 768px (D-02). Lives outside the <aside>
  * so it remains tappable when the drawer is hidden. */
 .sidebar-hamburger {

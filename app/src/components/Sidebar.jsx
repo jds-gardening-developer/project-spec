@@ -257,6 +257,31 @@ export function Sidebar() {
               </a>
             </li>
           </ul>
+          {/* External links injected here (not in the markdown) so the
+              update-spec LLM flow can't strip them on next run. */}
+          <ul className="sidebar-list sidebar-list--static">
+            <li className="sidebar-section-label">Important links</li>
+            <li className="sidebar-item">
+              <a
+                href="https://erp-platform-env-prototype-mac-plants.vercel.app/plants"
+                className="sidebar-link sidebar-link--h2 sidebar-link--static"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Live prototype ↗
+              </a>
+            </li>
+            <li className="sidebar-item">
+              <a
+                href="https://docs.google.com/document/d/1AFj8xlFnNWD609hpKOWQ4u3xq63d-dZCAe03770XuzM/edit"
+                className="sidebar-link sidebar-link--h2 sidebar-link--static"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Google Doc source ↗
+              </a>
+            </li>
+          </ul>
           {groups.length === 0 ? (
             <p className="sidebar-empty">
               {route === 'schema' ? '(open the spec to see PRD nav)' : '(no sections)'}
