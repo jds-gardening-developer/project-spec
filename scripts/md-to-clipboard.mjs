@@ -27,6 +27,47 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { marked } from "marked";
 
+// ---------- table styling for Google Docs ----------
+// Google Docs respects inline styles + `bgcolor` on pasted HTML. Marked emits
+// bare <table>/<th>/<td> which Docs renders with a near-zero column width.
+// We inject inline styles to force a navy header, padded cells, alternating
+// rows, and full table width.
+const TABLE_STYLE = "width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; margin: 1em 0; font-size: 11pt;";
+const TH_STYLE = "background-color: #2c3e50; color: #ffffff; padding: 6px 12px; text-align: left; font-weight: bold; border: 1px solid #2c3e50;";
+const TD_STYLE = "padding: 4px 12px; border: 1px solid #d6dde4; vertical-align: top;";
+const ROW_EVEN = "#ffffff";
+const ROW_ODD = "#f4f6f8";
+
+function styleTables(html) {
+  let out = html.replace(/<table>/g, `<table width="100%" cellpadding="0" cellspacing="0" style="${TABLE_STYLE}">`);
+
+  out = out.replace(/<th(\s[^>]*)?>/g, (match, attrs = "") => {
+    if (/style="/i.test(attrs)) {
+      return match.replace(/style="([^"]*)"/i, (_, existing) => `style="${existing}; ${TH_STYLE}"`);
+    }
+    return `<th${attrs} style="${TH_STYLE}">`;
+  });
+
+  out = out.replace(/<td(\s[^>]*)?>/g, (match, attrs = "") => {
+    if (/style="/i.test(attrs)) {
+      return match.replace(/style="([^"]*)"/i, (_, existing) => `style="${existing}; ${TD_STYLE}"`);
+    }
+    return `<td${attrs} style="${TD_STYLE}">`;
+  });
+
+  out = out.replace(/<tbody>([\s\S]*?)<\/tbody>/g, (_, body) => {
+    let i = 0;
+    const newBody = body.replace(/<tr>/g, () => {
+      const bg = i % 2 === 0 ? ROW_EVEN : ROW_ODD;
+      i += 1;
+      return `<tr bgcolor="${bg}" style="background-color: ${bg};">`;
+    });
+    return `<tbody>${newBody}</tbody>`;
+  });
+
+  return out;
+}
+
 // ---------- args ----------
 if (process.platform !== "darwin") {
   console.error("This script is macOS-only — it uses osascript to set the clipboard as text/html.");
@@ -84,7 +125,7 @@ console.log(`Source size    : ${md.length.toLocaleString()} chars`);
 
 // ---------- render ----------
 marked.setOptions({ gfm: true, breaks: false });
-const html = marked.parse(md);
+const html = styleTables(marked.parse(md));
 
 console.log(`HTML size      : ${html.length.toLocaleString()} chars`);
 

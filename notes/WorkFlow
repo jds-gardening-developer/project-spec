@@ -1,0 +1,20 @@
+The cheap path
+Don't manually fix every heading. Instead, use Google Docs' "Paste from Markdown":
+
+Open project-spec/2026-05-04.md (the clean export the script just produced)
+Copy all of it
+In the Google Doc, select the entire current ProductSpecDoc tab content and delete it
+Format → Paste from Markdown (or Cmd+Shift+V once you've enabled the setting)
+Google converts as it pastes: # → Heading 1, ## → Heading 2, **bold** → real bold, | Field | Type | tables → native Google tables, etc.
+Net result: the Google Doc looks like a proper document, and future exports stay clean.
+
+Caveats worth eyeballing afterwards
+A few things might not survive cleanly and are worth a 30-second skim after the paste:
+
+Backslash escapes like created\_at, \=== — these are deliberately in the markdown to prevent Google's exporter from interpreting _ as italic or = as Setext heading. After paste, Google might display them with the backslashes literal. If so, find-and-replace \_ → _ etc. (Or just leave them — they'll look ugly in the Doc but export fine.)
+The sentinel marker =============== EndOfProductSpecDoc ================= will probably become a Heading 1 on paste (since markdown sees rows of = as a Setext heading underline). Just unstyle that line back to plain paragraph after pasting.
+Per-line indentation on PRD-1.1+ — if those PRDs are still nested in a list in the new pasted version, you'd want to bump them out (Shift+Tab) so they sit at the top level. The "Paste from Markdown" should handle this correctly though, since it goes by markdown structure not visual indent.
+Reality check
+The only reason not to do this: if you regularly accept comments/edits from Josh and Arian via the Google Doc, and they've been working with the current "literal markdown syntax" view, switching to native styles changes the editing experience for them too. If they'll be fine with it (or they barely touch the Doc structure anyway), the upgrade is purely positive.
+
+Want me to anything on the repo side to support this — e.g. bump the script's behaviour now that the export will be cleaner — or is this purely a "you go do the Doc cleanup" task?

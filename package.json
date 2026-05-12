@@ -16,9 +16,9 @@
     "build-manifest": "node scripts/build-manifest.mjs",
     "build-search-index": "node scripts/build-search-index.mjs",
     "build-schema-index": "node scripts/build-schema-index.mjs",
-    "md-to-clipboard": "node scripts/md-to-clipboard.mjs",
+    "md-copy": "node scripts/md-to-clipboard.mjs",
     "update-spec": "node scripts/update-spec.mjs",
-    "pull-doc": "node scripts/pull-doc.mjs",
+    "pull-gdrive-doc": "node scripts/pull-doc.mjs",
     "test": "node --test app/src/components/*.test.js scripts/*.test.js"
   },
   "dependencies": {
