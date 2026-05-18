@@ -3,6 +3,7 @@
  *
  * Returns one of:
  *   - 'schema'  when the URL hash is #/schema (with or without a sub-path)
+ *   - 'component-map' when the URL hash is #/component-map (with or without a sub-path)
  *   - 'stage-2' when the URL hash is #/stage-2 (with or without a sub-path)
  *   - 'spec'    otherwise — including the empty hash, plain section
  *               anchors like #prd-1-1, and Phase-3-style #/prd-1-1 deep-links
@@ -19,6 +20,7 @@
 import { useEffect, useState } from 'react';
 
 const SCHEMA_ROUTE_RE = /^#?\/?schema(?:\/.*)?$/i;
+const COMPONENT_MAP_ROUTE_RE = /^#?\/?component-map(?:\/.*)?$/i;
 const STAGE2_ROUTE_RE = /^#?\/?stage-2(?:\/.*)?$/i;
 
 /**
@@ -26,6 +28,8 @@ const STAGE2_ROUTE_RE = /^#?\/?stage-2(?:\/.*)?$/i;
  *   '#/schema'        → 'schema'
  *   '#/schema/foo'    → 'schema'
  *   '#schema'         → 'schema'  (tolerant of missing slash)
+ *   '#/component-map'  → 'component-map'
+ *   '#component-map'   → 'component-map'
  *   '#/stage-2'       → 'stage-2'
  *   '#stage-2'        → 'stage-2'
  *   '#/prd-1-1'       → 'spec'
@@ -36,6 +40,7 @@ const STAGE2_ROUTE_RE = /^#?\/?stage-2(?:\/.*)?$/i;
 export function parseHashRoute(hash) {
   if (typeof hash !== 'string') return 'spec';
   if (SCHEMA_ROUTE_RE.test(hash)) return 'schema';
+  if (COMPONENT_MAP_ROUTE_RE.test(hash)) return 'component-map';
   if (STAGE2_ROUTE_RE.test(hash)) return 'stage-2';
   return 'spec';
 }

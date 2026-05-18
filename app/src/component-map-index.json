@@ -1,0 +1,528 @@
+{
+  "source": "project-spec\\2026-05-04.md",
+  "generated_at": "2026-05-18T10:37:26.719Z",
+  "components": [
+    {
+      "name": "Credit Note Allocation",
+      "prd_id": "prd-3-2",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Invoice",
+      "prd_id": "prd-03",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Note",
+      "prd_id": "prd-1-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "prd_id": "prd-03",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Order — delivery-related fields",
+      "prd_id": "prd-3-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Order Line Item",
+      "prd_id": "prd-03",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Plant",
+      "prd_id": "prd-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Plant Batch",
+      "prd_id": "prd-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Plant Variant",
+      "prd_id": "prd-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Purchase Order",
+      "prd_id": "prd-1-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Purchase Order Line Item",
+      "prd_id": "prd-1-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Quote",
+      "prd_id": "prd-03",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Quote Line Item",
+      "prd_id": "prd-03",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Refund / Credit Note",
+      "prd_id": "prd-3-2",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Retail Customer",
+      "prd_id": "prd-2-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Shrinkage Record",
+      "prd_id": "prd-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Supplier",
+      "prd_id": "prd-1-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Task",
+      "prd_id": "prd-04",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "Trade Customer",
+      "prd_id": "prd-2-1",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "prd_id": "",
+      "subpages": [
+        {
+          "id": "list",
+          "label": "List"
+        },
+        {
+          "id": "create-edit",
+          "label": "Create / Edit"
+        },
+        {
+          "id": "preview",
+          "label": "Preview"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "Credit Note Allocation",
+      "to": "Invoice",
+      "label": "invoice"
+    },
+    {
+      "from": "Credit Note Allocation",
+      "to": "User",
+      "label": "allocated_by"
+    },
+    {
+      "from": "Invoice",
+      "to": "Order",
+      "label": "order"
+    },
+    {
+      "from": "Invoice",
+      "to": "User",
+      "label": "marked_paid_by (nullable)"
+    },
+    {
+      "from": "Note",
+      "to": "User",
+      "label": "author"
+    },
+    {
+      "from": "Order",
+      "to": "Quote",
+      "label": "source_quote (nullable)"
+    },
+    {
+      "from": "Order",
+      "to": "User",
+      "label": "assigned_picker (nullable)"
+    },
+    {
+      "from": "Order Line Item",
+      "to": "Order",
+      "label": "order"
+    },
+    {
+      "from": "Order Line Item",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "Order",
+      "label": "reserved_against (nullable)"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Plant Batch",
+      "to": "User",
+      "label": "last_updated_by"
+    },
+    {
+      "from": "Plant Variant",
+      "to": "Plant",
+      "label": "plant"
+    },
+    {
+      "from": "Purchase Order",
+      "to": "Supplier",
+      "label": "supplier"
+    },
+    {
+      "from": "Purchase Order",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Purchase Order",
+      "to": "User",
+      "label": "reconciled_by (nullable)"
+    },
+    {
+      "from": "Purchase Order Line Item",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Purchase Order Line Item",
+      "to": "Purchase Order",
+      "label": "purchase_order"
+    },
+    {
+      "from": "Quote",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Quote Line Item",
+      "to": "Plant Variant",
+      "label": "plant_variant"
+    },
+    {
+      "from": "Quote Line Item",
+      "to": "Quote",
+      "label": "quote"
+    },
+    {
+      "from": "Refund / Credit Note",
+      "to": "Invoice",
+      "label": "invoice"
+    },
+    {
+      "from": "Refund / Credit Note",
+      "to": "Order",
+      "label": "order"
+    },
+    {
+      "from": "Refund / Credit Note",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Shrinkage Record",
+      "to": "Plant Batch",
+      "label": "plant_batch"
+    },
+    {
+      "from": "Shrinkage Record",
+      "to": "User",
+      "label": "recorded_by"
+    },
+    {
+      "from": "Task",
+      "to": "User",
+      "label": "assignee"
+    },
+    {
+      "from": "Task",
+      "to": "User",
+      "label": "completed_by (nullable)"
+    },
+    {
+      "from": "Task",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Trade Customer",
+      "to": "User",
+      "label": "created_by"
+    },
+    {
+      "from": "Trade Customer",
+      "to": "User",
+      "label": "portal_login"
+    }
+  ]
+}

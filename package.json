@@ -8,14 +8,15 @@
     "node": ">=20"
   },
   "scripts": {
-    "predev": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs && node scripts/build-schema-index.mjs",
+    "predev": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs && node scripts/build-schema-index.mjs && node scripts/build-component-map-index.mjs",
     "dev": "vite --config app/vite.config.js",
-    "prebuild": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs && node scripts/build-schema-index.mjs",
+    "prebuild": "node scripts/build-manifest.mjs && node scripts/build-search-index.mjs && node scripts/build-schema-index.mjs && node scripts/build-component-map-index.mjs",
     "build": "vite build --config app/vite.config.js",
     "preview": "vite preview --config app/vite.config.js",
     "build-manifest": "node scripts/build-manifest.mjs",
     "build-search-index": "node scripts/build-search-index.mjs",
     "build-schema-index": "node scripts/build-schema-index.mjs",
+    "build-component-map-index": "node scripts/build-component-map-index.mjs",
     "md-copy": "node scripts/md-to-clipboard.mjs",
     "update-spec": "node scripts/update-spec.mjs",
     "pull-gdrive-doc": "node scripts/pull-doc.mjs",

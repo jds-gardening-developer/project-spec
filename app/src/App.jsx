@@ -11,6 +11,7 @@ import { useRoute } from './components/useRoute.js';
 // React.lazy ensures SchemaPage + its dynamic-imported schema-index.json land
 // in their own Vite chunks. The main bundle gains only the lazy() wrapper.
 const SchemaPage = lazy(() => import('./components/SchemaPage.jsx'));
+const ComponentMapPage = lazy(() => import('./components/ComponentMapPage.jsx'));
 
 // Vite globs — resolved at build time. Keys are import paths relative to this
 // file; values are functions returning Promise<string of file contents>.
@@ -113,6 +114,10 @@ export default function App() {
           {route === 'schema' ? (
             <Suspense fallback={<p>Loading schema…</p>}>
               <SchemaPage />
+            </Suspense>
+          ) : route === 'component-map' ? (
+            <Suspense fallback={<p>Loading component map…</p>}>
+              <ComponentMapPage />
             </Suspense>
           ) : route === 'stage-2' ? (
             <>

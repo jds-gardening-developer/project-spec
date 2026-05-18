@@ -28,6 +28,18 @@ describe('parseHashRoute', () => {
     assert.equal(parseHashRoute('#/schema/foo/bar'), 'schema');
   });
 
+  it("'#/component-map' → 'component-map'", () => {
+    assert.equal(parseHashRoute('#/component-map'), 'component-map');
+  });
+
+  it("'#component-map' → 'component-map' (tolerant of missing leading slash)", () => {
+    assert.equal(parseHashRoute('#component-map'), 'component-map');
+  });
+
+  it("'#/component-map/anything' → 'component-map'", () => {
+    assert.equal(parseHashRoute('#/component-map/foo'), 'component-map');
+  });
+
   it("'#/stage-2' → 'stage-2'", () => {
     assert.equal(parseHashRoute('#/stage-2'), 'stage-2');
   });
@@ -61,6 +73,7 @@ describe('parseHashRoute', () => {
   it('case-insensitive', () => {
     assert.equal(parseHashRoute('#/SCHEMA'), 'schema');
     assert.equal(parseHashRoute('#/Schema'), 'schema');
+    assert.equal(parseHashRoute('#/Component-Map'), 'component-map');
   });
 });
 

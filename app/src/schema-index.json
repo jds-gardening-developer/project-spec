@@ -1,10 +1,10 @@
 {
-  "source": "project-spec/2026-05-02.md",
-  "generated_at": "2026-05-02T14:22:53.309Z",
+  "source": "project-spec\\2026-05-04.md",
+  "generated_at": "2026-05-18T10:37:26.648Z",
   "entities": [
     {
       "name": "User",
-      "prd_id": "prd-0",
+      "prd_id": "",
       "fields": [
         {
           "name": "role",
@@ -101,7 +101,7 @@
         {
           "name": "sku",
           "type": "string",
-          "notes": "SKU generated as per industry standard.  single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW"
+          "notes": "SKU generated as per industry standard. single source of truth across ERP, EPOS & labels \\- Need this to communicate with EPOS NOW"
         },
         {
           "name": "Plant_ID",
@@ -263,8 +263,8 @@
         },
         {
           "name": "notes",
-          "type": "string",
-          "notes": "addable at any stage"
+          "type": "array\\[Note\\]",
+          "notes": "addable at any stage by Admin / Super Admin; see Note entity below"
         },
         {
           "name": "created_by",
@@ -362,6 +362,37 @@
           "name": "address",
           "type": "string",
           "notes": ""
+        }
+      ]
+    },
+    {
+      "name": "Note",
+      "prd_id": "prd-1-1",
+      "fields": [
+        {
+          "name": "author",
+          "type": "FK → User",
+          "notes": "who added the note"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "notes": "when the note was added (date \\+ time)"
+        },
+        {
+          "name": "body",
+          "type": "string",
+          "notes": "the note content"
+        },
+        {
+          "name": "parent_type",
+          "type": "enum",
+          "notes": "Purchase Order / Quote / Order"
+        },
+        {
+          "name": "parent_number",
+          "type": "string",
+          "notes": "po_number, quote_number, or order_number"
         }
       ]
     },
@@ -517,14 +548,14 @@
           "notes": "2 weeks from sent — REQUIRED?"
         },
         {
-          "name": "notes",
-          "type": "string",
-          "notes": "customer-visible, quote-level"
+          "name": "external_notes",
+          "type": "array\\[Note\\]",
+          "notes": "customer-visible thread between Admin / Super Admin and the trade customer; either side can append. Carries over to the Order on conversion (see Note entity in PRD-1.1)"
         },
         {
           "name": "internal_notes",
-          "type": "string",
-          "notes": "not customer-visible"
+          "type": "array\\[Note\\]",
+          "notes": "admin / staff only; not visible to the customer. Carries over to the Order on conversion (see Note entity in PRD-1.1)"
         }
       ]
     },
@@ -609,9 +640,14 @@
           "notes": "manually assigned by Admin from Ready-to-Pick stage"
         },
         {
-          "name": "notes",
-          "type": "string",
-          "notes": ""
+          "name": "external_notes",
+          "type": "array\\[Note\\]",
+          "notes": "customer-visible thread shared with the trade customer; either side can append. Persisted from the source Quote on conversion (see Note entity in PRD-1.1)"
+        },
+        {
+          "name": "internal_notes",
+          "type": "array\\[Note\\]",
+          "notes": "admin / staff only; not visible to the customer. Persisted from the source Quote on conversion (see Note entity in PRD-1.1)"
         },
         {
           "name": "created_at",
@@ -957,6 +993,11 @@
       "from": "Invoice",
       "to": "User",
       "label": "marked_paid_by (nullable)"
+    },
+    {
+      "from": "Note",
+      "to": "User",
+      "label": "author"
     },
     {
       "from": "Order",

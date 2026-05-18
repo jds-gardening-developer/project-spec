@@ -244,6 +244,20 @@ export function Sidebar() {
             </li>
             <li className="sidebar-item">
               <a
+                href="#/component-map"
+                className={
+                  'sidebar-link sidebar-link--h2 sidebar-link--static' +
+                  (route === 'component-map' ? ' sidebar-link--active' : '')
+                }
+                onClick={() => {
+                  setDrawerOpen(false);
+                }}
+              >
+                Component Map
+              </a>
+            </li>
+            <li className="sidebar-item">
+              <a
                 href="#/stage-2"
                 className={
                   'sidebar-link sidebar-link--h2 sidebar-link--static' +
